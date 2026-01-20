@@ -1,12 +1,12 @@
 import { AppLayout } from "@/components/layout/AppLayout";
-import Dashboard from "./Dashboard";
+import Domains from "./Domains";
 
-const Index = () => {
+const DomainsPage = () => {
   return (
     <AppLayout>
-      <Dashboard />
+      <Domains />
     </AppLayout>
   );
 };
 
-export default Index;
+export default DomainsPage;
