@@ -12,12 +12,11 @@ export default function Dashboard() {
   
   // Calculate stats
   const totalDomains = mockDomains.length;
-  const activeDomains = mockDomains.filter(d => d.status === "active").length;
+  const activeDomains = mockDomains.filter(d => d.status === "actual").length;
   const expiringDomains = mockDomains.filter(d => {
     const daysLeft = differenceInDays(parseISO(d.expirationDate), new Date());
     return daysLeft <= 30 && daysLeft > 0;
   });
-  const expiredDomains = mockDomains.filter(d => d.status === "expired");
   const sslIssues = mockDomains.filter(d => d.sslStatus === "expired" || d.sslStatus === "none");
 
   // Get domains requiring attention

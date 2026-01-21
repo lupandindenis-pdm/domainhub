@@ -4,21 +4,25 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/components/language-provider";
 
 const statusConfig: Record<DomainStatus, { label: string; className: string }> = {
-  active: { 
-    label: "status.active", 
-    className: "text-[hsl(142,76%,36%)]" 
+  actual: {
+    label: "status.actual",
+    className: "bg-emerald-200 text-emerald-900",
   },
-  expiring: { 
-    label: "status.expiring", 
-    className: "text-[hsl(38,92%,50%)]" 
+  not_actual: {
+    label: "status.not_actual",
+    className: "bg-rose-200 text-rose-950",
   },
-  expired: { 
-    label: "status.expired", 
-    className: "text-[hsl(0,85%,75%)]" 
+  unknown: {
+    label: "status.unknown",
+    className: "bg-amber-200 text-amber-950",
   },
-  reserved: { 
-    label: "status.reserved", 
-    className: "text-muted-foreground" 
+  not_configured: {
+    label: "status.not_configured",
+    className: "bg-slate-200 text-slate-800",
+  },
+  spare: {
+    label: "status.spare",
+    className: "bg-indigo-200 text-indigo-950",
   },
 };
 
@@ -32,8 +36,15 @@ export function DomainStatusBadge({ status, className }: DomainStatusBadgeProps)
   const { t } = useLanguage();
   
   return (
-    <span className={cn("text-sm font-normal", config.className, className)}>
+    <Badge
+      variant="secondary"
+      className={cn(
+        "border-0 px-3 py-1 text-sm font-medium leading-none",
+        config.className,
+        className,
+      )}
+    >
       {t(config.label)}
-    </span>
+    </Badge>
   );
 }

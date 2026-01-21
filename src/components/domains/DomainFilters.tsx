@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -6,10 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Search, X, Download, Filter } from "lucide-react";
+import { X, Download } from "lucide-react";
 import { DomainFilter, DomainType, DomainStatus } from "@/types/domain";
-import { projects, departments, registrars } from "@/data/mockDomains";
+import { projects } from "@/data/mockDomains";
 import { useLanguage } from "@/components/language-provider";
 
 const domainTypes: { value: DomainType; label: string }[] = [
@@ -25,11 +25,20 @@ const domainTypes: { value: DomainType; label: string }[] = [
 ];
 
 const domainStatuses: { value: DomainStatus; label: string }[] = [
-  { value: "active", label: "status.active" },
-  { value: "expiring", label: "status.expiring" },
-  { value: "expired", label: "status.expired" },
-  { value: "reserved", label: "status.reserved" },
+  { value: "spare", label: "status.spare" },
+  { value: "actual", label: "status.actual" },
+  { value: "not_actual", label: "status.not_actual" },
+  { value: "not_configured", label: "status.not_configured" },
+  { value: "unknown", label: "status.unknown" },
 ];
+
+const statusBadgeClass: Record<DomainStatus, string> = {
+  actual: "bg-emerald-200 text-emerald-900",
+  not_actual: "bg-rose-200 text-rose-950",
+  unknown: "bg-amber-200 text-amber-950",
+  not_configured: "bg-slate-200 text-slate-800",
+  spare: "bg-indigo-200 text-indigo-950",
+};
 
 interface DomainFiltersProps {
   filters: DomainFilter;
@@ -43,8 +52,7 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
     filters.search || 
     filters.types?.length || 
     filters.statuses?.length || 
-    filters.projects?.length ||
-    filters.registrars?.length;
+    filters.projects?.length;
 
   const clearFilters = () => {
     onFiltersChange({});
@@ -91,7 +99,15 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
             <SelectItem value="all">{t("filters.all_statuses")}</SelectItem>
             {domainStatuses.map((status) => (
               <SelectItem key={status.value} value={status.value}>
-                {t(status.label)}
+                <Badge
+                  variant="secondary"
+                  className={
+                    "border-0 px-3 py-1 text-sm font-medium leading-none " +
+                    statusBadgeClass[status.value]
+                  }
+                >
+                  {t(status.label)}
+                </Badge>
               </SelectItem>
             ))}
           </SelectContent>
@@ -114,28 +130,6 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
             {projects.map((project) => (
               <SelectItem key={project} value={project}>
                 {project}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={filters.registrars?.[0] || "all"}
-          onValueChange={(value) => 
-            onFiltersChange({ 
-              ...filters, 
-              registrars: value === "all" ? undefined : [value] 
-            })
-          }
-        >
-          <SelectTrigger className="w-[150px] bg-secondary border-0">
-            <SelectValue placeholder={t("filters.registrar")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("filters.all_registrars")}</SelectItem>
-            {registrars.map((registrar) => (
-              <SelectItem key={registrar} value={registrar}>
-                {registrar}
               </SelectItem>
             ))}
           </SelectContent>

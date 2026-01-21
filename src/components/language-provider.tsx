@@ -58,10 +58,11 @@ const translations: Translations = {
     "badges.b2b": "B2B",
     "badges.site": "Сайты",
 
-    "status.active": "Активен",
-    "status.expiring": "Истекает",
-    "status.expired": "Истёк",
-    "status.reserved": "Резерв",
+    "status.spare": "Запасной",
+    "status.actual": "Актуален",
+    "status.not_actual": "Не актуален",
+    "status.not_configured": "Не настроен",
+    "status.unknown": "Не известно",
 
     "history": "История",
     "alerts": "Алерты",
@@ -126,10 +127,11 @@ const translations: Translations = {
     "badges.b2b": "B2B",
     "badges.site": "Sites",
 
-    "status.active": "Active",
-    "status.expiring": "Expiring",
-    "status.expired": "Expired",
-    "status.reserved": "Reserved",
+    "status.spare": "Spare",
+    "status.actual": "Actual",
+    "status.not_actual": "Not actual",
+    "status.not_configured": "Not configured",
+    "status.unknown": "Unknown",
 
     "history": "History",
     "alerts": "Alerts",
