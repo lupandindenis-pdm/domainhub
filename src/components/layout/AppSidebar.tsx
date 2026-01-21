@@ -57,13 +57,13 @@ export function AppSidebar() {
       <SidebarMenuButton asChild>
         <NavLink
           to={item.url}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+          className={
             isActive(item.url)
               ? "bg-primary/10 text-primary font-medium"
               : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-          }`}
+          }
         >
-          <item.icon className="h-4 w-4 shrink-0" />
+          <item.icon className="shrink-0" />
           {!collapsed && <span>{item.title}</span>}
         </NavLink>
       </SidebarMenuButton>
@@ -72,9 +72,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+      <SidebarHeader className={collapsed ? "border-b border-sidebar-border p-2" : "border-b border-sidebar-border px-4 py-4"}>
+        <div className={collapsed ? "flex w-full items-center justify-center" : "flex items-center gap-3"}>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
             <Globe className="h-4 w-4 text-primary-foreground" />
           </div>
           {!collapsed && (
