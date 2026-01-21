@@ -81,17 +81,18 @@
   }
 
   .light {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 224 71% 4%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 224 71% 4%;
 
+    /* Same electric blue accent as dark mode */
     --primary: 210 100% 52%;
-    --primary-foreground: 210 40% 98%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
@@ -115,11 +116,11 @@
     --input: 214 32% 91%;
     --ring: 210 100% 52%;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 210 40% 98%;
     --sidebar-foreground: 240 5% 26%;
     --sidebar-primary: 210 100% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent: 210 40% 93%;
     --sidebar-accent-foreground: 222 47% 11%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 210 100% 52%;

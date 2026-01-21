@@ -23,6 +23,7 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const mainNavItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -128,16 +129,19 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className={collapsed ? "border-t border-sidebar-border px-2 py-3" : "border-t border-sidebar-border px-4 py-3"}>
-        <div className={collapsed ? "flex items-center justify-center" : "flex items-center gap-3"}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
-            АИ
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col">
-              <span className="text-sm text-sidebar-foreground">Админ</span>
-              <span className="text-xs text-sidebar-foreground/60">Администратор</span>
+        <div className={collapsed ? "flex flex-col items-center justify-center gap-2" : "flex items-center justify-between gap-3"}>
+          <div className={collapsed ? "flex items-center justify-center" : "flex items-center gap-3"}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
+              АИ
             </div>
-          )}
+            {!collapsed && (
+              <div className="flex flex-col">
+                <span className="text-sm text-sidebar-foreground">Админ</span>
+                <span className="text-xs text-sidebar-foreground/60">Администратор</span>
+              </div>
+            )}
+          </div>
+          <ModeToggle />
         </div>
       </SidebarFooter>
     </Sidebar>
