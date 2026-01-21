@@ -23,29 +23,31 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-const mainNavItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Реестр доменов", url: "/domains", icon: Globe },
-  { title: "Добавить домен", url: "/domains/new", icon: Plus },
-];
-
-const managementItems = [
-  { title: "История изменений", url: "/history", icon: History },
-  { title: "Алерты", url: "/alerts", icon: Bell },
-  { title: "Отчёты", url: "/reports", icon: FileText },
-];
-
-const adminItems = [
-  { title: "Пользователи", url: "/users", icon: Users },
-  { title: "Роли и доступ", url: "/roles", icon: Shield },
-  { title: "Настройки", url: "/settings", icon: Settings },
-];
+import { useLanguage } from "@/components/language-provider";
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const { t } = useLanguage();
+
+  const mainNavItems = [
+    { title: t("dashboard"), url: "/", icon: LayoutDashboard },
+    { title: t("domains.registry"), url: "/domains", icon: Globe },
+    { title: t("domains.add"), url: "/domains/new", icon: Plus },
+  ];
+
+  const managementItems = [
+    { title: t("history"), url: "/history", icon: History },
+    { title: t("alerts"), url: "/alerts", icon: Bell },
+    { title: t("reports"), url: "/reports", icon: FileText },
+  ];
+
+  const adminItems = [
+    { title: t("users"), url: "/users", icon: Users },
+    { title: t("roles"), url: "/roles", icon: Shield },
+    { title: t("settings"), url: "/settings", icon: Settings },
+  ];
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -79,8 +81,8 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-sidebar-foreground">DMS</span>
-              <span className="text-xs text-sidebar-foreground/60">Domain Management</span>
+              <span className="text-sm font-semibold text-sidebar-foreground">{t("app.title")}</span>
+              <span className="text-xs text-sidebar-foreground/60">{t("app.subtitle")}</span>
             </div>
           )}
         </div>
@@ -89,7 +91,7 @@ export function AppSidebar() {
       <SidebarContent className={collapsed ? "px-1 py-4" : "px-2 py-4"}>
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 text-xs uppercase tracking-wider text-sidebar-foreground/50">
-            Главное
+            {t("main")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -102,7 +104,7 @@ export function AppSidebar() {
 
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-xs uppercase tracking-wider text-sidebar-foreground/50">
-            Управление
+            {t("management")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -115,7 +117,7 @@ export function AppSidebar() {
 
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-xs uppercase tracking-wider text-sidebar-foreground/50">
-            Администрирование
+            {t("admin")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -135,7 +137,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="flex flex-col">
               <span className="text-sm text-sidebar-foreground">Админ</span>
-              <span className="text-xs text-sidebar-foreground/60">Администратор</span>
+              <span className="text-xs text-sidebar-foreground/60">{t("admin.role")}</span>
             </div>
           )}
         </div>

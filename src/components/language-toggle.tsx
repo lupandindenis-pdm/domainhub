@@ -1,15 +1,11 @@
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-
-type Language = "ru" | "en"
+import { useLanguage } from "@/components/language-provider"
 
 export function LanguageToggle() {
-  const [language, setLanguage] = useState<Language>("ru")
+  const { language, setLanguage } = useLanguage()
 
   const toggleLanguage = () => {
-    setLanguage((prev) => (prev === "ru" ? "en" : "ru"))
-    // In a real app, this would trigger i18n change
-    console.log(`Language switched to ${language === "ru" ? "en" : "ru"}`)
+    setLanguage(language === "ru" ? "en" : "ru")
   }
 
   return (
