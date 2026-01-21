@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const mainNavItems = [
-  { title: "Дашборд", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Реестр доменов", url: "/domains", icon: Globe },
   { title: "Добавить домен", url: "/domains/new", icon: Plus },
 ];
@@ -72,7 +72,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
+      <SidebarHeader className={collapsed ? "border-b border-sidebar-border px-2 py-4" : "border-b border-sidebar-border px-4 py-4"}>
         <div className={collapsed ? "flex w-full items-center justify-center gap-3" : "flex items-center gap-3"}>
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
             <Globe className="h-4 w-4 text-primary-foreground" />
@@ -86,7 +86,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-4">
+      <SidebarContent className={collapsed ? "px-1 py-4" : "px-2 py-4"}>
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 text-xs uppercase tracking-wider text-sidebar-foreground/50">
             Главное
@@ -127,7 +127,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border px-4 py-3">
+      <SidebarFooter className={collapsed ? "border-t border-sidebar-border px-2 py-3" : "border-t border-sidebar-border px-4 py-3"}>
         <div className={collapsed ? "flex items-center justify-center" : "flex items-center gap-3"}>
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
             АИ

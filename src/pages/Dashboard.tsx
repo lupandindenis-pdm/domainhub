@@ -36,7 +36,7 @@ export default function Dashboard() {
     <div className="space-y-6 animate-fade-in">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Дашборд</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">Обзор всех доменов компании</p>
       </div>
 
