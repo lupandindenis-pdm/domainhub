@@ -78,7 +78,7 @@ export function DomainTable({ domains }: DomainTableProps) {
               >
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-medium">{domain.name}</span>
+                    <span className="font-mono text-sm font-normal">{domain.name}</span>
                     <Button
                       variant="ghost"
                       size="icon"
