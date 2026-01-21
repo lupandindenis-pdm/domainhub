@@ -58,7 +58,7 @@ export function DomainTypeBadge({ type, className }: DomainTypeBadgeProps) {
   return (
     <Badge 
       variant="outline" 
-      className={cn("border font-normal flex justify-center items-center h-[24px] min-w-[100px]", config.className, className)}
+      className={cn("border font-normal flex justify-center items-center h-[26px] px-3 min-w-fit whitespace-nowrap", config.className, className)}
     >
       {t(config.label)}
     </Badge>
