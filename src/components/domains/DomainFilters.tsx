@@ -10,25 +10,26 @@ import { Input } from "@/components/ui/input";
 import { Search, X, Download, Filter } from "lucide-react";
 import { DomainFilter, DomainType, DomainStatus } from "@/types/domain";
 import { projects, departments, registrars } from "@/data/mockDomains";
+import { useLanguage } from "@/components/language-provider";
 
 const domainTypes: { value: DomainType; label: string }[] = [
-  { value: "landing", label: "Лендинг" },
-  { value: "company", label: "Сайт компании" },
-  { value: "product", label: "Продукт" },
-  { value: "mirror", label: "Зеркало" },
-  { value: "seo", label: "SEO-сателлит" },
-  { value: "subdomain", label: "Поддомен" },
-  { value: "referral", label: "Реферальный" },
-  { value: "redirect", label: "Редиректор" },
-  { value: "technical", label: "Технический" },
-  { value: "b2b", label: "B2B" },
+  { value: "landing", label: "badges.landing" },
+  { value: "company", label: "badges.company" },
+  { value: "product", label: "badges.product" },
+  { value: "mirror", label: "badges.mirror" },
+  { value: "seo", label: "badges.seo" },
+  { value: "subdomain", label: "badges.subdomain" },
+  { value: "referral", label: "badges.referral" },
+  { value: "redirect", label: "badges.redirect" },
+  { value: "technical", label: "badges.technical" },
+  { value: "b2b", label: "badges.b2b" },
 ];
 
 const domainStatuses: { value: DomainStatus; label: string }[] = [
-  { value: "active", label: "Активен" },
-  { value: "expiring", label: "Истекает" },
-  { value: "expired", label: "Истёк" },
-  { value: "reserved", label: "Резерв" },
+  { value: "active", label: "status.active" },
+  { value: "expiring", label: "status.expiring" },
+  { value: "expired", label: "status.expired" },
+  { value: "reserved", label: "status.reserved" },
 ];
 
 interface DomainFiltersProps {
@@ -38,6 +39,7 @@ interface DomainFiltersProps {
 }
 
 export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFiltersProps) {
+  const { t } = useLanguage();
   const hasActiveFilters = 
     filters.search || 
     filters.types?.length || 
@@ -62,13 +64,13 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
           }
         >
           <SelectTrigger className="w-[160px] bg-secondary border-0">
-            <SelectValue placeholder="Тип домена" />
+            <SelectValue placeholder={t("filters.type")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Все типы</SelectItem>
+            <SelectItem value="all">{t("filters.all_types")}</SelectItem>
             {domainTypes.map((type) => (
               <SelectItem key={type.value} value={type.value}>
-                {type.label}
+                {t(type.label)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -84,13 +86,13 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
           }
         >
           <SelectTrigger className="w-[140px] bg-secondary border-0">
-            <SelectValue placeholder="Статус" />
+            <SelectValue placeholder={t("filters.status")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Все статусы</SelectItem>
+            <SelectItem value="all">{t("filters.all_statuses")}</SelectItem>
             {domainStatuses.map((status) => (
               <SelectItem key={status.value} value={status.value}>
-                {status.label}
+                {t(status.label)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -106,10 +108,10 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
           }
         >
           <SelectTrigger className="w-[180px] bg-secondary border-0">
-            <SelectValue placeholder="Проект" />
+            <SelectValue placeholder={t("filters.project")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Все проекты</SelectItem>
+            <SelectItem value="all">{t("filters.all_projects")}</SelectItem>
             {projects.map((project) => (
               <SelectItem key={project} value={project}>
                 {project}
@@ -128,10 +130,10 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
           }
         >
           <SelectTrigger className="w-[150px] bg-secondary border-0">
-            <SelectValue placeholder="Регистратор" />
+            <SelectValue placeholder={t("filters.registrar")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Все регистраторы</SelectItem>
+            <SelectItem value="all">{t("filters.all_registrars")}</SelectItem>
             {registrars.map((registrar) => (
               <SelectItem key={registrar} value={registrar}>
                 {registrar}
@@ -143,14 +145,14 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
             <X className="h-4 w-4" />
-            Сбросить
+            {t("filters.reset")}
           </Button>
         )}
 
-        <div className="ml-auto">
+        <div>
           <Button variant="outline" size="sm" onClick={onExport} className="gap-2">
             <Download className="h-4 w-4" />
-            Экспорт CSV
+            {t("domains.export")}
           </Button>
         </div>
       </div>

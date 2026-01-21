@@ -1,22 +1,23 @@
 import { DomainStatus } from "@/types/domain";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/language-provider";
 
 const statusConfig: Record<DomainStatus, { label: string; className: string }> = {
   active: { 
-    label: "Активен", 
+    label: "status.active", 
     className: "domain-status-active" 
   },
   expiring: { 
-    label: "Истекает", 
+    label: "status.expiring", 
     className: "domain-status-expiring" 
   },
   expired: { 
-    label: "Истёк", 
+    label: "status.expired", 
     className: "domain-status-expired" 
   },
   reserved: { 
-    label: "Резерв", 
+    label: "status.reserved", 
     className: "domain-status-reserved" 
   },
 };
@@ -28,13 +29,14 @@ interface DomainStatusBadgeProps {
 
 export function DomainStatusBadge({ status, className }: DomainStatusBadgeProps) {
   const config = statusConfig[status];
+  const { t } = useLanguage();
   
   return (
     <Badge 
       variant="outline" 
-      className={cn("border font-normal flex justify-center items-center", config.className, className)}
+      className={cn("border font-normal flex justify-center items-center h-[24px] min-w-[80px]", config.className, className)}
     >
-      {config.label}
+      {t(config.label)}
     </Badge>
   );
 }

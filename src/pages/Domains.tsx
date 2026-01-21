@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useLanguage } from "@/components/language-provider";
 
 export default function Domains() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [filters, setFilters] = useState<DomainFilter>({});
 
   const filteredDomains = useMemo(() => {
@@ -94,14 +96,14 @@ export default function Domains() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Реестр доменов</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("domains.title")}</h1>
           <p className="text-muted-foreground">
-            {filteredDomains.length} из {mockDomains.length} доменов
+            {filteredDomains.length} {t("domains.subtitle_prefix")} {mockDomains.length} {t("domains.subtitle_suffix")}
           </p>
         </div>
         <Button onClick={() => navigate("/domains/new")} className="gap-2">
           <Plus className="h-4 w-4" />
-          Добавить домен
+          {t("domains.add")}
         </Button>
       </div>
 
@@ -117,9 +119,9 @@ export default function Domains() {
 
       {filteredDomains.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <p className="text-lg font-medium text-muted-foreground">Домены не найдены</p>
+          <p className="text-lg font-medium text-muted-foreground">{t("domains.not_found")}</p>
           <p className="text-sm text-muted-foreground">
-            Попробуйте изменить параметры фильтрации
+            {t("domains.try_change_filters")}
           </p>
         </div>
       )}
