@@ -19,6 +19,7 @@ const translations: Translations = {
     "domains.export": "Экспорт CSV",
     "domains.not_found": "Домены не найдены",
     "domains.try_change_filters": "Попробуйте изменить параметры фильтрации",
+    "common.copied": "Скопировано",
     
     "filters.all_types": "Все типы",
     "filters.all_statuses": "Все статусы",
@@ -86,6 +87,7 @@ const translations: Translations = {
     "domains.export": "Export CSV",
     "domains.not_found": "No domains found",
     "domains.try_change_filters": "Try changing filter parameters",
+    "common.copied": "Copied",
 
     "filters.all_types": "All types",
     "filters.all_statuses": "All statuses",

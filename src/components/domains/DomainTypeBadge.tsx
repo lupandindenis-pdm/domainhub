@@ -4,41 +4,41 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/components/language-provider";
 
 const typeConfig: Record<DomainType, { label: string; className: string }> = {
-  landing: { 
-    label: "badges.landing", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
-  },
-  seo: { 
-    label: "badges.seo", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
-  },
-  mirror: { 
-    label: "badges.mirror", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
-  },
   site: { 
     label: "badges.site", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
-  },
-  subdomain: { 
-    label: "badges.subdomain", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
-  },
-  referral: { 
-    label: "badges.referral", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
-  },
-  redirect: { 
-    label: "badges.redirect", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
-  },
-  technical: { 
-    label: "badges.technical", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
+    className: "bg-blue-600/20 text-white border-blue-600/20" 
   },
   product: { 
     label: "badges.product", 
-    className: "bg-[hsl(262,83%,58%,0.15)] text-[hsl(262,83%,58%)] border-[hsl(262,83%,58%,0.3)]" 
+    className: "bg-emerald-600/20 text-white border-emerald-600/20" 
+  },
+  landing: { 
+    label: "badges.landing", 
+    className: "bg-violet-600/20 text-white border-violet-600/20" 
+  },
+  mirror: { 
+    label: "badges.mirror", 
+    className: "bg-amber-600/20 text-white border-amber-600/20" 
+  },
+  seo: { 
+    label: "badges.seo", 
+    className: "bg-pink-600/20 text-white border-pink-600/20" 
+  },
+  referral: { 
+    label: "badges.referral", 
+    className: "bg-orange-600/20 text-white border-orange-600/20" 
+  },
+  redirect: { 
+    label: "badges.redirect", 
+    className: "bg-indigo-600/20 text-white border-indigo-600/20" 
+  },
+  technical: { 
+    label: "badges.technical", 
+    className: "bg-slate-600/20 text-white border-slate-600/20" 
+  },
+  subdomain: { 
+    label: "badges.subdomain", 
+    className: "bg-cyan-600/20 text-white border-cyan-600/20" 
   },
 };
 
@@ -54,7 +54,7 @@ export function DomainTypeBadge({ type, className }: DomainTypeBadgeProps) {
   return (
     <Badge 
       variant="outline" 
-      className={cn("border font-normal text-sm flex justify-center items-center h-[28px] px-2.5 min-w-fit whitespace-nowrap", config.className, className)}
+      className={cn("border font-normal text-xs flex justify-center items-center h-[22px] px-2 min-w-fit whitespace-nowrap leading-none", config.className, className)}
     >
       {t(config.label)}
     </Badge>

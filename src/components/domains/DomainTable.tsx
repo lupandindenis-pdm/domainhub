@@ -10,7 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, MoreHorizontal, Shield, ShieldAlert, ShieldCheck } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Shield, ShieldAlert, ShieldCheck, Copy } from "lucide-react";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,24 +77,42 @@ export function DomainTable({ domains }: DomainTableProps) {
                 className="table-row-hover cursor-pointer"
                 onClick={() => navigate(`/domains/${domain.id}`)}
               >
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-normal">{domain.name}</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(`https://${domain.name}`, "_blank");
-                      }}
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                    </Button>
+                <TableCell className="max-w-[250px]">
+                  <div className="flex items-center justify-between gap-2 group">
+                    <span className="font-mono text-sm font-normal break-all flex-1 min-w-0 text-left line-clamp-2" title={domain.name}>
+                      {domain.name}
+                    </span>
+                    <div className="flex items-center shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(domain.name);
+                          toast.success(t("common.copied"));
+                        }}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(`https://${domain.name}`, "_blank");
+                        }}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <DomainTypeBadge type={domain.type} />
+                  <div className="flex justify-center">
+                    <DomainTypeBadge type={domain.type} />
+                  </div>
                 </TableCell>
                 <TableCell>
                   <DomainStatusBadge status={domain.status} />
