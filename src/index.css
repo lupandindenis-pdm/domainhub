@@ -57,7 +57,7 @@
     /* Domain status colors */
     --status-active: 142 76% 36%;
     --status-expiring: 38 92% 50%;
-    --status-expired: 0 72% 51%;
+    --status-expired: 0 85% 75%;
     --status-reserved: 215 20% 55%;
 
     /* Domain type badges */

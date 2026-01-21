@@ -15,7 +15,7 @@ export function LanguageToggle() {
       onClick={toggleLanguage}
       className="h-9 min-w-[3rem] px-2 font-medium text-foreground hover:bg-accent hover:text-accent-foreground"
     >
-      {language.toUpperCase()}
+      {(language === "ru" ? "en" : "ru").toUpperCase()}
     </Button>
   )
 }

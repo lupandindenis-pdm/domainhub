@@ -11,9 +11,9 @@ type Translations = {
 const translations: Translations = {
   ru: {
     "dashboard": "Дашборд",
-    "domains.registry": "Реестр доменов",
+    "domains.registry": "Реестр",
     "domains.add": "Добавить домен",
-    "history": "История изменений",
+    "history": "История",
     "alerts": "Алерты",
     "reports": "Отчёты",
     "users": "Пользователи",
@@ -29,7 +29,7 @@ const translations: Translations = {
   },
   en: {
     "dashboard": "Dashboard",
-    "domains.registry": "Domain Registry",
+    "domains.registry": "Registry",
     "domains.add": "Add Domain",
     "history": "History",
     "alerts": "Alerts",
