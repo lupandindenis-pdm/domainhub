@@ -1,14 +1,13 @@
 export type DomainType =
   | "landing"
-  | "company"
-  | "product"
-  | "mirror"
   | "seo"
+  | "mirror"
+  | "site"
   | "subdomain"
   | "referral"
   | "redirect"
   | "technical"
-  | "b2b";
+  | "product";
 
 export type DomainStatus = "active" | "expiring" | "expired" | "reserved";
 

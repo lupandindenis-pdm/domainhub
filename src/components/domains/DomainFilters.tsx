@@ -14,15 +14,14 @@ import { useLanguage } from "@/components/language-provider";
 
 const domainTypes: { value: DomainType; label: string }[] = [
   { value: "landing", label: "badges.landing" },
-  { value: "company", label: "badges.company" },
-  { value: "product", label: "badges.product" },
-  { value: "mirror", label: "badges.mirror" },
   { value: "seo", label: "badges.seo" },
+  { value: "mirror", label: "badges.mirror" },
+  { value: "site", label: "badges.site" },
   { value: "subdomain", label: "badges.subdomain" },
   { value: "referral", label: "badges.referral" },
   { value: "redirect", label: "badges.redirect" },
   { value: "technical", label: "badges.technical" },
-  { value: "b2b", label: "badges.b2b" },
+  { value: "product", label: "badges.product" },
 ];
 
 const domainStatuses: { value: DomainStatus; label: string }[] = [

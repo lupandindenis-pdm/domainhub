@@ -51,6 +51,7 @@ export function AppSidebar() {
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
+    if (path === "/domains" && location.pathname.startsWith("/domains/new")) return false;
     return location.pathname.startsWith(path);
   };
 
