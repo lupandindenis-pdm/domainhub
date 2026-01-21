@@ -52,16 +52,6 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Поиск по домену..."
-            value={filters.search || ""}
-            onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
-            className="pl-9 bg-secondary border-0"
-          />
-        </div>
-
         <Select
           value={filters.types?.[0] || "all"}
           onValueChange={(value) => 
