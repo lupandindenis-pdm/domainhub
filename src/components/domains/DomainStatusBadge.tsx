@@ -32,7 +32,7 @@ export function DomainStatusBadge({ status, className }: DomainStatusBadgeProps)
   const { t } = useLanguage();
   
   return (
-    <span className={cn("text-sm font-medium", config.className, className)}>
+    <span className={cn("text-sm font-normal", config.className, className)}>
       {t(config.label)}
     </span>
   );
