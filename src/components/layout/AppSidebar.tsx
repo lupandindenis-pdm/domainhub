@@ -72,8 +72,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className={collapsed ? "border-b border-sidebar-border p-2" : "border-b border-sidebar-border px-4 py-4"}>
-        <div className={collapsed ? "flex w-full items-center justify-center" : "flex items-center gap-3"}>
+      <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
+        <div className={collapsed ? "flex w-full items-center justify-center gap-3" : "flex items-center gap-3"}>
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
             <Globe className="h-4 w-4 text-primary-foreground" />
           </div>
@@ -89,7 +89,7 @@ export function AppSidebar() {
       <SidebarContent className="px-2 py-4">
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 text-xs uppercase tracking-wider text-sidebar-foreground/50">
-            {!collapsed && "Главное"}
+            Главное
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -102,7 +102,7 @@ export function AppSidebar() {
 
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-xs uppercase tracking-wider text-sidebar-foreground/50">
-            {!collapsed && "Управление"}
+            Управление
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -115,7 +115,7 @@ export function AppSidebar() {
 
         <SidebarGroup className="mt-4">
           <SidebarGroupLabel className="px-3 text-xs uppercase tracking-wider text-sidebar-foreground/50">
-            {!collapsed && "Администрирование"}
+            Администрирование
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -128,17 +128,17 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border px-4 py-3">
-        {!collapsed && (
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
-              АИ
-            </div>
+        <div className={collapsed ? "flex items-center justify-center" : "flex items-center gap-3"}>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
+            АИ
+          </div>
+          {!collapsed && (
             <div className="flex flex-col">
               <span className="text-sm text-sidebar-foreground">Админ</span>
               <span className="text-xs text-sidebar-foreground/60">Администратор</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
