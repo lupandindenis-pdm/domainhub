@@ -14,6 +14,8 @@ export default function Domains() {
   const { t } = useLanguage();
   const [filters, setFilters] = useState<DomainFilter>({});
 
+  const buildShortSha = __BUILD_SHA__ === "dev" ? "dev" : __BUILD_SHA__.slice(0, 7);
+
   const filteredDomains = useMemo(() => {
     return mockDomains.filter((domain) => {
       // Search filter
@@ -100,6 +102,7 @@ export default function Domains() {
           <p className="text-muted-foreground">
             {filteredDomains.length} {t("domains.subtitle_prefix")} {mockDomains.length} {t("domains.subtitle_suffix")}
           </p>
+          <p className="text-xs text-muted-foreground">build {buildShortSha}</p>
         </div>
         <Button onClick={() => navigate("/domains/new")} className="gap-2">
           <Plus className="h-4 w-4" />
