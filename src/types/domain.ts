@@ -9,7 +9,7 @@ export type DomainType =
   | "technical"
   | "product";
 
-export type DomainStatus = "spare" | "actual" | "not_actual" | "not_configured" | "unknown" | "expiring" | "expired" | "reserved";
+export type DomainStatus = "spare" | "actual" | "not_actual" | "not_configured" | "unknown" | "expiring" | "expired";
 
 export type DomainPurity = "white" | "grey" | "black";
 

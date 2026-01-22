@@ -63,6 +63,8 @@ const translations: Translations = {
     "status.not_actual": "Не актуален",
     "status.not_configured": "Не настроен",
     "status.unknown": "Не известно",
+    "status.expiring": "Истекает",
+    "status.expired": "Истёк",
 
     "history": "История",
     "alerts": "Алерты",
@@ -132,6 +134,8 @@ const translations: Translations = {
     "status.not_actual": "Not actual",
     "status.not_configured": "Not configured",
     "status.unknown": "Unknown",
+    "status.expiring": "Expiring",
+    "status.expired": "Expired",
 
     "history": "History",
     "alerts": "Alerts",

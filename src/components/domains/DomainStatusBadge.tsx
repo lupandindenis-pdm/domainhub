@@ -1,40 +1,35 @@
 import { DomainStatus } from "@/types/domain";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/components/language-provider";
 
 const statusConfig: Record<DomainStatus, { label: string; className: string }> = {
   actual: {
     label: "status.actual",
-    className: "bg-emerald-200 text-emerald-900",
+    className: "text-emerald-500",
   },
   not_actual: {
     label: "status.not_actual",
-    className: "bg-rose-200 text-rose-950",
+    className: "text-rose-500",
   },
   unknown: {
     label: "status.unknown",
-    className: "bg-amber-200 text-amber-950",
+    className: "text-amber-500",
   },
   not_configured: {
     label: "status.not_configured",
-    className: "bg-slate-200 text-slate-800",
+    className: "text-slate-500",
   },
   spare: {
     label: "status.spare",
-    className: "bg-indigo-200 text-indigo-950",
+    className: "text-indigo-500",
   },
   expiring: {
     label: "status.expiring",
-    className: "bg-orange-200 text-orange-950",
+    className: "text-orange-500",
   },
   expired: {
     label: "status.expired",
-    className: "bg-red-200 text-red-950",
-  },
-  reserved: {
-    label: "status.reserved",
-    className: "bg-purple-200 text-purple-950",
+    className: "text-red-500",
   },
 };
 
@@ -48,15 +43,14 @@ export function DomainStatusBadge({ status, className }: DomainStatusBadgeProps)
   const { t } = useLanguage();
   
   return (
-    <Badge
-      variant="secondary"
+    <span
       className={cn(
-        "border-0 px-3 py-1 text-sm font-medium leading-none",
+        "text-sm font-medium",
         config.className,
         className,
       )}
     >
       {t(config.label)}
-    </Badge>
+    </span>
   );
 }

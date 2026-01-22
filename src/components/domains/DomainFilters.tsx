@@ -24,14 +24,13 @@ const domainTypes: { value: DomainType; label: string }[] = [
 ];
 
 const domainStatuses: { value: DomainStatus; label: string }[] = [
-  { value: "spare", label: "status.spare" },
   { value: "actual", label: "status.actual" },
   { value: "not_actual", label: "status.not_actual" },
   { value: "not_configured", label: "status.not_configured" },
   { value: "unknown", label: "status.unknown" },
   { value: "expiring", label: "status.expiring" },
   { value: "expired", label: "status.expired" },
-  { value: "reserved", label: "status.reserved" },
+  { value: "spare", label: "status.spare" },
 ];
 
 interface DomainFiltersProps {
