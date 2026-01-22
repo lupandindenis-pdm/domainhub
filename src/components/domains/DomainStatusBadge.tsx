@@ -45,7 +45,7 @@ export function DomainStatusBadge({ status, className }: DomainStatusBadgeProps)
   return (
     <span
       className={cn(
-        "text-sm font-medium",
+        "text-sm font-normal",
         config.className,
         className,
       )}
