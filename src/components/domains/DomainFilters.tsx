@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -30,15 +29,10 @@ const domainStatuses: { value: DomainStatus; label: string }[] = [
   { value: "not_actual", label: "status.not_actual" },
   { value: "not_configured", label: "status.not_configured" },
   { value: "unknown", label: "status.unknown" },
+  { value: "expiring", label: "status.expiring" },
+  { value: "expired", label: "status.expired" },
+  { value: "reserved", label: "status.reserved" },
 ];
-
-const statusBadgeClass: Record<DomainStatus, string> = {
-  actual: "bg-emerald-200 text-emerald-900",
-  not_actual: "bg-rose-200 text-rose-950",
-  unknown: "bg-amber-200 text-amber-950",
-  not_configured: "bg-slate-200 text-slate-800",
-  spare: "bg-indigo-200 text-indigo-950",
-};
 
 interface DomainFiltersProps {
   filters: DomainFilter;
@@ -99,15 +93,7 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
             <SelectItem value="all">{t("filters.all_statuses")}</SelectItem>
             {domainStatuses.map((status) => (
               <SelectItem key={status.value} value={status.value}>
-                <Badge
-                  variant="secondary"
-                  className={
-                    "border-0 px-3 py-1 text-sm font-medium leading-none " +
-                    statusBadgeClass[status.value]
-                  }
-                >
-                  {t(status.label)}
-                </Badge>
+                {t(status.label)}
               </SelectItem>
             ))}
           </SelectContent>

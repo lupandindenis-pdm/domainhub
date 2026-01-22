@@ -24,6 +24,18 @@ const statusConfig: Record<DomainStatus, { label: string; className: string }> =
     label: "status.spare",
     className: "bg-indigo-200 text-indigo-950",
   },
+  expiring: {
+    label: "status.expiring",
+    className: "bg-orange-200 text-orange-950",
+  },
+  expired: {
+    label: "status.expired",
+    className: "bg-red-200 text-red-950",
+  },
+  reserved: {
+    label: "status.reserved",
+    className: "bg-purple-200 text-purple-950",
+  },
 };
 
 interface DomainStatusBadgeProps {
