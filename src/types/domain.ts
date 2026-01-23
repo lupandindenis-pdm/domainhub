@@ -9,11 +9,18 @@ export type DomainType =
   | "technical"
   | "product";
 
-export type DomainStatus = "spare" | "actual" | "not_actual" | "not_configured" | "unknown" | "expiring" | "expired";
+export type DomainStatus = "spare" | "actual" | "not_actual" | "not_configured" | "unknown" | "expiring" | "expired" | "blocked" | "test";
 
 export type DomainPurity = "white" | "grey" | "black";
 
 export type DomainLifespan = "short" | "mid" | "long";
+
+// New Enums
+export type DomainCategory = "Landing" | "Micro-site" | "Promo" | "Blog" | "Support" | "Other";
+export type DomainDirection = "Acquisition" | "Retention" | "Brand" | "SEO" | "Email" | "Social" | "Partnerships";
+export type TargetAction = "Lead" | "Purchase" | "Sign-up" | "Download" | "Contact" | "Other";
+export type TestMethod = "Manual" | "Auto" | "Local" | "Mixed";
+export type ProgramStatus = "Active" | "Inactive" | "Moderation" | "Paused";
 
 export interface Domain {
   id: string;
@@ -29,7 +36,7 @@ export interface Domain {
   nsServers: string[];
   ipAddress: string;
   cdn?: string;
-  sslStatus: "valid" | "expiring" | "expired" | "none";
+  sslStatus: "valid" | "expiring" | "expired" | "none" | "error";
   updateMethod: "manual" | "api";
   
   // Business attributes
@@ -48,6 +55,46 @@ export interface Domain {
   tags?: string[];
   createdAt: string;
   updatedAt: string;
+
+  // New Fields
+  // Marketing
+  category?: DomainCategory;
+  needsUpdate?: boolean;
+  jiraTask?: string;
+  direction?: DomainDirection;
+  bonus?: string;
+  targetAction?: TargetAction;
+  
+  // IT
+  fileHosting?: string;
+  techIssues?: string[];
+  testMethod?: TestMethod;
+  jiraTaskIT?: string[];
+  uptimeMonitor?: string;
+  lastCheck?: string;
+  
+  // Analytics
+  gaId?: string;
+  gtmId?: string;
+  uniqueUsers?: number;
+  uniqueUsersPeriod?: string;
+  
+  // Partnership
+  isInProgram?: boolean;
+  programStatus?: ProgramStatus;
+  companyName?: string;
+  programLink?: string;
+  
+  // General
+  landingName?: string;
+  hasGeoBlock?: boolean;
+  blockedGeo?: string[];
+  languages?: string[];
+  addedDate?: string;
+  
+  // Integrations
+  oneSignalId?: string;
+  otherIntegrations?: string[];
 }
 
 export interface DomainHistoryEntry {

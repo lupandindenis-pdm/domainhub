@@ -1,15 +1,25 @@
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { X, Download } from "lucide-react";
+import { X, Download, Check, ChevronDown } from "lucide-react";
 import { DomainFilter, DomainType, DomainStatus } from "@/types/domain";
 import { projects } from "@/data/mockDomains";
 import { useLanguage } from "@/components/language-provider";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 const domainTypes: { value: DomainType; label: string }[] = [
   { value: "landing", label: "badges.landing" },
@@ -21,6 +31,7 @@ const domainTypes: { value: DomainType; label: string }[] = [
   { value: "redirect", label: "badges.redirect" },
   { value: "technical", label: "badges.technical" },
   { value: "product", label: "badges.product" },
+  { value: "b2b", label: "badges.b2b" },
 ];
 
 const domainStatuses: { value: DomainStatus; label: string }[] = [
@@ -39,6 +50,91 @@ interface DomainFiltersProps {
   onExport: () => void;
 }
 
+interface MultiSelectProps {
+  title: string;
+  options: { value: string; label: string }[];
+  selectedValues?: string[];
+  onChange: (values: string[]) => void;
+}
+
+function MultiSelectFilter({ title, options, selectedValues = [], onChange }: MultiSelectProps) {
+  const [open, setOpen] = useState(false);
+  const { t } = useLanguage();
+
+  const handleSelect = (value: string) => {
+    const newSelected = selectedValues.includes(value)
+      ? selectedValues.filter((v) => v !== value)
+      : [...selectedValues, value];
+    onChange(newSelected);
+  };
+
+  const handleClear = () => {
+    onChange([]);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" role="combobox" aria-expanded={open} className="h-10 justify-between bg-secondary/50 border-0 hover:bg-secondary/80">
+          <div className="flex items-center gap-2">
+            <span>{title}</span>
+            {selectedValues.length > 0 && (
+              <Badge variant="secondary" className="rounded-sm px-1 font-normal bg-primary/20 text-primary-foreground">
+                {selectedValues.length}
+              </Badge>
+            )}
+          </div>
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0" align="start">
+        <Command>
+          <CommandInput placeholder={title} />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => {
+                const isSelected = selectedValues.includes(option.value);
+                return (
+                  <CommandItem
+                    key={option.value}
+                    onSelect={() => handleSelect(option.value)}
+                  >
+                    <div
+                      className={cn(
+                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        isSelected
+                          ? "bg-primary text-primary-foreground"
+                          : "opacity-50 [&_svg]:invisible"
+                      )}
+                    >
+                      <Check className={cn("h-4 w-4")} />
+                    </div>
+                    <span>{t(option.label) === option.label ? option.label : t(option.label)}</span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+            {selectedValues.length > 0 && (
+              <>
+                <CommandSeparator />
+                <CommandGroup>
+                  <CommandItem
+                    onSelect={handleClear}
+                    className="justify-center text-center"
+                  >
+                    Clear filters
+                  </CommandItem>
+                </CommandGroup>
+              </>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFiltersProps) {
   const { t } = useLanguage();
   const hasActiveFilters = 
@@ -54,83 +150,37 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
-        <Select
-          value={filters.types?.[0] || "all"}
-          onValueChange={(value) => 
-            onFiltersChange({ 
-              ...filters, 
-              types: value === "all" ? undefined : [value as DomainType] 
-            })
-          }
-        >
-          <SelectTrigger className="w-[160px] bg-secondary border-0">
-            <SelectValue placeholder={t("filters.type")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("filters.all_types")}</SelectItem>
-            {domainTypes.map((type) => (
-              <SelectItem key={type.value} value={type.value}>
-                {t(type.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          title={t("filters.all_types")}
+          options={domainTypes}
+          selectedValues={filters.types}
+          onChange={(values) => onFiltersChange({ ...filters, types: values as DomainType[] })}
+        />
 
-        <Select
-          value={filters.statuses?.[0] || "all"}
-          onValueChange={(value) => 
-            onFiltersChange({ 
-              ...filters, 
-              statuses: value === "all" ? undefined : [value as DomainStatus] 
-            })
-          }
-        >
-          <SelectTrigger className="w-[140px] bg-secondary border-0">
-            <SelectValue placeholder={t("filters.status")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("filters.all_statuses")}</SelectItem>
-            {domainStatuses.map((status) => (
-              <SelectItem key={status.value} value={status.value}>
-                {t(status.label)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          title={t("filters.all_statuses")}
+          options={domainStatuses}
+          selectedValues={filters.statuses}
+          onChange={(values) => onFiltersChange({ ...filters, statuses: values as DomainStatus[] })}
+        />
 
-        <Select
-          value={filters.projects?.[0] || "all"}
-          onValueChange={(value) => 
-            onFiltersChange({ 
-              ...filters, 
-              projects: value === "all" ? undefined : [value] 
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-secondary border-0">
-            <SelectValue placeholder={t("filters.project")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("filters.all_projects")}</SelectItem>
-            {projects.map((project) => (
-              <SelectItem key={project} value={project}>
-                {project}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          title={t("filters.all_projects")}
+          options={projects.map(p => ({ value: p, label: p }))}
+          selectedValues={filters.projects}
+          onChange={(values) => onFiltersChange({ ...filters, projects: values })}
+        />
 
         {hasActiveFilters && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1">
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 h-10">
             <X className="h-4 w-4" />
             {t("filters.reset")}
           </Button>
         )}
 
-        <div>
-          <Button variant="outline" size="sm" onClick={onExport} className="gap-2">
+        <div className="ml-auto">
+          <Button variant="outline" size="icon" onClick={onExport} className="h-10 w-10 bg-secondary/50 border-0 hover:bg-secondary/80">
             <Download className="h-4 w-4" />
-            {t("domains.export")}
           </Button>
         </div>
       </div>

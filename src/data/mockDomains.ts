@@ -28,6 +28,26 @@ export const mockDomains: Domain[] = [
     tags: ["main", "corporate"],
     createdAt: "2020-03-15T10:00:00Z",
     updatedAt: "2024-12-01T14:30:00Z",
+    
+    // New Fields
+    category: "Landing",
+    needsUpdate: false,
+    direction: "Brand",
+    targetAction: "Contact",
+    fileHosting: "Vercel",
+    testMethod: "Auto",
+    gaId: "UA-12345678-1",
+    gtmId: "GTM-XXXXXX",
+    uniqueUsers: 15000,
+    uniqueUsersPeriod: "last 30 days",
+    isInProgram: false,
+    landingName: "Main Corporate Site",
+    hasGeoBlock: false,
+    blockedGeo: [],
+    languages: ["ru", "en"],
+    addedDate: "2020-03-15",
+    oneSignalId: "onesignal-id-1",
+    otherIntegrations: ["Sentry", "Metrika"],
   },
   {
     id: "2",
@@ -56,6 +76,31 @@ export const mockDomains: Domain[] = [
     tags: ["product", "validator"],
     createdAt: "2022-06-20T08:00:00Z",
     updatedAt: "2024-11-15T09:45:00Z",
+
+    // New Fields
+    category: "Micro-site",
+    needsUpdate: true,
+    jiraTask: "PROD-123",
+    direction: "Acquisition",
+    bonus: "None",
+    targetAction: "Sign-up",
+    fileHosting: "AWS S3",
+    techIssues: ["Legacy PHP version"],
+    testMethod: "Manual",
+    jiraTaskIT: ["IT-456"],
+    uptimeMonitor: "https://uptime.com/status/product-validator",
+    lastCheck: "2024-01-22T10:00:00Z",
+    gaId: "UA-87654321-1",
+    uniqueUsers: 500,
+    uniqueUsersPeriod: "last 7 days",
+    isInProgram: true,
+    programStatus: "Active",
+    companyName: "Validation Corp",
+    programLink: "https://partners.product-validator.io",
+    landingName: "Product Validator Landing",
+    hasGeoBlock: true,
+    languages: ["en", "de", "fr"],
+    addedDate: "2022-06-20",
   },
   {
     id: "3",
@@ -83,6 +128,17 @@ export const mockDomains: Domain[] = [
     tags: ["promo", "campaign", "2024"],
     createdAt: "2024-01-10T12:00:00Z",
     updatedAt: "2024-10-20T16:20:00Z",
+    
+    // New Fields
+    category: "Promo",
+    needsUpdate: false,
+    direction: "Retention",
+    targetAction: "Purchase",
+    testMethod: "Mixed",
+    landingName: "NY 2024 Promo",
+    hasGeoBlock: false,
+    languages: ["ru"],
+    addedDate: "2024-01-10",
   },
   {
     id: "4",
@@ -111,6 +167,18 @@ export const mockDomains: Domain[] = [
     tags: ["mirror", "eu", "infrastructure"],
     createdAt: "2021-09-05T07:30:00Z",
     updatedAt: "2024-08-10T11:00:00Z",
+    
+    // New Fields
+    category: "Support",
+    needsUpdate: false,
+    direction: "Partnerships",
+    targetAction: "Other",
+    fileHosting: "DigitalOcean",
+    testMethod: "Auto",
+    landingName: "EU Mirror",
+    hasGeoBlock: false,
+    languages: ["en"],
+    addedDate: "2021-09-05",
   },
   {
     id: "5",
@@ -138,6 +206,17 @@ export const mockDomains: Domain[] = [
     tags: ["seo", "satellite"],
     createdAt: "2023-04-12T14:00:00Z",
     updatedAt: "2024-03-01T10:15:00Z",
+    
+    // New Fields
+    category: "Blog",
+    needsUpdate: true,
+    direction: "SEO",
+    targetAction: "Lead",
+    testMethod: "Manual",
+    landingName: "SEO Satellite 01",
+    hasGeoBlock: false,
+    languages: ["ru"],
+    addedDate: "2023-04-12",
   },
   {
     id: "6",
@@ -166,6 +245,20 @@ export const mockDomains: Domain[] = [
     tags: ["referral", "partners", "b2b"],
     createdAt: "2022-11-28T09:00:00Z",
     updatedAt: "2024-11-01T13:45:00Z",
+    
+    // New Fields
+    category: "Landing",
+    needsUpdate: false,
+    direction: "Partnerships",
+    targetAction: "Sign-up",
+    testMethod: "Auto",
+    isInProgram: true,
+    programStatus: "Active",
+    companyName: "Referral Sys",
+    landingName: "Partners Portal",
+    hasGeoBlock: false,
+    languages: ["en", "es"],
+    addedDate: "2022-11-28",
   },
   {
     id: "7",
@@ -193,6 +286,16 @@ export const mockDomains: Domain[] = [
     tags: ["redirect", "shortener", "utility"],
     createdAt: "2021-02-14T11:00:00Z",
     updatedAt: "2024-09-20T08:30:00Z",
+    
+    // New Fields
+    category: "Other",
+    direction: "Brand",
+    targetAction: "Other",
+    testMethod: "Auto",
+    landingName: "Short Link Service",
+    hasGeoBlock: false,
+    languages: ["en"],
+    addedDate: "2021-02-14",
   },
   {
     id: "8",
@@ -221,6 +324,16 @@ export const mockDomains: Domain[] = [
     tags: ["api", "internal", "technical"],
     createdAt: "2023-08-01T06:00:00Z",
     updatedAt: "2024-12-10T15:00:00Z",
+    
+    // New Fields
+    category: "Other",
+    direction: "Brand",
+    targetAction: "Other",
+    testMethod: "Auto",
+    landingName: "Internal API",
+    hasGeoBlock: true,
+    languages: ["en"],
+    addedDate: "2023-08-01",
   },
   {
     id: "9",
@@ -249,6 +362,17 @@ export const mockDomains: Domain[] = [
     tags: ["b2b", "platform", "enterprise"],
     createdAt: "2022-03-22T10:30:00Z",
     updatedAt: "2024-11-28T12:00:00Z",
+    
+    // New Fields
+    category: "Landing",
+    needsUpdate: false,
+    direction: "Acquisition",
+    targetAction: "Lead",
+    testMethod: "Mixed",
+    landingName: "B2B Platform",
+    hasGeoBlock: false,
+    languages: ["en", "fr", "de"],
+    addedDate: "2022-03-22",
   },
   {
     id: "10",
@@ -277,6 +401,16 @@ export const mockDomains: Domain[] = [
     tags: ["staging", "dev", "internal"],
     createdAt: "2023-01-15T09:00:00Z",
     updatedAt: "2024-12-05T17:30:00Z",
+    
+    // New Fields
+    category: "Other",
+    direction: "Brand",
+    targetAction: "Other",
+    testMethod: "Auto",
+    landingName: "Staging Env",
+    hasGeoBlock: true,
+    languages: ["en"],
+    addedDate: "2023-01-15",
   },
 ];
 
