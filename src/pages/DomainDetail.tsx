@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,33 +23,20 @@ import {
   ExternalLink, 
   Edit, 
   Copy, 
-  Globe,
-  Server,
-  Shield,
-  Calendar as CalendarIcon,
-  User,
-  Building,
-  MapPin,
-  Tag,
-  Clock,
-  AlertCircle,
-  History as HistoryIcon,
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  Megaphone,
-  BarChart3,
-  Users,
-  Layers,
-  Activity,
-  Code2,
-  Smartphone,
-  Save,
-  RotateCcw,
-  FileText,
-  ChevronDown,
-  ChevronsUpDown,
-  Check
+  Globe, 
+  Server, 
+  Shield, 
+  Calendar as CalendarIcon, 
+  AlertCircle, 
+  AlertTriangle, 
+  Megaphone, 
+  BarChart3, 
+  Users, 
+  Layers, 
+  Code2, 
+  RotateCcw, 
+  FileText, 
+  ChevronsUpDown
 } from "lucide-react";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -73,25 +61,34 @@ export default function DomainDetail() {
     );
   }
 
-  if (version === 'v1') {
-    return (
-      <div className="relative">
-        <div className="absolute top-0 right-0 p-4 z-50">
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            onClick={() => setVersion('v2')}
-            className="shadow-md border"
-          >
-            Переключить на V2 (New)
-          </Button>
-        </div>
-        <DomainDetailV1 />
-      </div>
-    );
-  }
-
   const daysLeft = differenceInDays(parseISO(domain.expirationDate), new Date());
+
+  const statusColors: Record<string, string> = {
+    actual: "bg-green-500/20 text-green-700 dark:text-green-300",
+    spare: "bg-blue-500/20 text-blue-700 dark:text-blue-300",
+    not_actual: "bg-slate-500/20 text-slate-700 dark:text-slate-300",
+    not_configured: "bg-orange-500/20 text-orange-700 dark:text-orange-300",
+    unknown: "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300",
+    expiring: "bg-red-500/20 text-red-700 dark:text-red-300",
+    expired: "bg-red-500/20 text-red-700 dark:text-red-300",
+    blocked: "bg-red-500/20 text-red-700 dark:text-red-300",
+    test: "bg-purple-500/20 text-purple-700 dark:text-purple-300",
+  };
+  
+  const typeColors: Record<string, string> = {
+    site: "bg-blue-500/20 text-blue-700 dark:text-blue-300",
+    product: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300",
+    landing: "bg-violet-500/20 text-violet-700 dark:text-violet-300",
+    mirror: "bg-amber-500/20 text-amber-700 dark:text-amber-300",
+    seo: "bg-pink-500/20 text-pink-700 dark:text-pink-300",
+    referral: "bg-orange-500/20 text-orange-700 dark:text-orange-300",
+    redirect: "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300",
+    technical: "bg-slate-500/20 text-slate-700 dark:text-slate-300",
+    subdomain: "bg-cyan-500/20 text-cyan-700 dark:text-cyan-300",
+  };
+
+  const statusColorClass = statusColors[domain.status] || "bg-muted/50";
+  const typeColorClass = typeColors[domain.type] || "bg-muted/50";
 
   return (
     <div className="container py-6 space-y-6 max-w-7xl mx-auto">
@@ -117,7 +114,6 @@ export default function DomainDetail() {
               </Badge>
             </div>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-              <DomainTypeBadge type={domain.type} />
               <DomainStatusBadge status={domain.status} />
               
               {domain.sslStatus === 'valid' ? (
@@ -193,56 +189,36 @@ export default function DomainDetail() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium leading-none text-muted-foreground">
+                      Тип
+                    </label>
+                    <div className="flex items-center h-10 px-3 rounded-md border border-input bg-muted/50">
+                        <DomainTypeBadge type={domain.type} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium leading-none text-muted-foreground">
                       Проект
                     </label>
-                    <Select defaultValue={domain.project}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Выберите проект" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {projects.map((p) => (
-                          <SelectItem key={p} value={p}>{p}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input value={domain.project} readOnly className="bg-muted/50" />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium leading-none text-muted-foreground">
                       Статус
                     </label>
-                     <Select defaultValue={domain.status}>
-                      <SelectTrigger>
-                         <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                         <SelectItem value="actual">Actual</SelectItem>
-                         <SelectItem value="spare">Spare</SelectItem>
-                         <SelectItem value="not_actual">Not Actual</SelectItem>
-                         <SelectItem value="not_configured">Not Configured</SelectItem>
-                         <SelectItem value="unknown">Unknown</SelectItem>
-                         <SelectItem value="expiring">Expiring</SelectItem>
-                         <SelectItem value="expired">Expired</SelectItem>
-                         <SelectItem value="blocked">Blocked</SelectItem>
-                         <SelectItem value="test">Test</SelectItem>
-                      </SelectContent>
-                    </Select>
+                     <div className={cn("flex items-center h-10 px-3 rounded-md border-none", statusColorClass)}>
+                        <span className="font-bold text-sm">
+                           {domain.status}
+                        </span>
+                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium leading-none text-muted-foreground">
                       Отдел
                     </label>
-                    <Select defaultValue={domain.department}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Выберите отдел" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((d) => (
-                          <SelectItem key={d} value={d}>{d}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Input value={domain.department} readOnly className="bg-muted/50" />
                   </div>
                 </div>
 
@@ -252,62 +228,25 @@ export default function DomainDetail() {
                     <label className="text-sm font-medium leading-none text-muted-foreground">
                       GEO (используется)
                     </label>
-                    <MultiSelect 
-                        options={['WW', 'US', 'EU', 'RU', 'CIS', 'ASIA', 'LATAM', 'CN', 'JP', 'BR'].map(g => ({ label: g, value: g }))} 
-                        selected={domain.geo || []} 
-                        onChange={() => {}} 
-                        placeholder="Выберите GEO"
-                    />
+                    <div className="min-h-10 py-2 px-3 rounded-md border border-input bg-muted/50 text-sm">
+                      {domain.geo?.join(", ") || "—"}
+                    </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium leading-none text-muted-foreground">
                       GEO (блокировка)
                     </label>
-                    <MultiSelect 
-                        options={['WW', 'US', 'EU', 'RU', 'CIS', 'ASIA', 'LATAM', 'CN', 'JP', 'BR'].map(g => ({ label: g, value: g }))} 
+                    <ReadOnlyGeoView 
                         selected={domain.blockedGeo || []} 
-                        onChange={() => {}} 
-                        placeholder="Нет блокировок"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium leading-none text-muted-foreground">
-                      Дата занесения в админку
+                      Автор
                     </label>
-                    <Input 
-                      value={domain.addedDate || format(parseISO(domain.createdAt), "dd.MM.yyyy")} 
-                      readOnly 
-                      className="bg-muted/50 text-muted-foreground" 
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
-                      Дата следующего продления
-                    </label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !domain.expirationDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {domain.expirationDate ? format(parseISO(domain.expirationDate), "PPP", { locale: ru }) : <span>Выберите дату</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={parseISO(domain.expirationDate)}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <Input value={domain.owner || "Неизвестен"} readOnly className="bg-muted/50" />
                   </div>
                 </div>
               </div>
@@ -321,28 +260,21 @@ export default function DomainDetail() {
                         <label className="text-sm font-medium leading-none text-muted-foreground">Комментарий</label>
                         <CollapsibleTrigger asChild>
                             <Button variant="ghost" size="sm" className="h-8 gap-2 text-xs">
-                                {domain.description ? "Свернуть / Развернуть" : "Добавить комментарий"}
+                                Свернуть / Развернуть
                                 <ChevronsUpDown className="h-3 w-3" />
                             </Button>
                         </CollapsibleTrigger>
                     </div>
-                    <CollapsibleContent className="data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                         <Textarea 
-                            className="min-h-[100px] resize-y"
-                            placeholder="Например: Лендинг для партнера под GEO US, не использовать в других проектах" 
-                            defaultValue={domain.description} 
-                         />
-                    </CollapsibleContent>
-                    {!domain.description && (
-                        <div className="text-sm text-muted-foreground italic px-1 py-2 border border-dashed rounded bg-muted/30 text-center">
-                          Комментарий отсутствует
-                        </div>
-                    )}
-                    {domain.description && (
-                         <div className="text-sm text-foreground bg-muted/30 p-3 rounded-md border text-wrap">
-                           {domain.description}
+                    {/* Preview when closed */}
+                    <div className="group-data-[state=open]:hidden min-h-10 w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm shadow-sm truncate text-muted-foreground">
+                        {domain.description || "Комментарий отсутствует"}
+                    </div>
+                    {/* Full content when open */}
+                    <CollapsibleContent>
+                         <div className="min-h-[100px] w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm shadow-sm whitespace-pre-wrap">
+                           {domain.description || <span className="text-muted-foreground italic">Комментарий отсутствует</span>}
                          </div>
-                    )}
+                    </CollapsibleContent>
                  </Collapsible>
               </div>
 
@@ -414,6 +346,7 @@ export default function DomainDetail() {
                     <InfoRow label="Хостинг файлов" value={domain.fileHosting || "—"} />
                     <InfoRow label="IP-адрес" value={domain.ipAddress} copyable />
                     <InfoRow label="CDN" value={domain.cdn || "Нет"} />
+                    <InfoRow label="Дата продления" value={domain.expirationDate ? format(parseISO(domain.expirationDate), "dd.MM.yyyy") : "—"} />
                     <div className="space-y-2">
                       <span className="text-sm text-muted-foreground">NS-записи</span>
                       <div className="bg-secondary p-2 rounded text-xs font-mono">
@@ -594,76 +527,48 @@ function InfoRow({
   );
 }
 
-function MultiSelect({ 
-  options, 
-  selected, 
-  onChange, 
-  placeholder = "Выберите...",
-  emptyText = "Не найдено."
+function ReadOnlyGeoView({ 
+  selected,
+  limit = 3 
 }: { 
-  options: { value: string; label: string }[]; 
-  selected: string[]; 
-  onChange: (selected: string[]) => void;
-  placeholder?: string;
-  emptyText?: string;
+  selected: string[];
+  limit?: number;
 }) {
-  const [open, setOpen] = useState(false);
-
-  const handleSelect = (value: string) => {
-    // In a real app, you would call onChange here.
-    // For this mock display, we don't have a setter for the domain object.
-    console.log("Selected:", value);
-  };
+  const visible = selected.slice(0, limit);
+  const hidden = selected.slice(limit);
+  const hasHidden = hidden.length > 0;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between h-auto min-h-10 py-2"
-        >
-          <div className="flex flex-wrap gap-1 justify-start">
-            {selected.length > 0 ? (
-              selected.map((val) => (
-                <Badge key={val} variant="secondary" className="mr-1 mb-1">
-                  {options.find((opt) => opt.value === val)?.label || val}
-                  {/* Read-only view mainly, but keeping structure */}
+    <div className="flex flex-wrap gap-1 items-center min-h-10 py-2 px-3 rounded-md border border-input bg-muted/50">
+      {selected.length > 0 ? (
+        <>
+          {visible.map((val) => (
+            <Badge key={val} variant="secondary" className="mr-1">
+              {val}
+            </Badge>
+          ))}
+          {hasHidden && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+                  +{hidden.length}
                 </Badge>
-              ))
-            ) : (
-              <span className="text-muted-foreground">{placeholder}</span>
-            )}
-          </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-full p-0" align="start">
-        <Command>
-          <CommandInput placeholder="Поиск..." />
-          <CommandList>
-            <CommandEmpty>{emptyText}</CommandEmpty>
-            <CommandGroup>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.value}
-                  onSelect={() => handleSelect(option.value)}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selected.includes(option.value) ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {option.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2">
+                <div className="flex flex-wrap gap-1">
+                  {hidden.map((val) => (
+                    <Badge key={val} variant="secondary">
+                      {val}
+                    </Badge>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+        </>
+      ) : (
+        <span className="text-muted-foreground text-sm">Не выбрано</span>
+      )}
+    </div>
   );
 }

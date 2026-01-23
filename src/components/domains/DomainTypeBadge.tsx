@@ -6,39 +6,39 @@ import { useLanguage } from "@/components/language-provider";
 const typeConfig: Record<DomainType, { label: string; className: string }> = {
   site: { 
     label: "badges.site", 
-    className: "bg-blue-600/20 text-white border-blue-600/20" 
+    className: "bg-blue-500 text-white" 
   },
   product: { 
     label: "badges.product", 
-    className: "bg-emerald-600/20 text-white border-emerald-600/20" 
+    className: "bg-emerald-500 text-white" 
   },
   landing: { 
     label: "badges.landing", 
-    className: "bg-violet-600/20 text-white border-violet-600/20" 
+    className: "bg-violet-500 text-white" 
   },
   mirror: { 
     label: "badges.mirror", 
-    className: "bg-amber-600/20 text-white border-amber-600/20" 
+    className: "bg-amber-500 text-white" 
   },
   seo: { 
     label: "badges.seo", 
-    className: "bg-pink-600/20 text-white border-pink-600/20" 
+    className: "bg-pink-500 text-white" 
   },
   referral: { 
     label: "badges.referral", 
-    className: "bg-orange-600/20 text-white border-orange-600/20" 
+    className: "bg-orange-500 text-white" 
   },
   redirect: { 
     label: "badges.redirect", 
-    className: "bg-indigo-600/20 text-white border-indigo-600/20" 
+    className: "bg-indigo-500 text-white" 
   },
   technical: { 
     label: "badges.technical", 
-    className: "bg-slate-600/20 text-white border-slate-600/20" 
+    className: "bg-slate-500 text-white" 
   },
   subdomain: { 
     label: "badges.subdomain", 
-    className: "bg-cyan-600/20 text-white border-cyan-600/20" 
+    className: "bg-cyan-500 text-white" 
   },
 };
 
