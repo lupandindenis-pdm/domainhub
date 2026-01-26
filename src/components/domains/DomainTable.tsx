@@ -31,15 +31,15 @@ export function DomainTable({ domains }: DomainTableProps) {
   const { t } = useLanguage();
 
   return (
-    <div className="rounded-lg border border-border bg-card">
-      <Table className="table-fixed">
+    <div className="w-full">
+      <Table className="table-fixed w-full" role="table" aria-label="Domains list">
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[45%]">{t("table.domain")}</TableHead>
-            <TableHead className="w-[18%]">{t("table.type")}</TableHead>
-            <TableHead className="w-[12%]">{t("table.status")}</TableHead>
-            <TableHead>{t("table.project")}</TableHead>
-            <TableHead className="w-[56px]"></TableHead>
+            <TableHead className="w-[45%]" scope="col">Domain</TableHead>
+            <TableHead className="w-[18%]" scope="col">Type</TableHead>
+            <TableHead className="w-[12%]" scope="col">Status</TableHead>
+            <TableHead scope="col">Project</TableHead>
+            <TableHead className="w-[56px]" scope="col" aria-label="Actions"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -47,8 +47,9 @@ export function DomainTable({ domains }: DomainTableProps) {
             return (
               <TableRow 
                 key={domain.id} 
-                className="table-row-hover cursor-pointer"
+                className="hover:bg-muted/50 cursor-pointer transition-colors duration-150"
                 onClick={() => navigate(`/domains/${domain.id}`)}
+                aria-label={`Domain: ${domain.name}, Type: ${domain.type}, Status: ${domain.status}, Project: ${domain.project}`}
               >
                 <TableCell className="py-3">
                   <div className="flex items-center gap-3">
@@ -58,9 +59,14 @@ export function DomainTable({ domains }: DomainTableProps) {
                       className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigator.clipboard.writeText(domain.name);
-                        toast.success(t("common.copied"));
+                        try {
+                          navigator.clipboard.writeText(domain.name);
+                          toast.success(t("common.copied"));
+                        } catch (error) {
+                          toast.error(t("common.copy_failed"));
+                        }
                       }}
+                      aria-label={`Copy domain: ${domain.name}`}
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -72,8 +78,19 @@ export function DomainTable({ domains }: DomainTableProps) {
                         className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
                         onClick={(e) => {
                           e.stopPropagation();
-                          window.open(`https://${domain.name}`, "_blank");
+                          const url = `https://${domain.name}`;
+                          try {
+                            const validatedUrl = new URL(url);
+                            if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
+                              window.open(validatedUrl.toString(), "_blank", "noopener,noreferrer");
+                            } else {
+                              toast.error(t("common.invalid_url"));
+                            }
+                          } catch (error) {
+                            toast.error(t("common.invalid_url"));
+                          }
                         }}
+                        aria-label={`Open external site: ${domain.name}`}
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>
@@ -106,7 +123,19 @@ export function DomainTable({ domains }: DomainTableProps) {
                         {t("actions.edit")}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => window.open(`https://${domain.name}`, "_blank")}>
+                      <DropdownMenuItem onClick={() => {
+                        const url = `https://${domain.name}`;
+                        try {
+                          const validatedUrl = new URL(url);
+                          if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
+                            window.open(validatedUrl.toString(), "_blank", "noopener,noreferrer");
+                          } else {
+                            toast.error(t("common.invalid_url"));
+                          }
+                        } catch (error) {
+                          toast.error(t("common.invalid_url"));
+                        }
+                      }}>
                         {t("actions.open_site")}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

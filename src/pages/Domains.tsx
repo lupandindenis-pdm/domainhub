@@ -8,19 +8,21 @@ import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useLanguage } from "@/components/language-provider";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function Domains() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [filters, setFilters] = useState<DomainFilter>({});
+  const debouncedFilters = useDebounce(filters, 300);
 
   const buildShortSha = __BUILD_SHA__ === "dev" ? "dev" : __BUILD_SHA__.slice(0, 7);
 
   const filteredDomains = useMemo(() => {
     return mockDomains.filter((domain) => {
       // Search filter
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
+      if (debouncedFilters.search) {
+        const searchLower = debouncedFilters.search.toLowerCase();
         if (!domain.name.toLowerCase().includes(searchLower) &&
             !domain.project.toLowerCase().includes(searchLower) &&
             !domain.description.toLowerCase().includes(searchLower)) {
@@ -29,40 +31,40 @@ export default function Domains() {
       }
 
       // Type filter
-      if (filters.types?.length && !filters.types.includes(domain.type)) {
+      if (debouncedFilters.types?.length && !debouncedFilters.types.includes(domain.type)) {
         return false;
       }
 
       // Status filter
-      if (filters.statuses?.length && !filters.statuses.includes(domain.status)) {
+      if (debouncedFilters.statuses?.length && !debouncedFilters.statuses.includes(domain.status)) {
         return false;
       }
 
       // Project filter
-      if (filters.projects?.length && !filters.projects.includes(domain.project)) {
+      if (debouncedFilters.projects?.length && !debouncedFilters.projects.includes(domain.project)) {
         return false;
       }
 
       // Registrar filter
-      if (filters.registrars?.length && !filters.registrars.includes(domain.registrar)) {
+      if (debouncedFilters.registrars?.length && !debouncedFilters.registrars.includes(domain.registrar)) {
         return false;
       }
 
       return true;
     });
-  }, [filters]);
+  }, [debouncedFilters]);
 
   const handleExport = () => {
-    // Generate CSV content
+    // Generate CSV content with internationalized headers
     const headers = [
-      "Домен",
-      "Тип",
-      "Статус",
-      "Проект",
-      "Отдел",
-      "Регистратор",
-      "Дата окончания",
-      "SSL",
+      t("export.domain"),
+      t("export.type"),
+      t("export.status"),
+      t("export.project"),
+      t("export.department"),
+      t("export.registrar"),
+      t("export.expiration_date"),
+      t("export.ssl_status"),
     ];
 
     const rows = filteredDomains.map((d) => [
@@ -88,8 +90,8 @@ export default function Domains() {
     link.download = `domains-export-${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
 
-    toast.success("Экспорт завершён", {
-      description: `Экспортировано ${filteredDomains.length} доменов`,
+    toast.success(t("export.completed"), {
+      description: `${t("export.exported_count")}: ${filteredDomains.length}`,
     });
   };
 

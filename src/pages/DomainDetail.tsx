@@ -32,21 +32,29 @@ import {
   Megaphone, 
   BarChart3, 
   Users, 
+  User,
   Layers, 
   Code2, 
   RotateCcw, 
   FileText, 
-  ChevronsUpDown
+  ChevronsUpDown,
+  CheckCircle,
+  Ban,
+  Activity,
+  Tag
 } from "lucide-react";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import { toast } from "sonner";
+import { useLanguage } from "@/components/language-provider";
 import DomainDetailV1 from "./DomainDetailV1";
 
 export default function DomainDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [version, setVersion] = useState<'v1' | 'v2'>('v2');
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const { t } = useLanguage();
   
   const domain = mockDomains.find((d) => d.id === id);
 
@@ -93,14 +101,26 @@ export default function DomainDetail() {
   return (
     <div className="container py-6 space-y-6 max-w-7xl mx-auto">
       {/* Top Navigation & Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/domains")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold font-mono tracking-tight">{domain.name}</h1>
+              <h1 
+                className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-primary transition-colors"
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(domain.name);
+                    toast.success("Домен скопирован в буфер обмена");
+                  } catch (error) {
+                    toast.error("Ошибка копирования");
+                  }
+                }}
+              >
+                {domain.name}
+              </h1>
               <Button
                 variant="ghost"
                 size="icon"
@@ -109,43 +129,24 @@ export default function DomainDetail() {
               >
                 <ExternalLink className="h-5 w-5" />
               </Button>
-              <Badge variant="outline" className="ml-2 font-normal text-xs uppercase tracking-wider">
-                v2.1
-              </Badge>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 mt-2">
-              <DomainStatusBadge status={domain.status} />
-              
-              {domain.sslStatus === 'valid' ? (
-                <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20 gap-1">
-                  <Shield className="h-3 w-3" /> SSL OK
-                </Badge>
-              ) : (
-                 <Badge variant="destructive" className="gap-1">
-                  <Shield className="h-3 w-3" /> SSL Issue
-                </Badge>
-              )}
+              <div className="flex items-center gap-2 ml-4">
+                {domain.needsUpdate && (
+                   <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 gap-1 h-6">
+                    <AlertTriangle className="h-3 w-3" /> Требует обновления
+                  </Badge>
+                )}
 
-              {domain.needsUpdate && (
-                 <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 gap-1">
-                  <AlertTriangle className="h-3 w-3" /> Требует обновления
-                </Badge>
-              )}
-
-              {domain.hasGeoBlock && (
-                <Badge variant="destructive" className="gap-1">
-                  <Globe className="h-3 w-3" /> GEO Block
-                </Badge>
-              )}
+                {domain.hasGeoBlock && (
+                  <Badge variant="destructive" className="gap-1 h-6">
+                    <Globe className="h-3 w-3" /> GEO Block
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setVersion('v1')}>
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Версия V1
-          </Button>
           <Button onClick={() => navigate(`/domains/${id}/edit`)} className="gap-2">
             <Edit className="h-4 w-4" />
             Редактировать
@@ -168,73 +169,57 @@ export default function DomainDetail() {
         </TabsList>
 
         {/* 1. GENERAL TAB (Merged Overview + General) */}
-        <TabsContent value="general" className="space-y-6">
-          <Card>
-            <CardHeader className="pb-4 border-b bg-muted/20">
-              <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                Основная информация
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-8">
+        <TabsContent value="general" className="space-y-4">
+          <div className="w-full">
+            <div className="p-6 space-y-8">
+              {/* Two columns for remaining fields */}
               <div className="grid gap-8 md:grid-cols-2">
-                {/* Column 1: Core Identifiers */}
+                {/* Column 1 */}
                 <div className="space-y-5">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
-                      Название домена
-                    </label>
-                    <Input value={domain.name} readOnly className="font-mono bg-muted/50" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Tag className="h-4 w-4" />
                       Тип
                     </label>
-                    <div className="flex items-center h-10 px-3 rounded-md border border-input bg-muted/50">
-                        <DomainTypeBadge type={domain.type} />
+                    <div className={cn("flex items-center h-10 px-3 rounded-md border-none text-sm", typeColorClass)}>
+                      {t(`badges.${domain.type}`)}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
                       Проект
                     </label>
-                    <Input value={domain.project} readOnly className="bg-muted/50" />
+                    <Input value={domain.project} readOnly className="bg-muted/50 text-base" />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Activity className="h-4 w-4" />
                       Статус
                     </label>
                      <div className={cn("flex items-center h-10 px-3 rounded-md border-none", statusColorClass)}>
-                        <span className="font-bold text-sm">
-                           {domain.status}
+                        <span className="text-sm">
+                           {t(`status.${domain.status}`)}
                         </span>
                      </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
-                      Отдел
-                    </label>
-                    <Input value={domain.department} readOnly className="bg-muted/50" />
-                  </div>
                 </div>
 
-                {/* Column 2: Details & Dates */}
+                {/* Column 2 */}
                 <div className="space-y-5">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
                       GEO (используется)
                     </label>
-                    <div className="min-h-10 py-2 px-3 rounded-md border border-input bg-muted/50 text-sm">
-                      {domain.geo?.join(", ") || "—"}
-                    </div>
+                    <ReadOnlyGeoView selected={domain.geo || []} />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Ban className="h-4 w-4" />
                       GEO (блокировка)
                     </label>
                     <ReadOnlyGeoView 
@@ -243,10 +228,11 @@ export default function DomainDetail() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium leading-none text-muted-foreground">
-                      Автор
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Отдел
                     </label>
-                    <Input value={domain.owner || "Неизвестен"} readOnly className="bg-muted/50" />
+                    <Input value={domain.department} readOnly className="bg-muted/50 text-base" />
                   </div>
                 </div>
               </div>
@@ -255,31 +241,66 @@ export default function DomainDetail() {
 
               {/* Comment Section */}
               <div className="space-y-2">
-                 <Collapsible>
-                    <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium leading-none text-muted-foreground">Комментарий</label>
-                        <CollapsibleTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 gap-2 text-xs">
-                                Свернуть / Развернуть
-                                <ChevronsUpDown className="h-3 w-3" />
-                            </Button>
-                        </CollapsibleTrigger>
-                    </div>
-                    {/* Preview when closed */}
-                    <div className="group-data-[state=open]:hidden min-h-10 w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm shadow-sm truncate text-muted-foreground">
-                        {domain.description || "Комментарий отсутствует"}
-                    </div>
-                    {/* Full content when open */}
-                    <CollapsibleContent>
-                         <div className="min-h-[100px] w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm shadow-sm whitespace-pre-wrap">
-                           {domain.description || <span className="text-muted-foreground italic">Комментарий отсутствует</span>}
-                         </div>
-                    </CollapsibleContent>
-                 </Collapsible>
+                 <div className="flex items-center justify-between mb-2">
+                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                         <FileText className="h-4 w-4" />
+                         Комментарий
+                     </label>
+                     <Button 
+                       variant="ghost" 
+                       size="sm" 
+                       className="h-8 gap-2 text-xs"
+                       onClick={() => setIsCommentOpen(!isCommentOpen)}
+                     >
+                         {isCommentOpen ? 'Свернуть' : 'Развернуть'}
+                         <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                     </Button>
+                 </div>
+                 
+                 {/* Single container with conditional content */}
+                 <div className={cn(
+                   "w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200",
+                   isCommentOpen ? "min-h-[100px] whitespace-pre-wrap" : "min-h-10"
+                 )}>
+                   {domain.description ? (
+                     <span className="text-muted-foreground">
+                       {isCommentOpen 
+                         ? domain.description 
+                         : (domain.description.length > 100 
+                             ? `${domain.description.substring(0, 100)}...` 
+                             : domain.description
+                           )
+                       }
+                     </span>
+                   ) : (
+                     <span className="text-muted-foreground italic">Комментарий отсутствует</span>
+                   )}
+                 </div>
               </div>
 
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Author and Date - moved to bottom as less important info */}
+          <div className="flex flex-wrap justify-between gap-6 text-sm text-muted-foreground/40 px-6">
+            <div className="flex flex-wrap gap-6">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span>Автор: </span>
+                <span>{domain.owner || "Неизвестен"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                <span>Дата добавления: </span>
+                <span>{new Date().toLocaleDateString()}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <RotateCcw className="h-4 w-4" />
+              <span>Последнее изменение: </span>
+              <span>{new Date().toLocaleDateString()}</span>
+            </div>
+          </div>
         </TabsContent>
 
         {/* 2. DEPARTMENT TAB (GROUPED) - Kept as is */}
@@ -538,37 +559,65 @@ function ReadOnlyGeoView({
   const hidden = selected.slice(limit);
   const hasHidden = hidden.length > 0;
 
+  // Цветовая схема для континентов/регионов
+  const getRegionColor = (country: string) => {
+    // Приводим к 2-символьным кодам
+    const code = country.substring(0, 2).toUpperCase();
+    const europe = ['RU', 'DE', 'FR', 'IT', 'ES', 'GB', 'PL', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI'];
+    const asia = ['CN', 'JP', 'KR', 'IN', 'SG', 'TH', 'MY', 'ID', 'PH', 'VN'];
+    const americas = ['US', 'CA', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE'];
+    
+    if (europe.includes(code)) return 'bg-blue-500/30 text-white';
+    if (asia.includes(code)) return 'bg-emerald-500/30 text-white';
+    if (americas.includes(code)) return 'bg-purple-500/30 text-white';
+    return 'bg-orange-500/30 text-white';
+  };
+
+  // Форматируем код страны до 2 символов
+  const formatCountryCode = (country: string) => {
+    return country.substring(0, 2).toUpperCase();
+  };
+
   return (
-    <div className="flex flex-wrap gap-1 items-center min-h-10 py-2 px-3 rounded-md border border-input bg-muted/50">
-      {selected.length > 0 ? (
-        <>
-          {visible.map((val) => (
-            <Badge key={val} variant="secondary" className="mr-1">
-              {val}
-            </Badge>
-          ))}
-          {hasHidden && (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Badge variant="outline" className="cursor-pointer hover:bg-accent">
-                  +{hidden.length}
-                </Badge>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-2">
-                <div className="flex flex-wrap gap-1">
-                  {hidden.map((val) => (
-                    <Badge key={val} variant="secondary">
-                      {val}
-                    </Badge>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
-        </>
-      ) : (
-        <span className="text-muted-foreground text-sm">Не выбрано</span>
-      )}
+    <div className="space-y-2">
+      {/* Выбранные страны с цветами */}
+      <div className="flex flex-wrap items-center gap-1 min-h-10 py-2 px-3 rounded-md border border-border/50 bg-muted/30">
+        {selected.length > 0 ? (
+          <>
+            {visible.map((val) => (
+              <div 
+                key={val}
+                className={`${getRegionColor(val)} font-mono text-xs px-2 py-1 min-w-[2rem] text-center rounded-md`}
+              >
+                {formatCountryCode(val)}
+              </div>
+            ))}
+            {hasHidden && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="border border-border/50 font-mono text-xs px-2 py-1 rounded-md cursor-pointer">
+                    +{hidden.length}
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-2">
+                  <div className="flex flex-wrap gap-1">
+                    {hidden.map((val) => (
+                      <div 
+                        key={val} 
+                        className={`${getRegionColor(val)} font-mono text-xs px-2 py-1 min-w-[2rem] text-center rounded-md`}
+                      >
+                        {formatCountryCode(val)}
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            )}
+          </>
+        ) : (
+          <span className="text-muted-foreground/60 text-sm italic">Не выбрано</span>
+        )}
+      </div>
     </div>
   );
 }
