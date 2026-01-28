@@ -259,8 +259,8 @@ export default function DomainDetail() {
                  
                  {/* Single container with conditional content */}
                  <div className={cn(
-                   "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200",
-                   isCommentOpen ? "min-h-[100px] whitespace-pre-wrap" : "min-h-10"
+                   "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                   isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
                  )}>
                    {domain.description ? (
                      <span className="text-muted-foreground">
@@ -282,7 +282,7 @@ export default function DomainDetail() {
           </div>
 
           {/* Author and Date - moved to bottom as less important info */}
-          <div className="flex flex-wrap justify-between gap-6 text-sm text-muted-foreground/40 px-6">
+          <div className="flex flex-wrap justify-between gap-6 text-sm text-muted-foreground px-6">
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
