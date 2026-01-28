@@ -191,7 +191,7 @@ export default function DomainDetail() {
                       <BarChart3 className="h-4 w-4" />
                       Проект
                     </label>
-                    <Input value={domain.project} readOnly className="bg-muted/50 text-base" />
+                    <Input value={domain.project} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
                   </div>
 
                   <div className="space-y-2">
@@ -232,7 +232,7 @@ export default function DomainDetail() {
                       <Users className="h-4 w-4" />
                       Отдел
                     </label>
-                    <Input value={domain.department} readOnly className="bg-muted/50 text-base" />
+                    <Input value={domain.department} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
                   </div>
                 </div>
               </div>
@@ -259,7 +259,7 @@ export default function DomainDetail() {
                  
                  {/* Single container with conditional content */}
                  <div className={cn(
-                   "w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200",
+                   "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200",
                    isCommentOpen ? "min-h-[100px] whitespace-pre-wrap" : "min-h-10"
                  )}>
                    {domain.description ? (
@@ -581,7 +581,7 @@ function ReadOnlyGeoView({
   return (
     <div className="space-y-2">
       {/* Выбранные страны с цветами */}
-      <div className="flex flex-wrap items-center gap-1 min-h-10 py-2 px-3 rounded-md border border-border/50 bg-muted/30">
+      <div className="flex flex-wrap items-center gap-1 min-h-10 py-2 px-3 rounded-md border-none bg-muted/30">
         {selected.length > 0 ? (
           <>
             {visible.map((val) => (
