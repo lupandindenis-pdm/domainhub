@@ -109,7 +109,7 @@ export default function DomainDetail() {
           <div className="space-y-1">
             <div className="flex items-center gap-3">
               <h1 
-                className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-primary transition-colors"
+                className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors"
                 onClick={() => {
                   try {
                     navigator.clipboard.writeText(domain.name);
