@@ -174,7 +174,7 @@ export default function DomainDetail() {
             <div className="p-6 space-y-8">
               {/* Two columns for remaining fields */}
               <div className="grid gap-8 md:grid-cols-2">
-                {/* Column 1 */}
+                {/* Column 1: Тип, GEO исп, Проект */}
                 <div className="space-y-5">
                   <div className="space-y-2">
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
@@ -188,12 +188,23 @@ export default function DomainDetail() {
 
                   <div className="space-y-2">
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      GEO (используется)
+                    </label>
+                    <ReadOnlyGeoView selected={domain.geo || []} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
                       <BarChart3 className="h-4 w-4" />
                       Проект
                     </label>
                     <Input value={domain.project} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
                   </div>
+                </div>
 
+                {/* Column 2: Статус, GEO блок, Отдел */}
+                <div className="space-y-5">
                   <div className="space-y-2">
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
                       <Activity className="h-4 w-4" />
@@ -204,17 +215,6 @@ export default function DomainDetail() {
                            {t(`status.${domain.status}`)}
                         </span>
                      </div>
-                  </div>
-                </div>
-
-                {/* Column 2 */}
-                <div className="space-y-5">
-                  <div className="space-y-2">
-                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-                      <Globe className="h-4 w-4" />
-                      GEO (используется)
-                    </label>
-                    <ReadOnlyGeoView selected={domain.geo || []} />
                   </div>
 
                   <div className="space-y-2">
