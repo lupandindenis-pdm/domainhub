@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { DomainTable } from "@/components/domains/DomainTable";
 import { DomainFilters } from "@/components/domains/DomainFilters";
+import { BulkActionsBar } from "@/components/domains/BulkActionsBar";
 import { mockDomains } from "@/data/mockDomains";
 import { DomainFilter } from "@/types/domain";
 import { Button } from "@/components/ui/button";
@@ -15,11 +16,13 @@ export default function Domains() {
   const { t } = useLanguage();
   const [filters, setFilters] = useState<DomainFilter>({});
   const debouncedFilters = useDebounce(filters, 300);
+  const [bulkSelectMode, setBulkSelectMode] = useState(false);
+  const [selectedDomainIds, setSelectedDomainIds] = useState<Set<string>>(new Set());
 
   const buildShortSha = __BUILD_SHA__ === "dev" ? "dev" : __BUILD_SHA__.slice(0, 7);
 
   const filteredDomains = useMemo(() => {
-    return mockDomains.filter((domain) => {
+    const filtered = mockDomains.filter((domain) => {
       // Search filter
       if (debouncedFilters.search) {
         const searchLower = debouncedFilters.search.toLowerCase();
@@ -52,7 +55,106 @@ export default function Domains() {
 
       return true;
     });
+
+    // Remove selected domains that are no longer in filtered results
+    const filteredIds = new Set(filtered.map(d => d.id));
+    setSelectedDomainIds(prev => {
+      const newSet = new Set([...prev].filter(id => filteredIds.has(id)));
+      return newSet.size !== prev.size ? newSet : prev;
+    });
+
+    return filtered;
   }, [debouncedFilters]);
+
+  const handleToggleBulkMode = () => {
+    const newMode = !bulkSelectMode;
+    setBulkSelectMode(newMode);
+    if (!newMode) {
+      setSelectedDomainIds(new Set());
+    } else {
+      toast.success("Множественный выбор включен", {
+        description: "Кликайте по строкам для выбора доменов",
+      });
+    }
+  };
+
+  const handleToggleDomain = (domainId: string) => {
+    setSelectedDomainIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(domainId)) {
+        newSet.delete(domainId);
+      } else {
+        newSet.add(domainId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleCloseBulkActions = () => {
+    setBulkSelectMode(false);
+    setSelectedDomainIds(new Set());
+  };
+
+  const handleExportSelected = () => {
+    const selectedDomains = mockDomains.filter(d => selectedDomainIds.has(d.id));
+    const headers = [
+      t("export.domain"),
+      t("export.type"),
+      t("export.status"),
+      t("export.project"),
+      t("export.department"),
+      t("export.registrar"),
+      t("export.expiration_date"),
+      t("export.ssl_status"),
+    ];
+
+    const rows = selectedDomains.map((d) => [
+      d.name,
+      d.type,
+      d.status,
+      d.project,
+      d.department,
+      d.registrar,
+      d.expirationDate,
+      d.sslStatus,
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `domains-selected-${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+
+    toast.success("Экспорт завершён", {
+      description: `Экспортировано доменов: ${selectedDomains.length}`,
+    });
+  };
+
+  const handleHideSelected = () => {
+    toast.info("Скрытие доменов", {
+      description: `Будет скрыто доменов: ${selectedDomainIds.size}`,
+    });
+    // TODO: Implement hide logic
+  };
+
+  const handleMoveSelected = () => {
+    toast.info("Перемещение доменов", {
+      description: `Будет перемещено доменов: ${selectedDomainIds.size}`,
+    });
+    // TODO: Implement move logic
+  };
+
+  const handleDeleteSelected = () => {
+    toast.warning("Удаление доменов", {
+      description: `Будет удалено доменов: ${selectedDomainIds.size}. Требуется подтверждение.`,
+    });
+    // TODO: Implement delete with confirmation
+  };
 
   const handleExport = () => {
     // Generate CSV content with internationalized headers
@@ -117,10 +219,17 @@ export default function Domains() {
         filters={filters} 
         onFiltersChange={setFilters}
         onExport={handleExport}
+        bulkSelectMode={bulkSelectMode}
+        onToggleBulkMode={handleToggleBulkMode}
       />
 
       {/* Domain Table */}
-      <DomainTable domains={filteredDomains} />
+      <DomainTable 
+        domains={filteredDomains}
+        bulkSelectMode={bulkSelectMode}
+        selectedDomainIds={selectedDomainIds}
+        onToggleDomain={handleToggleDomain}
+      />
 
       {filteredDomains.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -130,6 +239,16 @@ export default function Domains() {
           </p>
         </div>
       )}
+
+      {/* Bulk Actions Bar */}
+      <BulkActionsBar
+        selectedCount={selectedDomainIds.size}
+        onExportSelected={handleExportSelected}
+        onHideSelected={handleHideSelected}
+        onMoveSelected={handleMoveSelected}
+        onDeleteSelected={handleDeleteSelected}
+        onClose={handleCloseBulkActions}
+      />
     </div>
   );
 }

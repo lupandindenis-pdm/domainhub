@@ -14,14 +14,26 @@ import { Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/components/language-provider";
+import { cn } from "@/lib/utils";
 
 interface DomainTableProps {
   domains: Domain[];
+  bulkSelectMode: boolean;
+  selectedDomainIds: Set<string>;
+  onToggleDomain: (domainId: string) => void;
 }
 
-export function DomainTable({ domains }: DomainTableProps) {
+export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onToggleDomain }: DomainTableProps) {
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  const handleRowClick = (domainId: string) => {
+    if (bulkSelectMode) {
+      onToggleDomain(domainId);
+    } else {
+      navigate(`/domains/${domainId}`);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -36,11 +48,15 @@ export function DomainTable({ domains }: DomainTableProps) {
         </TableHeader>
         <TableBody>
           {domains.map((domain) => {
+            const isSelected = selectedDomainIds.has(domain.id);
             return (
               <TableRow 
                 key={domain.id} 
-                className="hover:bg-muted/50 cursor-pointer transition-colors duration-150"
-                onClick={() => navigate(`/domains/${domain.id}`)}
+                className={cn(
+                  "hover:bg-muted/50 cursor-pointer transition-colors duration-150",
+                  isSelected && "bg-primary/10 border-l-4 border-l-primary"
+                )}
+                onClick={() => handleRowClick(domain.id)}
                 aria-label={`Domain: ${domain.name}, Type: ${domain.type}, Status: ${domain.status}, Project: ${domain.project}`}
               >
                 <TableCell className="py-3">

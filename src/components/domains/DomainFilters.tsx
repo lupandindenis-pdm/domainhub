@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { X, Download, Check, ChevronDown } from "lucide-react";
+import { X, Download, Check, ChevronDown, CheckSquare, Square } from "lucide-react";
 import { DomainFilter, DomainType, DomainStatus } from "@/types/domain";
 import { projects } from "@/data/mockDomains";
 import { useLanguage } from "@/components/language-provider";
@@ -48,6 +48,8 @@ interface DomainFiltersProps {
   filters: DomainFilter;
   onFiltersChange: (filters: DomainFilter) => void;
   onExport: () => void;
+  bulkSelectMode: boolean;
+  onToggleBulkMode: () => void;
 }
 
 interface MultiSelectProps {
@@ -135,7 +137,7 @@ function MultiSelectFilter({ title, options, selectedValues = [], onChange }: Mu
   );
 }
 
-export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFiltersProps) {
+export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode }: DomainFiltersProps) {
   const { t } = useLanguage();
   const hasActiveFilters = 
     filters.search || 
@@ -150,6 +152,19 @@ export function DomainFilters({ filters, onFiltersChange, onExport }: DomainFilt
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
+        <Button
+          variant={bulkSelectMode ? "default" : "outline"}
+          size="icon"
+          onClick={onToggleBulkMode}
+          className={cn(
+            "h-10 w-10 transition-colors",
+            bulkSelectMode ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80"
+          )}
+          aria-label="Toggle bulk select mode"
+        >
+          {bulkSelectMode ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
+        </Button>
+
         <MultiSelectFilter
           title={t("filters.all_types")}
           options={domainTypes}
