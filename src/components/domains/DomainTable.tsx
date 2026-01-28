@@ -10,15 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Copy, ExternalLink, MoreHorizontal } from "lucide-react";
+import { Copy, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/components/language-provider";
 
@@ -35,11 +28,10 @@ export function DomainTable({ domains }: DomainTableProps) {
       <Table className="table-fixed w-full" role="table" aria-label="Domains list">
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[45%]" scope="col">Domain</TableHead>
+            <TableHead className="w-[35%]" scope="col">Domain</TableHead>
+            <TableHead className="w-[20%]" scope="col">Project</TableHead>
             <TableHead className="w-[18%]" scope="col">Type</TableHead>
-            <TableHead className="w-[12%]" scope="col">Status</TableHead>
-            <TableHead scope="col">Project</TableHead>
-            <TableHead className="w-[56px]" scope="col" aria-label="Actions"></TableHead>
+            <TableHead className="w-[15%]" scope="col">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -97,6 +89,9 @@ export function DomainTable({ domains }: DomainTableProps) {
                     </div>
                   </div>
                 </TableCell>
+                <TableCell className="py-3 text-sm text-muted-foreground">
+                  {domain.project}
+                </TableCell>
                 <TableCell className="py-3">
                   <div className="flex justify-start">
                     <DomainTypeBadge type={domain.type} />
@@ -104,46 +99,6 @@ export function DomainTable({ domains }: DomainTableProps) {
                 </TableCell>
                 <TableCell className="py-3">
                   <DomainStatusBadge status={domain.status} />
-                </TableCell>
-                <TableCell className="py-3 text-sm text-muted-foreground">
-                  {domain.project}
-                </TableCell>
-                <TableCell className="py-3">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => navigate(`/domains/${domain.id}`)}>
-                        {t("actions.open")}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate(`/domains/${domain.id}/edit`)}>
-                        {t("actions.edit")}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => {
-                        const url = `https://${domain.name}`;
-                        try {
-                          const validatedUrl = new URL(url);
-                          if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
-                            window.open(validatedUrl.toString(), "_blank", "noopener,noreferrer");
-                          } else {
-                            toast.error(t("common.invalid_url"));
-                          }
-                        } catch (error) {
-                          toast.error(t("common.invalid_url"));
-                        }
-                      }}>
-                        {t("actions.open_site")}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">
-                        {t("actions.delete")}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             );
