@@ -1,6 +1,8 @@
 import { Domain } from "@/types/domain";
 import { DomainTypeBadge } from "./DomainTypeBadge";
 import { DomainStatusBadge } from "./DomainStatusBadge";
+import { LabelBadge } from "./LabelBadge";
+import { mockLabels } from "@/data/mockDomains";
 import {
   Table,
   TableBody,
@@ -125,6 +127,10 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>
+                      {domain.labelId && (() => {
+                        const label = mockLabels.find(l => l.id === domain.labelId);
+                        return label ? <LabelBadge label={label} /> : null;
+                      })()}
                     </div>
                   </div>
                 </TableCell>

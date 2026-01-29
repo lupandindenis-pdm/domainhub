@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { X, Download, Check, ChevronDown, CheckSquare, Square, EyeOff } from "lucide-react";
+import { SingleSelectFilter } from "./SingleSelectFilter";
 import { DomainFilter, DomainType, DomainStatus } from "@/types/domain";
+import { mockLabels } from "@/data/mockDomains";
+import { LabelBadge } from "./LabelBadge";
 import { projects } from "@/data/mockDomains";
 import { useLanguage } from "@/components/language-provider";
 import {
@@ -146,7 +149,8 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
     filters.search || 
     filters.types?.length || 
     filters.statuses?.length || 
-    filters.projects?.length;
+    filters.projects?.length ||
+    filters.labelId;
 
   const clearFilters = () => {
     onFiltersChange({});
@@ -187,6 +191,17 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
           options={projects.map(p => ({ value: p, label: p }))}
           selectedValues={filters.projects}
           onChange={(values) => onFiltersChange({ ...filters, projects: values })}
+        />
+
+        <SingleSelectFilter
+          title="Метки"
+          options={mockLabels.map(l => ({ value: l.id, label: l.name, color: l.color }))}
+          selectedValue={filters.labelId}
+          onChange={(value) => onFiltersChange({ ...filters, labelId: value })}
+          renderOption={(option) => {
+            const label = mockLabels.find(l => l.id === option.value);
+            return label ? <LabelBadge label={label} /> : option.label;
+          }}
         />
 
         {hasActiveFilters && (

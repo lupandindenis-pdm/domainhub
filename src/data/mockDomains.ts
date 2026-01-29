@@ -1,4 +1,13 @@
-import { Domain, DomainHistoryEntry } from "@/types/domain";
+import { Domain, DomainHistoryEntry, Label } from "@/types/domain";
+
+export const mockLabels: Label[] = [
+  { id: "label-1", name: "Приоритет", color: "#ef4444", projectId: "Corporate Website" },
+  { id: "label-2", name: "Тест", color: "#f59e0b", projectId: "Corporate Website" },
+  { id: "label-3", name: "Архив", color: "#6b7280", projectId: "Corporate Website" },
+  { id: "label-4", name: "Новый", color: "#10b981", projectId: "Corporate Website" },
+  { id: "label-5", name: "Ревью", color: "#3b82f6", projectId: "Corporate Website" },
+  { id: "label-6", name: "Продакшн", color: "#8b5cf6", projectId: "E-commerce Platform" },
+];
 
 export const mockDomains: Domain[] = [
   {
@@ -48,6 +57,7 @@ export const mockDomains: Domain[] = [
     addedDate: "2020-03-15",
     oneSignalId: "onesignal-id-1",
     otherIntegrations: ["Sentry", "Metrika"],
+    labelId: "label-1",
   },
   {
     id: "2",
@@ -101,6 +111,7 @@ export const mockDomains: Domain[] = [
     hasGeoBlock: true,
     languages: ["en", "de", "fr"],
     addedDate: "2022-06-20",
+    labelId: "label-2",
   },
   {
     id: "3",
@@ -140,6 +151,7 @@ export const mockDomains: Domain[] = [
     blockedGeo: ["US", "EU", "CN", "BR", "JP", "AU"],
     languages: ["ru"],
     addedDate: "2024-01-10",
+    labelId: "label-4",
   },
   {
     id: "4",
@@ -180,6 +192,7 @@ export const mockDomains: Domain[] = [
     hasGeoBlock: false,
     languages: ["en"],
     addedDate: "2021-09-05",
+    labelId: "label-5",
   },
   {
     id: "5",

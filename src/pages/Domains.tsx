@@ -82,6 +82,13 @@ export default function Domains() {
         return false;
       }
 
+      // Label filter
+      if (debouncedFilters.labelId) {
+        if (domain.labelId !== debouncedFilters.labelId) {
+          return false;
+        }
+      }
+
       return true;
     });
 

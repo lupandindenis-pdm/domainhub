@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { mockDomains } from "@/data/mockDomains";
+import { mockDomains, mockLabels } from "@/data/mockDomains";
 import { DomainTypeBadge } from "@/components/domains/DomainTypeBadge";
 import { DomainStatusBadge } from "@/components/domains/DomainStatusBadge";
+import { LabelBadge } from "@/components/domains/LabelBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -102,48 +103,45 @@ export default function DomainDetail() {
     <div className="container py-6 space-y-6 max-w-7xl mx-auto">
       {/* Top Navigation & Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/domains")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div className="space-y-1">
-            <div className="flex items-center gap-3">
-              <h1 
-                className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors"
-                onClick={() => {
-                  try {
-                    navigator.clipboard.writeText(domain.name);
-                    toast.success("Домен скопирован в буфер обмена");
-                  } catch (error) {
-                    toast.error("Ошибка копирования");
-                  }
-                }}
-              >
-                {domain.name}
-              </h1>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                onClick={() => window.open(`https://${domain.name}`, "_blank")}
-              >
-                <ExternalLink className="h-5 w-5" />
-              </Button>
-              <div className="flex items-center gap-2 ml-4">
-                {domain.needsUpdate && (
-                   <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 gap-1 h-6">
-                    <AlertTriangle className="h-3 w-3" /> Требует обновления
-                  </Badge>
-                )}
-
-                {domain.hasGeoBlock && (
-                  <Badge variant="destructive" className="gap-1 h-6">
-                    <Globe className="h-3 w-3" /> GEO Block
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
+          <h1 
+            className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors"
+            onClick={() => {
+              try {
+                navigator.clipboard.writeText(domain.name);
+                toast.success("Домен скопирован в буфер обмена");
+              } catch (error) {
+                toast.error("Ошибка копирования");
+              }
+            }}
+          >
+            {domain.name}
+          </h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={() => window.open(`https://${domain.name}`, "_blank")}
+          >
+            <ExternalLink className="h-5 w-5" />
+          </Button>
+          {domain.labelId && (() => {
+            const label = mockLabels.find(l => l.id === domain.labelId);
+            return label ? <LabelBadge label={label} /> : null;
+          })()}
+          {domain.needsUpdate && (
+             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6">
+              <AlertTriangle className="h-3 w-3" /> Требует обновления
+            </Badge>
+          )}
+          {domain.hasGeoBlock && (
+            <Badge variant="destructive" className="gap-1 h-6">
+              <Globe className="h-3 w-3" /> GEO Block
+            </Badge>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

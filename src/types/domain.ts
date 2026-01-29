@@ -96,6 +96,9 @@ export interface Domain {
   // Integrations
   oneSignalId?: string;
   otherIntegrations?: string[];
+  
+  // Label
+  labelId?: string;
 }
 
 export interface DomainHistoryEntry {
@@ -108,6 +111,13 @@ export interface DomainHistoryEntry {
   changedAt: string;
 }
 
+export interface Label {
+  id: string;
+  name: string;
+  color: string;
+  projectId: string;
+}
+
 export interface DomainFilter {
   search?: string;
   types?: DomainType[];
@@ -116,4 +126,5 @@ export interface DomainFilter {
   departments?: string[];
   registrars?: string[];
   geo?: string[];
+  labelId?: string;
 }
