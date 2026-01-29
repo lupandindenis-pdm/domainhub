@@ -87,7 +87,7 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-yellow-400"
                       onClick={(e) => {
                         e.stopPropagation();
                         try {
@@ -102,18 +102,7 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                       <Copy className="h-4 w-4" />
                     </Button>
                     <div className="flex items-center gap-2 min-w-0">
-                      <span 
-                        className="font-mono text-sm font-normal whitespace-nowrap cursor-pointer hover:text-yellow-400 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          try {
-                            navigator.clipboard.writeText(domain.name);
-                            toast.success(t("common.copied"));
-                          } catch (error) {
-                            toast.error(t("common.copy_failed"));
-                          }
-                        }}
-                      >
+                      <span className="font-mono text-sm font-normal whitespace-nowrap">
                         {domain.name}
                       </span>
                       <Button

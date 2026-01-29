@@ -44,49 +44,55 @@ export function BulkActionsBar({
               variant="ghost"
               size="sm"
               onClick={onExportSelected}
-              className="gap-2 hover:bg-transparent"
+              className="gap-2 hover:bg-transparent hover:text-yellow-400 transition-colors"
             >
               <Download className="h-4 w-4" />
               Скачать CSV
             </Button>
 
+            <div className="w-px h-6 bg-border" />
+
             <Button
               variant="ghost"
               size="sm"
               onClick={onHideSelected}
-              className="gap-2 hover:bg-transparent"
+              className="gap-2 hover:bg-transparent hover:text-yellow-400 transition-colors"
             >
               <EyeOff className="h-4 w-4" />
               {showHidden ? "Убрать из скрытых" : "Скрыть"}
             </Button>
 
+            <div className="w-px h-6 bg-border" />
+
             <Button
               variant="ghost"
               size="sm"
               onClick={onMoveSelected}
-              className="gap-2 hover:bg-transparent"
+              className="gap-2 hover:bg-transparent hover:text-yellow-400 transition-colors"
             >
               <FolderInput className="h-4 w-4" />
               Переместить
             </Button>
 
+            <div className="w-px h-6 bg-border" />
+
             <Button
               variant="ghost"
               size="sm"
               onClick={onDeleteSelected}
-              className="gap-2 text-destructive hover:text-destructive hover:bg-transparent"
+              className="gap-2 hover:bg-transparent hover:text-destructive transition-colors"
             >
               <Trash2 className="h-4 w-4" />
               Удалить
             </Button>
 
-            <div className="w-px h-6 bg-border mx-2" />
+            <div className="w-px h-6 bg-border" />
 
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="gap-2 hover:bg-transparent"
+              className="gap-2 hover:bg-transparent hover:text-yellow-400 transition-colors"
             >
               <X className="h-4 w-4" />
               Закрыть
