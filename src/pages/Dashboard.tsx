@@ -166,7 +166,12 @@ export default function Dashboard() {
             Все домены →
           </button>
         </div>
-        <DomainTable domains={mockDomains.slice(0, 5)} />
+        <DomainTable 
+          domains={mockDomains.slice(0, 5)} 
+          bulkSelectMode={false}
+          selectedDomainIds={new Set()}
+          onToggleDomain={() => {}}
+        />
       </div>
     </div>
   );
