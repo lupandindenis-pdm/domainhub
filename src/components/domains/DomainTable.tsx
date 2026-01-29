@@ -10,8 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, Globe, FolderKanban, Tag, Activity } from "lucide-react";
 import { toast } from "sonner";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/components/language-provider";
 import { cn } from "@/lib/utils";
@@ -21,9 +22,10 @@ interface DomainTableProps {
   bulkSelectMode: boolean;
   selectedDomainIds: Set<string>;
   onToggleDomain: (domainId: string) => void;
+  showHidden?: boolean;
 }
 
-export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onToggleDomain }: DomainTableProps) {
+export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onToggleDomain, showHidden = false }: DomainTableProps) {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -40,10 +42,30 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
       <Table className="table-fixed w-full" role="table" aria-label="Domains list">
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[35%]" scope="col">Domain</TableHead>
-            <TableHead className="w-[20%]" scope="col">Project</TableHead>
-            <TableHead className="w-[18%]" scope="col">Type</TableHead>
-            <TableHead className="w-[15%]" scope="col">Status</TableHead>
+            <TableHead className="w-[35%]" scope="col">
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-primary" />
+                <span>Domain</span>
+              </div>
+            </TableHead>
+            <TableHead className="w-[20%]" scope="col">
+              <div className="flex items-center gap-2">
+                <FolderKanban className="h-4 w-4 text-success" />
+                <span>Project</span>
+              </div>
+            </TableHead>
+            <TableHead className="w-[18%]" scope="col">
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-chart-4" />
+                <span>Type</span>
+              </div>
+            </TableHead>
+            <TableHead className="w-[15%]" scope="col">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-warning" />
+                <span>Status</span>
+              </div>
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,12 +76,13 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                 key={domain.id} 
                 className={cn(
                   "hover:bg-muted/50 cursor-pointer transition-colors duration-150",
-                  isSelected && "bg-primary/10 border-l-4 border-l-primary"
+                  showHidden && !isSelected && "bg-warning/10",
+                  isSelected && "bg-primary/10"
                 )}
                 onClick={() => handleRowClick(domain.id)}
                 aria-label={`Domain: ${domain.name}, Type: ${domain.type}, Status: ${domain.status}, Project: ${domain.project}`}
               >
-                <TableCell className="py-3">
+                <TableCell className={cn("py-3", isSelected && "border-l-4 border-l-primary")}>
                   <div className="flex items-center gap-3">
                     <Button
                       variant="ghost"
@@ -79,26 +102,37 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                       <Copy className="h-4 w-4" />
                     </Button>
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-mono text-sm font-normal whitespace-nowrap">{domain.name}</span>
+                      <span 
+                        className="font-mono text-sm font-normal whitespace-nowrap cursor-pointer hover:text-yellow-400 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          try {
+                            navigator.clipboard.writeText(domain.name);
+                            toast.success(t("common.copied"));
+                          } catch (error) {
+                            toast.error(t("common.copy_failed"));
+                          }
+                        }}
+                      >
+                        {domain.name}
+                      </span>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                        className="h-8 w-8 shrink-0 text-muted-foreground hover:text-primary"
                         onClick={(e) => {
                           e.stopPropagation();
                           const url = `https://${domain.name}`;
                           try {
                             const validatedUrl = new URL(url);
                             if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
-                              window.open(validatedUrl.toString(), "_blank", "noopener,noreferrer");
-                            } else {
-                              toast.error(t("common.invalid_url"));
+                              window.open(validatedUrl.href, "_blank", "noopener,noreferrer");
                             }
                           } catch (error) {
                             toast.error(t("common.invalid_url"));
                           }
                         }}
-                        aria-label={`Open external site: ${domain.name}`}
+                        aria-label={`Open domain: ${domain.name}`}
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>

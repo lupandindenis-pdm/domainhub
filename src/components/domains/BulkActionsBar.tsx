@@ -10,6 +10,7 @@ interface BulkActionsBarProps {
   onMoveSelected: () => void;
   onDeleteSelected: () => void;
   onClose: () => void;
+  showHidden?: boolean;
 }
 
 export function BulkActionsBar({
@@ -19,6 +20,7 @@ export function BulkActionsBar({
   onMoveSelected,
   onDeleteSelected,
   onClose,
+  showHidden = false,
 }: BulkActionsBarProps) {
   const { t } = useLanguage();
 
@@ -55,7 +57,7 @@ export function BulkActionsBar({
               className="gap-2 hover:bg-transparent"
             >
               <EyeOff className="h-4 w-4" />
-              Скрыть
+              {showHidden ? "Убрать из скрытых" : "Скрыть"}
             </Button>
 
             <Button

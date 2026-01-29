@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { X, Download, Check, ChevronDown, CheckSquare, Square } from "lucide-react";
+import { X, Download, Check, ChevronDown, CheckSquare, Square, EyeOff } from "lucide-react";
 import { DomainFilter, DomainType, DomainStatus } from "@/types/domain";
 import { projects } from "@/data/mockDomains";
 import { useLanguage } from "@/components/language-provider";
@@ -50,6 +50,9 @@ interface DomainFiltersProps {
   onExport: () => void;
   bulkSelectMode: boolean;
   onToggleBulkMode: () => void;
+  showHidden: boolean;
+  onToggleShowHidden: () => void;
+  hiddenCount: number;
 }
 
 interface MultiSelectProps {
@@ -137,7 +140,7 @@ function MultiSelectFilter({ title, options, selectedValues = [], onChange }: Mu
   );
 }
 
-export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode }: DomainFiltersProps) {
+export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode, showHidden, onToggleShowHidden, hiddenCount }: DomainFiltersProps) {
   const { t } = useLanguage();
   const hasActiveFilters = 
     filters.search || 
@@ -193,10 +196,21 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
           </Button>
         )}
 
-        <div className="ml-auto">
-          <Button variant="outline" size="icon" onClick={onExport} className="h-10 w-10 bg-secondary/50 border-0 hover:bg-secondary/80">
-            <Download className="h-4 w-4" />
-          </Button>
+        <div className="ml-auto flex items-center gap-2">
+          {hiddenCount > 0 && (
+            <Button
+              variant={showHidden ? "default" : "outline"}
+              size="icon"
+              onClick={onToggleShowHidden}
+              className={cn(
+                "h-10 w-10 transition-colors",
+                showHidden ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80"
+              )}
+              aria-label="Toggle show hidden domains"
+            >
+              <EyeOff className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

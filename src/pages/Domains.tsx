@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DomainTable } from "@/components/domains/DomainTable";
 import { DomainFilters } from "@/components/domains/DomainFilters";
 import { BulkActionsBar } from "@/components/domains/BulkActionsBar";
@@ -18,11 +18,40 @@ export default function Domains() {
   const debouncedFilters = useDebounce(filters, 300);
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [selectedDomainIds, setSelectedDomainIds] = useState<Set<string>>(new Set());
+  const [hiddenDomainIds, setHiddenDomainIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('hiddenDomainIds');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+  const [showHidden, setShowHidden] = useState(false);
 
   const buildShortSha = __BUILD_SHA__ === "dev" ? "dev" : __BUILD_SHA__.slice(0, 7);
 
+  // Save hidden domains to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('hiddenDomainIds', JSON.stringify([...hiddenDomainIds]));
+    } catch (error) {
+      console.error('Failed to save hidden domains to localStorage:', error);
+    }
+  }, [hiddenDomainIds]);
+
   const filteredDomains = useMemo(() => {
     const filtered = mockDomains.filter((domain) => {
+      // Hidden filter - show only hidden or only visible based on showHidden toggle
+      if (showHidden) {
+        if (!hiddenDomainIds.has(domain.id)) {
+          return false;
+        }
+      } else {
+        if (hiddenDomainIds.has(domain.id)) {
+          return false;
+        }
+      }
+
       // Search filter
       if (debouncedFilters.search) {
         const searchLower = debouncedFilters.search.toLowerCase();
@@ -64,7 +93,7 @@ export default function Domains() {
     });
 
     return filtered;
-  }, [debouncedFilters]);
+  }, [debouncedFilters, hiddenDomainIds, showHidden]);
 
   const handleToggleBulkMode = () => {
     const newMode = !bulkSelectMode;
@@ -136,10 +165,41 @@ export default function Domains() {
   };
 
   const handleHideSelected = () => {
-    toast.info("Скрытие доменов", {
-      description: `Будет скрыто доменов: ${selectedDomainIds.size}`,
-    });
-    // TODO: Implement hide logic
+    if (showHidden) {
+      // Убираем из скрытых (возвращаем в основной список)
+      setHiddenDomainIds(prev => {
+        const newSet = new Set(prev);
+        selectedDomainIds.forEach(id => newSet.delete(id));
+        
+        // Если после удаления не осталось скрытых доменов, выключаем режим просмотра скрытых
+        if (newSet.size === 0) {
+          setShowHidden(false);
+        }
+        
+        return newSet;
+      });
+      setSelectedDomainIds(new Set());
+      setBulkSelectMode(false);
+      toast.success("Домены возвращены", {
+        description: `Возвращено доменов: ${selectedDomainIds.size}`,
+      });
+    } else {
+      // Скрываем домены
+      setHiddenDomainIds(prev => {
+        const newSet = new Set(prev);
+        selectedDomainIds.forEach(id => newSet.add(id));
+        return newSet;
+      });
+      setSelectedDomainIds(new Set());
+      setBulkSelectMode(false);
+      toast.success("Домены скрыты", {
+        description: `Скрыто доменов: ${selectedDomainIds.size}`,
+      });
+    }
+  };
+
+  const handleToggleShowHidden = () => {
+    setShowHidden(!showHidden);
   };
 
   const handleMoveSelected = () => {
@@ -221,6 +281,9 @@ export default function Domains() {
         onExport={handleExport}
         bulkSelectMode={bulkSelectMode}
         onToggleBulkMode={handleToggleBulkMode}
+        showHidden={showHidden}
+        onToggleShowHidden={handleToggleShowHidden}
+        hiddenCount={hiddenDomainIds.size}
       />
 
       {/* Domain Table */}
@@ -229,6 +292,7 @@ export default function Domains() {
         bulkSelectMode={bulkSelectMode}
         selectedDomainIds={selectedDomainIds}
         onToggleDomain={handleToggleDomain}
+        showHidden={showHidden}
       />
 
       {filteredDomains.length === 0 && (
@@ -248,6 +312,7 @@ export default function Domains() {
         onMoveSelected={handleMoveSelected}
         onDeleteSelected={handleDeleteSelected}
         onClose={handleCloseBulkActions}
+        showHidden={showHidden}
       />
     </div>
   );
