@@ -378,18 +378,18 @@ export default function DomainDetail() {
         {/* 2. DEPARTMENT TAB (GROUPED) - Kept as is */}
         <TabsContent value="department" className="space-y-6">
           <Tabs defaultValue="marketing" className="space-y-4">
-            <div className="flex justify-start">
-              <TabsList className="bg-secondary/50">
-                <TabsTrigger value="marketing" className="gap-2">
+            <div className="flex justify-start pl-6">
+              <TabsList className="bg-transparent p-0 gap-2 flex-wrap">
+                <TabsTrigger value="marketing" className="gap-2 data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-600 data-[state=active]:border-blue-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
                   <Megaphone className="h-4 w-4" /> Маркетинг
                 </TabsTrigger>
-                <TabsTrigger value="it" className="gap-2">
+                <TabsTrigger value="it" className="gap-2 data-[state=active]:bg-slate-500/10 data-[state=active]:text-slate-600 data-[state=active]:border-slate-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
                   <Server className="h-4 w-4" /> IT
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="gap-2">
+                <TabsTrigger value="analytics" className="gap-2 data-[state=active]:bg-green-500/10 data-[state=active]:text-green-600 data-[state=active]:border-green-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
                   <BarChart3 className="h-4 w-4" /> Аналитика
                 </TabsTrigger>
-                <TabsTrigger value="partnership" className="gap-2">
+                <TabsTrigger value="partnership" className="gap-2 data-[state=active]:bg-amber-500/10 data-[state=active]:text-amber-600 data-[state=active]:border-amber-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
                   <Users className="h-4 w-4" /> Партнёрка
                 </TabsTrigger>
               </TabsList>
