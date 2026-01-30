@@ -474,12 +474,26 @@ export default function DomainDetail() {
                       <BarChart3 className="h-4 w-4" />
                       Проект
                     </label>
-                    <Input 
-                      value={formData.project || domain.project} 
-                      onChange={(e) => handleFieldChange('project', e.target.value)}
-                      readOnly={!isEditing}
-                      className="bg-muted/50 text-base border-none focus-visible:ring-0" 
-                    />
+                    {isEditing ? (
+                      <Select value={formData.project} onValueChange={(value) => handleFieldChange('project', value)}>
+                        <SelectTrigger className="bg-muted/50">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {projects.map((project) => (
+                            <SelectItem key={project} value={project}>
+                              {project}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input 
+                        value={formData.project || domain.project} 
+                        readOnly
+                        className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                      />
+                    )}
                   </div>
                 </div>
 
