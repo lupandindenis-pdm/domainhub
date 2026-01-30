@@ -228,7 +228,7 @@ export default function DomainDetail() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="general" className="space-y-6 mt-12">
-        <TabsList className="flex h-auto flex-wrap gap-2 bg-transparent p-0 justify-start ml-4 mt-4">
+        <TabsList className="flex h-auto flex-wrap gap-2 bg-transparent p-0 justify-start pl-6 mt-4">
           <TabsTrigger value="general" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
             Общая информация
           </TabsTrigger>
