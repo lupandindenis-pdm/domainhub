@@ -174,20 +174,6 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
         </Button>
 
         <MultiSelectFilter
-          title={t("filters.all_types")}
-          options={domainTypes}
-          selectedValues={filters.types}
-          onChange={(values) => onFiltersChange({ ...filters, types: values as DomainType[] })}
-        />
-
-        <MultiSelectFilter
-          title={t("filters.all_statuses")}
-          options={domainStatuses}
-          selectedValues={filters.statuses}
-          onChange={(values) => onFiltersChange({ ...filters, statuses: values as DomainStatus[] })}
-        />
-
-        <MultiSelectFilter
           title={t("filters.all_projects")}
           options={projects.map(p => ({ value: p, label: p }))}
           selectedValues={filters.projects}
@@ -210,6 +196,20 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
             const label = labels.find(l => l.id === option.value);
             return label ? <LabelBadge label={label} /> : option.label;
           }}
+        />
+
+        <MultiSelectFilter
+          title={t("filters.all_types")}
+          options={domainTypes}
+          selectedValues={filters.types}
+          onChange={(values) => onFiltersChange({ ...filters, types: values as DomainType[] })}
+        />
+
+        <MultiSelectFilter
+          title={t("filters.all_statuses")}
+          options={domainStatuses}
+          selectedValues={filters.statuses}
+          onChange={(values) => onFiltersChange({ ...filters, statuses: values as DomainStatus[] })}
         />
 
         {hasActiveFilters && (
