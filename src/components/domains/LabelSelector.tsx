@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label as LabelUI } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Tag, Plus, X } from "lucide-react";
+import { Tag, Plus, X, Check, Search } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -51,13 +50,21 @@ export function LabelSelector({
   const [newLabelName, setNewLabelName] = useState("");
   const [newLabelColor, setNewLabelColor] = useState(LABEL_COLORS[0]);
   const [selectedLabelId, setSelectedLabelId] = useState<string | undefined>(currentLabelId);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const currentLabel = labels.find((l) => l.id === currentLabelId);
 
-  const handleSave = () => {
-    onLabelChange(selectedLabelId);
+  const filteredLabels = useMemo(() => {
+    if (!searchQuery.trim()) return labels;
+    const query = searchQuery.toLowerCase();
+    return labels.filter(label => label.name.toLowerCase().includes(query));
+  }, [labels, searchQuery]);
+
+  const handleSelectLabel = (labelId: string | undefined) => {
+    setSelectedLabelId(labelId);
+    onLabelChange(labelId);
     setOpen(false);
-    toast.success(selectedLabelId ? "Метка применена" : "Метка удалена");
+    toast.success(labelId ? "Метка применена" : "Метка удалена");
   };
 
   const handleCancel = () => {
@@ -65,6 +72,7 @@ export function LabelSelector({
     setIsCreating(false);
     setNewLabelName("");
     setNewLabelColor(LABEL_COLORS[0]);
+    setSearchQuery("");
     setOpen(false);
   };
 
@@ -119,47 +127,74 @@ export function LabelSelector({
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex flex-col">
           <div className="px-4 py-3 border-b">
-            <h4 className="font-semibold text-sm">Метка домена</h4>
+            <div className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-muted-foreground" />
+              <h4 className="font-semibold text-sm">Метка домена</h4>
+            </div>
           </div>
 
           {!isCreating ? (
             <>
-              <div className="p-2 max-h-[300px] overflow-y-auto">
-                <RadioGroup
-                  value={selectedLabelId || "none"}
-                  onValueChange={(value) =>
-                    setSelectedLabelId(value === "none" ? undefined : value)
-                  }
-                >
-                  <div className="flex items-center space-x-2 rounded-md px-3 py-2 hover:bg-accent cursor-pointer">
-                    <RadioGroupItem value="none" id="label-none" />
-                    <LabelUI
-                      htmlFor="label-none"
-                      className="flex-1 cursor-pointer text-sm font-normal"
-                    >
-                      Без метки
-                    </LabelUI>
-                  </div>
+              <div className="p-3 border-b">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Поиск меток..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 h-9"
+                  />
+                </div>
+              </div>
 
-                  {labels.map((label) => (
+              <div className="p-2 max-h-[300px] overflow-y-auto">
+                <div
+                  className={cn(
+                    "flex items-center justify-between rounded-md px-3 py-2.5 cursor-pointer transition-colors",
+                    !selectedLabelId
+                      ? "bg-accent/50 border border-border"
+                      : "hover:bg-accent/50"
+                  )}
+                  onClick={() => handleSelectLabel(undefined)}
+                >
+                  <span className="text-sm text-muted-foreground">Без метки</span>
+                  {!selectedLabelId && (
+                    <Check className="h-4 w-4 text-primary" />
+                  )}
+                </div>
+
+                {filteredLabels.map((label) => {
+                  const isSelected = selectedLabelId === label.id;
+                  return (
                     <div
                       key={label.id}
-                      className="flex items-center space-x-2 rounded-md px-3 py-2 hover:bg-accent cursor-pointer"
+                      className={cn(
+                        "flex items-center justify-between rounded-md px-3 py-2.5 cursor-pointer transition-colors",
+                        isSelected
+                          ? "bg-accent/50 border border-border"
+                          : "hover:bg-accent/50"
+                      )}
+                      onClick={() => handleSelectLabel(label.id)}
                     >
-                      <RadioGroupItem value={label.id} id={`label-${label.id}`} />
-                      <LabelUI
-                        htmlFor={`label-${label.id}`}
-                        className="flex-1 cursor-pointer flex items-center gap-2 text-sm font-normal"
-                      >
+                      <div className="flex items-center gap-2.5">
                         <div
                           className="h-3 w-3 rounded-full"
                           style={{ backgroundColor: label.color }}
                         />
-                        <span>{label.name}</span>
-                      </LabelUI>
+                        <span className="text-sm">{label.name}</span>
+                      </div>
+                      {isSelected && (
+                        <Check className="h-4 w-4 text-primary" />
+                      )}
                     </div>
-                  ))}
-                </RadioGroup>
+                  );
+                })}
+
+                {filteredLabels.length === 0 && searchQuery && (
+                  <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+                    Метки не найдены
+                  </div>
+                )}
               </div>
 
               <div className="border-t p-2">
@@ -232,22 +267,6 @@ export function LabelSelector({
                   Создать
                 </Button>
               </div>
-            </div>
-          )}
-
-          {!isCreating && (
-            <div className="border-t p-3 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={handleCancel}
-              >
-                Отмена
-              </Button>
-              <Button size="sm" className="flex-1" onClick={handleSave}>
-                Сохранить
-              </Button>
             </div>
           )}
         </div>
