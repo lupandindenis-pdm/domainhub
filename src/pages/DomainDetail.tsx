@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { mockDomains, mockLabels } from "@/data/mockDomains";
 import { DomainTypeBadge } from "@/components/domains/DomainTypeBadge";
@@ -60,8 +60,59 @@ export default function DomainDetail() {
   
   const [version, setVersion] = useState<'v1' | 'v2'>('v2');
   const [isCommentOpen, setIsCommentOpen] = useState(false);
-  const [labels, setLabels] = useState(mockLabels);
-  const [domainLabelId, setDomainLabelId] = useState(domain?.labelId);
+  
+  // Load labels from localStorage or use defaults
+  const [labels, setLabels] = useState(() => {
+    try {
+      const saved = localStorage.getItem('domainLabels');
+      return saved ? JSON.parse(saved) : mockLabels;
+    } catch {
+      return mockLabels;
+    }
+  });
+  
+  // Load domain label assignment from localStorage
+  const [domainLabelId, setDomainLabelId] = useState(() => {
+    try {
+      const saved = localStorage.getItem('domainLabelAssignments');
+      if (saved && id) {
+        const assignments = JSON.parse(saved);
+        return assignments[id] || domain?.labelId;
+      }
+    } catch {
+      return domain?.labelId;
+    }
+    return domain?.labelId;
+  });
+
+  // Save labels to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('domainLabels', JSON.stringify(labels));
+    } catch (error) {
+      console.error('Failed to save labels to localStorage:', error);
+    }
+  }, [labels]);
+
+  // Save domain label assignment to localStorage whenever it changes
+  useEffect(() => {
+    if (!id) return;
+    
+    try {
+      const saved = localStorage.getItem('domainLabelAssignments');
+      const assignments = saved ? JSON.parse(saved) : {};
+      
+      if (domainLabelId) {
+        assignments[id] = domainLabelId;
+      } else {
+        delete assignments[id];
+      }
+      
+      localStorage.setItem('domainLabelAssignments', JSON.stringify(assignments));
+    } catch (error) {
+      console.error('Failed to save domain label assignment to localStorage:', error);
+    }
+  }, [id, domainLabelId]);
 
   if (!domain) {
     return (
@@ -157,10 +208,10 @@ export default function DomainDetail() {
                 id: `label-${Date.now()}`,
                 name,
                 color,
+                projectId: domain.project,
               };
               setLabels([...labels, newLabel]);
               setDomainLabelId(newLabel.id);
-              // TODO: Save to backend
             }}
           />
           <Button onClick={() => navigate(`/domains/${id}/edit`)} className="gap-2">

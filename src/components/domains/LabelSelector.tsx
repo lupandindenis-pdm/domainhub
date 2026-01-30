@@ -152,15 +152,12 @@ export function LabelSelector({
                   className={cn(
                     "flex items-center justify-between rounded-md px-3 py-2.5 cursor-pointer transition-colors",
                     !selectedLabelId
-                      ? "bg-accent/50 border border-border"
+                      ? "bg-accent border border-border"
                       : "hover:bg-accent/50"
                   )}
                   onClick={() => handleSelectLabel(undefined)}
                 >
                   <span className="text-sm text-muted-foreground">Без метки</span>
-                  {!selectedLabelId && (
-                    <Check className="h-4 w-4 text-primary" />
-                  )}
                 </div>
 
                 {filteredLabels.map((label) => {
@@ -171,7 +168,7 @@ export function LabelSelector({
                       className={cn(
                         "flex items-center justify-between rounded-md px-3 py-2.5 cursor-pointer transition-colors group",
                         isSelected
-                          ? "bg-accent/50 border border-border"
+                          ? "bg-accent border border-border"
                           : "hover:bg-accent/50"
                       )}
                       onClick={() => handleSelectLabel(label.id)}
@@ -183,23 +180,18 @@ export function LabelSelector({
                         />
                         <span className="text-sm">{label.name}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // TODO: Add delete label functionality
-                            toast.info("Удаление метки будет реализовано");
-                          }}
-                        >
-                          <X className="h-3.5 w-3.5" />
-                        </Button>
-                        {isSelected && (
-                          <Check className="h-4 w-4 text-primary" />
-                        )}
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Add delete label functionality
+                          toast.info("Удаление метки будет реализовано");
+                        }}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   );
                 })}
