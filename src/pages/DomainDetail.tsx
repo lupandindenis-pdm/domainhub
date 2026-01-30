@@ -52,6 +52,7 @@ import { ru } from "date-fns/locale";
 import { toast } from "sonner";
 import { useLanguage } from "@/components/language-provider";
 import DomainDetailV1 from "./DomainDetailV1";
+import { GeoMultiSelector } from "@/components/domains/GeoMultiSelector";
 
 export default function DomainDetail() {
   const { id } = useParams();
@@ -69,7 +70,8 @@ export default function DomainDetail() {
     name: domain?.name || '',
     type: domain?.type || '',
     status: domain?.status || '',
-    geo: domain?.geo || '',
+    geo: domain?.geo || [],
+    blockedGeo: domain?.blockedGeo || [],
     department: domain?.department || '',
     project: domain?.project || '',
     category: domain?.category || '',
@@ -180,7 +182,8 @@ export default function DomainDetail() {
       name: domain?.name || '',
       type: domain?.type || '',
       status: domain?.status || '',
-      geo: domain?.geo || '',
+      geo: domain?.geo || [],
+      blockedGeo: domain?.blockedGeo || [],
       department: domain?.department || '',
       project: domain?.project || '',
       category: domain?.category || '',
@@ -231,7 +234,8 @@ export default function DomainDetail() {
         name: domain.name || '',
         type: domain.type || '',
         status: domain.status || '',
-        geo: domain.geo || '',
+        geo: domain.geo || [],
+        blockedGeo: domain.blockedGeo || [],
         department: domain.department || '',
         project: domain.project || '',
         category: domain.category || '',
@@ -455,7 +459,14 @@ export default function DomainDetail() {
                       <Globe className="h-4 w-4" />
                       GEO (используется)
                     </label>
-                    <ReadOnlyGeoView selected={domain.geo || []} />
+                    {isEditing ? (
+                      <GeoMultiSelector
+                        selected={Array.isArray(formData.geo) ? formData.geo : [formData.geo].filter(Boolean)}
+                        onChange={(selected) => handleFieldChange('geo', selected)}
+                      />
+                    ) : (
+                      <ReadOnlyGeoView selected={Array.isArray(formData.geo) ? formData.geo : [formData.geo].filter(Boolean)} />
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -508,9 +519,16 @@ export default function DomainDetail() {
                       <Ban className="h-4 w-4" />
                       GEO (блокировка)
                     </label>
-                    <ReadOnlyGeoView 
-                        selected={domain.blockedGeo || []} 
-                    />
+                    {isEditing ? (
+                      <GeoMultiSelector
+                        selected={formData.blockedGeo || []}
+                        onChange={(selected) => handleFieldChange('blockedGeo', selected)}
+                      />
+                    ) : (
+                      <ReadOnlyGeoView 
+                        selected={formData.blockedGeo || domain.blockedGeo || []} 
+                      />
+                    )}
                   </div>
 
                   <div className="space-y-2">
