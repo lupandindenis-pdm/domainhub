@@ -1,14 +1,47 @@
 import { StatsCard } from "@/components/domains/StatsCard";
 import { DomainTable } from "@/components/domains/DomainTable";
-import { mockDomains } from "@/data/mockDomains";
+import { mockDomains, mockLabels } from "@/data/mockDomains";
 import { Globe, AlertTriangle, Clock, CheckCircle, TrendingUp, ShieldAlert } from "lucide-react";
 import { differenceInDays, parseISO } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  
+  // Load labels from localStorage
+  const [labels, setLabels] = useState(() => {
+    try {
+      const saved = localStorage.getItem('domainLabels');
+      return saved ? JSON.parse(saved) : mockLabels;
+    } catch {
+      return mockLabels;
+    }
+  });
+
+  // Listen for localStorage changes to sync labels
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const saved = localStorage.getItem('domainLabels');
+        if (saved) {
+          setLabels(JSON.parse(saved));
+        }
+      } catch (error) {
+        console.error('Failed to load labels from localStorage:', error);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    const interval = setInterval(handleStorageChange, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
   
   // Calculate stats
   const totalDomains = mockDomains.length;
@@ -171,6 +204,7 @@ export default function Dashboard() {
           bulkSelectMode={false}
           selectedDomainIds={new Set()}
           onToggleDomain={() => {}}
+          labels={labels}
         />
       </div>
     </div>
