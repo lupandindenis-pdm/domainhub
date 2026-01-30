@@ -378,19 +378,19 @@ export default function DomainDetail() {
         {/* 2. DEPARTMENT TAB (GROUPED) - Kept as is */}
         <TabsContent value="department" className="space-y-6">
           <Tabs defaultValue="marketing" className="space-y-4">
-            <div className="flex justify-start pl-6">
-              <TabsList className="bg-transparent p-0 gap-2 flex-wrap">
-                <TabsTrigger value="marketing" className="gap-2 data-[state=active]:bg-blue-500/10 data-[state=active]:text-blue-600 data-[state=active]:border-blue-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
-                  <Megaphone className="h-4 w-4" /> Маркетинг
+            <div className="pl-6">
+              <TabsList className="bg-transparent p-0 gap-2 flex-wrap h-auto">
+                <TabsTrigger value="marketing" className="gap-1.5 data-[state=active]:bg-blue-500/15 data-[state=active]:text-blue-600 px-3 py-1.5 rounded text-sm font-medium transition-all hover:bg-muted/50">
+                  <Megaphone className="h-3.5 w-3.5" /> Маркетинг
                 </TabsTrigger>
-                <TabsTrigger value="it" className="gap-2 data-[state=active]:bg-slate-500/10 data-[state=active]:text-slate-600 data-[state=active]:border-slate-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
-                  <Server className="h-4 w-4" /> IT
+                <TabsTrigger value="it" className="gap-1.5 data-[state=active]:bg-yellow-500/15 data-[state=active]:text-yellow-600 px-3 py-1.5 rounded text-sm font-medium transition-all hover:bg-muted/50">
+                  <Server className="h-3.5 w-3.5" /> IT
                 </TabsTrigger>
-                <TabsTrigger value="analytics" className="gap-2 data-[state=active]:bg-green-500/10 data-[state=active]:text-green-600 data-[state=active]:border-green-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
-                  <BarChart3 className="h-4 w-4" /> Аналитика
+                <TabsTrigger value="analytics" className="gap-1.5 data-[state=active]:bg-green-500/15 data-[state=active]:text-green-600 px-3 py-1.5 rounded text-sm font-medium transition-all hover:bg-muted/50">
+                  <BarChart3 className="h-3.5 w-3.5" /> Аналитика
                 </TabsTrigger>
-                <TabsTrigger value="partnership" className="gap-2 data-[state=active]:bg-amber-500/10 data-[state=active]:text-amber-600 data-[state=active]:border-amber-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
-                  <Users className="h-4 w-4" /> Партнёрка
+                <TabsTrigger value="partnership" className="gap-1.5 data-[state=active]:bg-amber-500/15 data-[state=active]:text-amber-600 px-3 py-1.5 rounded text-sm font-medium transition-all hover:bg-muted/50">
+                  <Users className="h-3.5 w-3.5" /> Партнёрка
                 </TabsTrigger>
               </TabsList>
             </div>
