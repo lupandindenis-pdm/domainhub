@@ -4,6 +4,7 @@ import { mockDomains, mockLabels } from "@/data/mockDomains";
 import { DomainTypeBadge } from "@/components/domains/DomainTypeBadge";
 import { DomainStatusBadge } from "@/components/domains/DomainStatusBadge";
 import { LabelBadge } from "@/components/domains/LabelBadge";
+import { LabelSelector } from "@/components/domains/LabelSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -53,11 +54,14 @@ import DomainDetailV1 from "./DomainDetailV1";
 export default function DomainDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [version, setVersion] = useState<'v1' | 'v2'>('v2');
-  const [isCommentOpen, setIsCommentOpen] = useState(false);
   const { t } = useLanguage();
   
   const domain = mockDomains.find((d) => d.id === id);
+  
+  const [version, setVersion] = useState<'v1' | 'v2'>('v2');
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [labels, setLabels] = useState(mockLabels);
+  const [domainLabelId, setDomainLabelId] = useState(domain?.labelId);
 
   if (!domain) {
     return (
@@ -128,8 +132,8 @@ export default function DomainDetail() {
           >
             <ExternalLink className="h-5 w-5" />
           </Button>
-          {domain.labelId && (() => {
-            const label = mockLabels.find(l => l.id === domain.labelId);
+          {domainLabelId && (() => {
+            const label = labels.find(l => l.id === domainLabelId);
             return label ? <LabelBadge label={label} /> : null;
           })()}
           {domain.needsUpdate && (
@@ -145,6 +149,24 @@ export default function DomainDetail() {
         </div>
 
         <div className="flex items-center gap-2">
+          <LabelSelector
+            currentLabelId={domainLabelId}
+            labels={labels}
+            onLabelChange={(labelId) => {
+              setDomainLabelId(labelId);
+              // TODO: Save to backend
+            }}
+            onCreateLabel={(name, color) => {
+              const newLabel = {
+                id: `label-${Date.now()}`,
+                name,
+                color,
+              };
+              setLabels([...labels, newLabel]);
+              setDomainLabelId(newLabel.id);
+              // TODO: Save to backend
+            }}
+          />
           <Button onClick={() => navigate(`/domains/${id}/edit`)} className="gap-2">
             <Edit className="h-4 w-4" />
             Редактировать
