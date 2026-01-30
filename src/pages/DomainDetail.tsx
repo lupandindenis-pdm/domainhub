@@ -317,38 +317,40 @@ export default function DomainDetail() {
       {/* Top Navigation & Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3 flex-wrap">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/domains")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/domains")} className="flex-shrink-0">
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          {isEditing ? (
-            <Input
-              value={formData.name}
-              onChange={(e) => handleFieldChange('name', e.target.value)}
-              className="text-2xl font-bold font-mono tracking-tight h-auto py-2 px-3 border border-primary/30 bg-muted/30 focus-visible:ring-1 focus-visible:ring-primary/50 max-w-md"
-            />
-          ) : (
-            <h1 
-              className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors"
-              onClick={() => {
-                try {
-                  navigator.clipboard.writeText(formData.name || domain.name);
-                  toast.success("Домен скопирован в буфер обмена");
-                } catch (error) {
-                  toast.error("Ошибка копирования");
-                }
-              }}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {isEditing ? (
+              <Input
+                value={formData.name}
+                onChange={(e) => handleFieldChange('name', e.target.value)}
+                className="text-2xl font-bold font-mono tracking-tight h-[44px] py-2 px-3 border border-primary/30 bg-muted/30 focus-visible:ring-1 focus-visible:ring-primary/50 flex-1 min-w-[300px] max-w-md"
+              />
+            ) : (
+              <h1 
+                className="text-2xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors h-[44px] flex items-center"
+                onClick={() => {
+                  try {
+                    navigator.clipboard.writeText(formData.name || domain.name);
+                    toast.success("Домен скопирован в буфер обмена");
+                  } catch (error) {
+                    toast.error("Ошибка копирования");
+                  }
+                }}
+              >
+                {formData.name || domain.name}
+              </h1>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
+              onClick={() => window.open(`https://${formData.name || domain.name}`, "_blank")}
             >
-              {formData.name || domain.name}
-            </h1>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
-            onClick={() => window.open(`https://${domain.name}`, "_blank")}
-          >
-            <ExternalLink className="h-5 w-5" />
-          </Button>
+              <ExternalLink className="h-5 w-5" />
+            </Button>
+          </div>
           {domain.needsUpdate && (
              <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap">
               <AlertTriangle className="h-3 w-3" /> Требует обновления
