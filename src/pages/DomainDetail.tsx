@@ -284,12 +284,12 @@ export default function DomainDetail() {
   const daysLeft = differenceInDays(parseISO(domain.expirationDate), new Date());
 
   const statusColors: Record<string, string> = {
-    actual: "bg-green-500/20 text-green-700 dark:text-green-300",
-    spare: "bg-blue-500/20 text-blue-700 dark:text-blue-300",
-    not_actual: "bg-slate-500/20 text-slate-700 dark:text-slate-300",
-    not_configured: "bg-orange-500/20 text-orange-700 dark:text-orange-300",
-    unknown: "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300",
-    expiring: "bg-red-500/20 text-red-700 dark:text-red-300",
+    actual: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-300",
+    spare: "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300",
+    not_actual: "bg-rose-500/20 text-rose-700 dark:text-rose-300",
+    not_configured: "bg-slate-500/20 text-slate-700 dark:text-slate-300",
+    unknown: "bg-amber-500/20 text-amber-700 dark:text-amber-300",
+    expiring: "bg-orange-500/20 text-orange-700 dark:text-orange-300",
     expired: "bg-red-500/20 text-red-700 dark:text-red-300",
     blocked: "bg-red-500/20 text-red-700 dark:text-red-300",
     test: "bg-purple-500/20 text-purple-700 dark:text-purple-300",
@@ -305,6 +305,8 @@ export default function DomainDetail() {
     redirect: "bg-indigo-500/20 text-indigo-700 dark:text-indigo-300",
     technical: "bg-slate-500/20 text-slate-700 dark:text-slate-300",
     subdomain: "bg-cyan-500/20 text-cyan-700 dark:text-cyan-300",
+    b2b: "bg-teal-500/20 text-teal-700 dark:text-teal-300",
+    unknown: "bg-gray-500/20 text-gray-700 dark:text-gray-300",
   };
 
   const statusColorClass = statusColors[domain.status] || "bg-muted/50";

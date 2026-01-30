@@ -57,6 +57,7 @@ const translations: Translations = {
     "badges.technical": "Тех. домен",
     "badges.b2b": "B2B",
     "badges.site": "Сайт",
+    "badges.unknown": "Неизвестно",
 
     "status.spare": "Запасной",
     "status.actual": "Актуален",
@@ -128,6 +129,7 @@ const translations: Translations = {
     "badges.technical": "Tech Domain",
     "badges.b2b": "B2B",
     "badges.site": "Site",
+    "badges.unknown": "Unknown",
 
     "status.spare": "Spare",
     "status.actual": "Actual",
