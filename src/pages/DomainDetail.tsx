@@ -62,6 +62,41 @@ export default function DomainDetail() {
   
   const [version, setVersion] = useState<'v1' | 'v2'>('v2');
   const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // Form data state
+  const [formData, setFormData] = useState({
+    name: domain?.name || '',
+    type: domain?.type || '',
+    status: domain?.status || '',
+    geo: domain?.geo || '',
+    department: domain?.department || '',
+    category: domain?.category || '',
+    direction: domain?.direction || '',
+    targetAction: domain?.targetAction || '',
+    bonus: domain?.bonus || '',
+    needsUpdate: domain?.needsUpdate || false,
+    jiraTask: domain?.jiraTask || '',
+    fileHosting: domain?.fileHosting || '',
+    registrar: domain?.registrar || '',
+    nsServers: domain?.nsServers || [],
+    techIssues: domain?.techIssues || [],
+    testMethod: domain?.testMethod || '',
+    gaId: domain?.gaId || '',
+    gtmId: domain?.gtmId || '',
+    isInProgram: domain?.isInProgram || false,
+    programLink: domain?.programLink || '',
+    companyName: domain?.companyName || '',
+    programStatus: domain?.programStatus || '',
+    oneSignalId: domain?.oneSignalId || '',
+    cloudflareAccount: domain?.cloudflareAccount || '',
+    description: domain?.description || '',
+    marketingNote: '',
+    itNote: '',
+    analyticsNote: '',
+    partnershipNote: '',
+    integrationsNote: ''
+  });
   
   // Load labels from localStorage or use defaults
   const [labels, setLabels] = useState(() => {
@@ -116,6 +151,81 @@ export default function DomainDetail() {
     }
   }, [id, domainLabelId]);
 
+  // Handle form field changes
+  const handleFieldChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Handle save
+  const handleSave = () => {
+    // Save to localStorage or API
+    try {
+      const savedDomains = localStorage.getItem('editedDomains');
+      const editedDomains = savedDomains ? JSON.parse(savedDomains) : {};
+      editedDomains[id!] = formData;
+      localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
+      
+      toast.success('Изменения сохранены');
+      setIsEditing(false);
+    } catch (error) {
+      toast.error('Ошибка при сохранении');
+      console.error(error);
+    }
+  };
+
+  // Handle cancel
+  const handleCancel = () => {
+    setFormData({
+      name: domain?.name || '',
+      type: domain?.type || '',
+      status: domain?.status || '',
+      geo: domain?.geo || '',
+      department: domain?.department || '',
+      category: domain?.category || '',
+      direction: domain?.direction || '',
+      targetAction: domain?.targetAction || '',
+      bonus: domain?.bonus || '',
+      needsUpdate: domain?.needsUpdate || false,
+      jiraTask: domain?.jiraTask || '',
+      fileHosting: domain?.fileHosting || '',
+      registrar: domain?.registrar || '',
+      nsServers: domain?.nsServers || [],
+      techIssues: domain?.techIssues || [],
+      testMethod: domain?.testMethod || '',
+      gaId: domain?.gaId || '',
+      gtmId: domain?.gtmId || '',
+      isInProgram: domain?.isInProgram || false,
+      programLink: domain?.programLink || '',
+      companyName: domain?.companyName || '',
+      programStatus: domain?.programStatus || '',
+      oneSignalId: domain?.oneSignalId || '',
+      cloudflareAccount: domain?.cloudflareAccount || '',
+      description: domain?.description || '',
+      marketingNote: '',
+      itNote: '',
+      analyticsNote: '',
+      partnershipNote: '',
+      integrationsNote: ''
+    });
+    setIsEditing(false);
+  };
+
+  // Load edited data from localStorage
+  useEffect(() => {
+    if (!id) return;
+    try {
+      const savedDomains = localStorage.getItem('editedDomains');
+      if (savedDomains) {
+        const editedDomains = JSON.parse(savedDomains);
+        if (editedDomains[id]) {
+          setFormData(editedDomains[id]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load edited data:', error);
+    }
+  }, [id]);
+
   if (!domain) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
@@ -164,19 +274,27 @@ export default function DomainDetail() {
           <Button variant="ghost" size="icon" onClick={() => navigate("/domains")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 
-            className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors"
-            onClick={() => {
-              try {
-                navigator.clipboard.writeText(domain.name);
-                toast.success("Домен скопирован в буфер обмена");
-              } catch (error) {
-                toast.error("Ошибка копирования");
-              }
-            }}
-          >
-            {domain.name}
-          </h1>
+          {isEditing ? (
+            <Input
+              value={formData.name}
+              onChange={(e) => handleFieldChange('name', e.target.value)}
+              className="text-3xl font-bold font-mono tracking-tight h-auto py-1 px-2 border-2 border-primary/50"
+            />
+          ) : (
+            <h1 
+              className="text-3xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors"
+              onClick={() => {
+                try {
+                  navigator.clipboard.writeText(formData.name || domain.name);
+                  toast.success("Домен скопирован в буфер обмена");
+                } catch (error) {
+                  toast.error("Ошибка копирования");
+                }
+              }}
+            >
+              {formData.name || domain.name}
+            </h1>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -221,10 +339,22 @@ export default function DomainDetail() {
               }
             }}
           />
-          <Button onClick={() => navigate(`/domains/${id}/edit`)} className="gap-2">
-            <Edit className="h-4 w-4" />
-            Редактировать
-          </Button>
+          {!isEditing ? (
+            <Button onClick={() => setIsEditing(true)} className="gap-2">
+              <Edit className="h-4 w-4" />
+              Редактировать
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button onClick={handleCancel} variant="outline" className="gap-2">
+                Отмена
+              </Button>
+              <Button onClick={handleSave} className="gap-2 bg-green-600 hover:bg-green-700">
+                <CheckCircle className="h-4 w-4" />
+                Сохранить
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -255,9 +385,24 @@ export default function DomainDetail() {
                       <Tag className="h-4 w-4" />
                       Тип
                     </label>
-                    <div className={cn("flex items-center h-10 px-3 rounded-md border-none text-sm", typeColorClass)}>
-                      {t(`badges.${domain.type}`)}
-                    </div>
+                    {isEditing ? (
+                      <Select value={formData.type} onValueChange={(value) => handleFieldChange('type', value)}>
+                        <SelectTrigger className="bg-muted/50 border-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="product">Домен продукта</SelectItem>
+                          <SelectItem value="referral">Реферальный</SelectItem>
+                          <SelectItem value="redirect">Редирект</SelectItem>
+                          <SelectItem value="technical">Технический</SelectItem>
+                          <SelectItem value="subdomain">Поддомен</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className={cn("flex items-center h-10 px-3 rounded-md border-none text-sm", typeColorClass)}>
+                        {t(`badges.${formData.type || domain.type}`)}
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -284,11 +429,26 @@ export default function DomainDetail() {
                       <Activity className="h-4 w-4" />
                       Статус
                     </label>
-                     <div className={cn("flex items-center h-10 px-3 rounded-md border-none", statusColorClass)}>
+                    {isEditing ? (
+                      <Select value={formData.status} onValueChange={(value) => handleFieldChange('status', value)}>
+                        <SelectTrigger className="bg-muted/50 border-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="actual">Актуальный</SelectItem>
+                          <SelectItem value="spare">Запасной</SelectItem>
+                          <SelectItem value="not_actual">Не актуальный</SelectItem>
+                          <SelectItem value="not_configured">Не настроен</SelectItem>
+                          <SelectItem value="unknown">Неизвестно</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className={cn("flex items-center h-10 px-3 rounded-md border-none", statusColorClass)}>
                         <span className="text-sm">
-                           {t(`status.${domain.status}`)}
+                           {t(`status.${formData.status || domain.status}`)}
                         </span>
-                     </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -306,7 +466,21 @@ export default function DomainDetail() {
                       <Users className="h-4 w-4" />
                       Отдел
                     </label>
-                    <Input value={domain.department} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                    {isEditing ? (
+                      <Select value={formData.department} onValueChange={(value) => handleFieldChange('department', value)}>
+                        <SelectTrigger className="bg-muted/50 border-none">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Marketing">Маркетинг</SelectItem>
+                          <SelectItem value="IT">IT</SelectItem>
+                          <SelectItem value="Business Development">Бизнес-развитие</SelectItem>
+                          <SelectItem value="Sales">Продажи</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input value={formData.department || domain.department} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -332,24 +506,33 @@ export default function DomainDetail() {
                  </div>
                  
                  {/* Single container with conditional content */}
-                 <div className={cn(
-                   "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                   isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
-                 )}>
-                   {domain.description ? (
-                     <span className="text-muted-foreground">
-                       {isCommentOpen 
-                         ? domain.description 
-                         : (domain.description.length > 100 
-                             ? `${domain.description.substring(0, 100)}...` 
-                             : domain.description
-                           )
-                       }
-                     </span>
-                   ) : (
-                     <span className="text-muted-foreground italic">Комментарий отсутствует</span>
-                   )}
-                 </div>
+                 {isEditing ? (
+                   <Textarea
+                     value={formData.description}
+                     onChange={(e) => handleFieldChange('description', e.target.value)}
+                     className="w-full min-h-[100px] bg-muted/30 border-none resize-none"
+                     placeholder="Введите комментарий..."
+                   />
+                 ) : (
+                   <div className={cn(
+                     "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                     isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                   )}>
+                     {formData.description || domain.description ? (
+                       <span className="text-muted-foreground">
+                         {isCommentOpen 
+                           ? (formData.description || domain.description)
+                           : ((formData.description || domain.description).length > 100 
+                               ? `${(formData.description || domain.description).substring(0, 100)}...` 
+                               : (formData.description || domain.description)
+                             )
+                         }
+                       </span>
+                     ) : (
+                       <span className="text-muted-foreground italic">Комментарий отсутствует</span>
+                     )}
+                   </div>
+                 )}
               </div>
 
             </div>
@@ -409,7 +592,12 @@ export default function DomainDetail() {
                           <Tag className="h-4 w-4" />
                           Категория
                         </label>
-                        <Input value={domain.category || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Input 
+                          value={formData.category || "Нет"} 
+                          onChange={(e) => handleFieldChange('category', e.target.value)}
+                          readOnly={!isEditing}
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                        />
                       </div>
 
                       <div className="space-y-2">
@@ -417,7 +605,12 @@ export default function DomainDetail() {
                           <BarChart3 className="h-4 w-4" />
                           Направление
                         </label>
-                        <Input value={domain.direction || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Input 
+                          value={formData.direction || "Нет"} 
+                          onChange={(e) => handleFieldChange('direction', e.target.value)}
+                          readOnly={!isEditing}
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                        />
                       </div>
 
                       <div className="space-y-2">
@@ -425,7 +618,12 @@ export default function DomainDetail() {
                           <Activity className="h-4 w-4" />
                           Целевое действие
                         </label>
-                        <Input value={domain.targetAction || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Input 
+                          value={formData.targetAction || "Нет"} 
+                          onChange={(e) => handleFieldChange('targetAction', e.target.value)}
+                          readOnly={!isEditing}
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                        />
                       </div>
                     </div>
 
@@ -436,7 +634,12 @@ export default function DomainDetail() {
                           <Tag className="h-4 w-4" />
                           Бонус
                         </label>
-                        <Input value={domain.bonus || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Input 
+                          value={formData.bonus || "Нет"} 
+                          onChange={(e) => handleFieldChange('bonus', e.target.value)}
+                          readOnly={!isEditing}
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                        />
                       </div>
 
                       <div className="space-y-2">
@@ -444,7 +647,17 @@ export default function DomainDetail() {
                           <AlertCircle className="h-4 w-4" />
                           Требует обновления
                         </label>
-                        <Input value={domain.needsUpdate ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        {isEditing ? (
+                          <div className="flex items-center h-10 px-3 rounded-md bg-muted/50">
+                            <Switch 
+                              checked={formData.needsUpdate}
+                              onCheckedChange={(checked) => handleFieldChange('needsUpdate', checked)}
+                            />
+                            <span className="ml-2 text-sm">{formData.needsUpdate ? "Да" : "Нет"}</span>
+                          </div>
+                        ) : (
+                          <Input value={formData.needsUpdate ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        )}
                       </div>
 
                       <div className="space-y-2">
@@ -452,7 +665,12 @@ export default function DomainDetail() {
                           <FileText className="h-4 w-4" />
                           Ссылка на задачу Jira
                         </label>
-                        <Input value={domain.jiraTask || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Input 
+                          value={formData.jiraTask || "Нет"} 
+                          onChange={(e) => handleFieldChange('jiraTask', e.target.value)}
+                          readOnly={!isEditing}
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                        />
                       </div>
                     </div>
                   </div>
@@ -466,35 +684,46 @@ export default function DomainDetail() {
                         <FileText className="h-4 w-4" />
                         Примечание
                       </label>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 gap-2 text-xs"
-                        onClick={() => setIsCommentOpen(!isCommentOpen)}
-                      >
-                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
-                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
-                      </Button>
-                    </div>
-                    
-                    <div className={cn(
-                      "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
-                    )}>
-                      {domain.description ? (
-                        <span className="text-muted-foreground">
-                          {isCommentOpen 
-                            ? domain.description 
-                            : (domain.description.length > 100 
-                                ? `${domain.description.substring(0, 100)}...` 
-                                : domain.description
-                              )
-                          }
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground italic">Примечание отсутствует</span>
+                      {!isEditing && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 gap-2 text-xs"
+                          onClick={() => setIsCommentOpen(!isCommentOpen)}
+                        >
+                          {isCommentOpen ? 'Свернуть' : 'Развернуть'}
+                          <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                        </Button>
                       )}
                     </div>
+                    
+                    {isEditing ? (
+                      <Textarea
+                        value={formData.marketingNote}
+                        onChange={(e) => handleFieldChange('marketingNote', e.target.value)}
+                        className="w-full min-h-[100px] bg-muted/30 border-none resize-none"
+                        placeholder="Введите примечание для маркетинга..."
+                      />
+                    ) : (
+                      <div className={cn(
+                        "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                        isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                      )}>
+                        {formData.marketingNote ? (
+                          <span className="text-muted-foreground">
+                            {isCommentOpen 
+                              ? formData.marketingNote 
+                              : (formData.marketingNote.length > 100 
+                                  ? `${formData.marketingNote.substring(0, 100)}...` 
+                                  : formData.marketingNote
+                                )
+                            }
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground italic">Примечание отсутствует</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
