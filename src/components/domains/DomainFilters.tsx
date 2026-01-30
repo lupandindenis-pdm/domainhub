@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { X, Download, Check, ChevronDown, CheckSquare, Square, EyeOff } from "lucide-react";
 import { SingleSelectFilter } from "./SingleSelectFilter";
-import { DomainFilter, DomainType, DomainStatus } from "@/types/domain";
-import { mockLabels } from "@/data/mockDomains";
+import { DomainFilter, DomainType, DomainStatus, Label } from "@/types/domain";
 import { LabelBadge } from "./LabelBadge";
 import { projects } from "@/data/mockDomains";
 import { useLanguage } from "@/components/language-provider";
@@ -56,6 +55,7 @@ interface DomainFiltersProps {
   showHidden: boolean;
   onToggleShowHidden: () => void;
   hiddenCount: number;
+  labels: Label[];
 }
 
 interface MultiSelectProps {
@@ -143,7 +143,7 @@ function MultiSelectFilter({ title, options, selectedValues = [], onChange }: Mu
   );
 }
 
-export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode, showHidden, onToggleShowHidden, hiddenCount }: DomainFiltersProps) {
+export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode, showHidden, onToggleShowHidden, hiddenCount, labels }: DomainFiltersProps) {
   const { t } = useLanguage();
   const hasActiveFilters = 
     filters.search || 
@@ -195,11 +195,11 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
 
         <SingleSelectFilter
           title="Метки"
-          options={mockLabels.map(l => ({ value: l.id, label: l.name, color: l.color }))}
+          options={labels.map(l => ({ value: l.id, label: l.name, color: l.color }))}
           selectedValue={filters.labelId}
           onChange={(value) => onFiltersChange({ ...filters, labelId: value })}
           renderOption={(option) => {
-            const label = mockLabels.find(l => l.id === option.value);
+            const label = labels.find(l => l.id === option.value);
             return label ? <LabelBadge label={label} /> : option.label;
           }}
         />

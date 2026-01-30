@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { DomainTable } from "@/components/domains/DomainTable";
 import { DomainFilters } from "@/components/domains/DomainFilters";
 import { BulkActionsBar } from "@/components/domains/BulkActionsBar";
-import { mockDomains } from "@/data/mockDomains";
+import { mockDomains, mockLabels } from "@/data/mockDomains";
 import { DomainFilter } from "@/types/domain";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -28,6 +28,16 @@ export default function Domains() {
   });
   const [showHidden, setShowHidden] = useState(false);
   
+  // Load labels from localStorage
+  const [labels, setLabels] = useState(() => {
+    try {
+      const saved = localStorage.getItem('domainLabels');
+      return saved ? JSON.parse(saved) : mockLabels;
+    } catch {
+      return mockLabels;
+    }
+  });
+  
   // Load domain label assignments from localStorage
   const [domainLabelAssignments, setDomainLabelAssignments] = useState<Record<string, string>>(() => {
     try {
@@ -38,16 +48,21 @@ export default function Domains() {
     }
   });
 
-  // Listen for localStorage changes to sync labels across tabs/components
+  // Listen for localStorage changes to sync labels and assignments across tabs/components
   useEffect(() => {
     const handleStorageChange = () => {
       try {
-        const saved = localStorage.getItem('domainLabelAssignments');
-        if (saved) {
-          setDomainLabelAssignments(JSON.parse(saved));
+        const savedLabels = localStorage.getItem('domainLabels');
+        if (savedLabels) {
+          setLabels(JSON.parse(savedLabels));
+        }
+        
+        const savedAssignments = localStorage.getItem('domainLabelAssignments');
+        if (savedAssignments) {
+          setDomainLabelAssignments(JSON.parse(savedAssignments));
         }
       } catch (error) {
-        console.error('Failed to load domain label assignments:', error);
+        console.error('Failed to load labels from localStorage:', error);
       }
     };
 
@@ -332,6 +347,7 @@ export default function Domains() {
         showHidden={showHidden}
         onToggleShowHidden={handleToggleShowHidden}
         hiddenCount={hiddenDomainIds.size}
+        labels={labels}
       />
 
       {/* Domain Table */}
@@ -341,6 +357,7 @@ export default function Domains() {
         selectedDomainIds={selectedDomainIds}
         onToggleDomain={handleToggleDomain}
         showHidden={showHidden}
+        labels={labels}
       />
 
       {filteredDomains.length === 0 && (
