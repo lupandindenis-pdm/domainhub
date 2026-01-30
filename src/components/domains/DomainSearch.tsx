@@ -117,33 +117,29 @@ export function DomainSearch() {
                   key={domain.id}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors border-b last:border-b-0"
                 >
-                  {/* Domain Name - clickable */}
-                  <button
-                    onClick={() => handleNavigate(domain.id)}
-                    className="font-mono font-semibold text-sm text-foreground hover:text-primary transition-colors text-left flex-shrink-0"
-                  >
-                    {domain.name}
-                  </button>
-
-                  {/* Label - read-only */}
-                  {label && (
-                    <div className="flex-shrink-0">
-                      <LabelBadge label={label} />
+                  {/* Left side: Domain info */}
+                  <div className="flex-1 min-w-0">
+                    {/* Domain Name - clickable */}
+                    <button
+                      onClick={() => handleNavigate(domain.id)}
+                      className="font-mono font-semibold text-sm text-foreground hover:text-primary transition-colors text-left block w-full truncate"
+                    >
+                      {domain.name}
+                    </button>
+                    
+                    {/* Metadata line: Type, Status, Label */}
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <span>{domain.type === 'landing' ? 'Лендинг' : domain.type === 'site' ? 'Сайт' : domain.type === 'product' ? 'Домен продукта' : domain.type === 'mirror' ? 'Зеркало' : domain.type === 'seo' ? 'SEO' : domain.type === 'subdomain' ? 'Поддомен' : domain.type === 'referral' ? 'Реферальный' : domain.type === 'redirect' ? 'Редирект' : domain.type === 'technical' ? 'Технический' : domain.type === 'b2b' ? 'B2B' : domain.type}</span>
+                      <span>•</span>
+                      <span>{domain.status === 'actual' ? 'Активен' : domain.status === 'spare' ? 'Запасной' : domain.status === 'not_actual' ? 'Не актуален' : domain.status === 'not_configured' ? 'Не настроен' : domain.status === 'unknown' ? 'Не известен' : domain.status === 'expiring' ? 'Истекает' : domain.status === 'expired' ? 'Истёк' : domain.status === 'blocked' ? 'Заблокирован' : domain.status === 'test' ? 'Тест' : domain.status}</span>
+                      {label && (
+                        <>
+                          <span>•</span>
+                          <span>{label.name}</span>
+                        </>
+                      )}
                     </div>
-                  )}
-
-                  {/* Type Badge */}
-                  <div className="flex-shrink-0">
-                    <DomainTypeBadge type={domain.type} />
                   </div>
-
-                  {/* Status Badge */}
-                  <div className="flex-shrink-0">
-                    <DomainStatusBadge status={domain.status} />
-                  </div>
-
-                  {/* Spacer */}
-                  <div className="flex-grow" />
 
                   {/* Navigate Icon - clickable */}
                   <button
