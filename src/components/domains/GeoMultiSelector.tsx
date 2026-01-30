@@ -6,87 +6,88 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { getGeoColor } from "@/data/geoColors";
 
-// Список всех стран с кодами и цветами
+// Список всех стран с кодами
 const geoOptions = [
-  { code: "WW", name: "Worldwide", color: "#8b5cf6" },
-  { code: "RU", name: "Россия", color: "#ef4444" },
-  { code: "US", name: "США", color: "#3b82f6" },
-  { code: "GB", name: "Великобритания", color: "#10b981" },
-  { code: "DE", name: "Германия", color: "#f59e0b" },
-  { code: "FR", name: "Франция", color: "#06b6d4" },
-  { code: "IT", name: "Италия", color: "#ec4899" },
-  { code: "ES", name: "Испания", color: "#f97316" },
-  { code: "CA", name: "Канада", color: "#14b8a6" },
-  { code: "AU", name: "Австралия", color: "#a855f7" },
-  { code: "JP", name: "Япония", color: "#ef4444" },
-  { code: "CN", name: "Китай", color: "#eab308" },
-  { code: "IN", name: "Индия", color: "#f97316" },
-  { code: "BR", name: "Бразилия", color: "#10b981" },
-  { code: "MX", name: "Мексика", color: "#06b6d4" },
-  { code: "KR", name: "Южная Корея", color: "#3b82f6" },
-  { code: "NL", name: "Нидерланды", color: "#f59e0b" },
-  { code: "SE", name: "Швеция", color: "#06b6d4" },
-  { code: "NO", name: "Норвегия", color: "#3b82f6" },
-  { code: "FI", name: "Финляндия", color: "#06b6d4" },
-  { code: "DK", name: "Дания", color: "#ef4444" },
-  { code: "PL", name: "Польша", color: "#ef4444" },
-  { code: "CZ", name: "Чехия", color: "#3b82f6" },
-  { code: "AT", name: "Австрия", color: "#ef4444" },
-  { code: "CH", name: "Швейцария", color: "#ef4444" },
-  { code: "BE", name: "Бельгия", color: "#eab308" },
-  { code: "PT", name: "Португалия", color: "#10b981" },
-  { code: "GR", name: "Греция", color: "#3b82f6" },
-  { code: "TR", name: "Турция", color: "#ef4444" },
-  { code: "IL", name: "Израиль", color: "#3b82f6" },
-  { code: "AE", name: "ОАЭ", color: "#10b981" },
-  { code: "SA", name: "Саудовская Аравия", color: "#10b981" },
-  { code: "ZA", name: "ЮАР", color: "#eab308" },
-  { code: "AR", name: "Аргентина", color: "#06b6d4" },
-  { code: "CL", name: "Чили", color: "#ef4444" },
-  { code: "CO", name: "Колумбия", color: "#eab308" },
-  { code: "PE", name: "Перу", color: "#ef4444" },
-  { code: "VE", name: "Венесуэла", color: "#eab308" },
-  { code: "TH", name: "Таиланд", color: "#3b82f6" },
-  { code: "VN", name: "Вьетнам", color: "#ef4444" },
-  { code: "ID", name: "Индонезия", color: "#ef4444" },
-  { code: "MY", name: "Малайзия", color: "#3b82f6" },
-  { code: "SG", name: "Сингапур", color: "#ef4444" },
-  { code: "PH", name: "Филиппины", color: "#3b82f6" },
-  { code: "NZ", name: "Новая Зеландия", color: "#3b82f6" },
-  { code: "HK", name: "Гонконг", color: "#ef4444" },
-  { code: "TW", name: "Тайвань", color: "#3b82f6" },
-  { code: "UA", name: "Украина", color: "#3b82f6" },
-  { code: "BY", name: "Беларусь", color: "#10b981" },
-  { code: "KZ", name: "Казахстан", color: "#06b6d4" },
-  { code: "UZ", name: "Узбекистан", color: "#3b82f6" },
-  { code: "GE", name: "Грузия", color: "#ef4444" },
-  { code: "AM", name: "Армения", color: "#f97316" },
-  { code: "AZ", name: "Азербайджан", color: "#10b981" },
-  { code: "MD", name: "Молдова", color: "#3b82f6" },
-  { code: "EE", name: "Эстония", color: "#3b82f6" },
-  { code: "LV", name: "Латвия", color: "#ef4444" },
-  { code: "LT", name: "Литва", color: "#eab308" },
-  { code: "RO", name: "Румыния", color: "#3b82f6" },
-  { code: "BG", name: "Болгария", color: "#10b981" },
-  { code: "RS", name: "Сербия", color: "#ef4444" },
-  { code: "HR", name: "Хорватия", color: "#3b82f6" },
-  { code: "SI", name: "Словения", color: "#3b82f6" },
-  { code: "SK", name: "Словакия", color: "#3b82f6" },
-  { code: "HU", name: "Венгрия", color: "#10b981" },
-  { code: "IE", name: "Ирландия", color: "#10b981" },
-  { code: "IS", name: "Исландия", color: "#3b82f6" },
-  { code: "LU", name: "Люксембург", color: "#06b6d4" },
-  { code: "MT", name: "Мальта", color: "#ef4444" },
-  { code: "CY", name: "Кипр", color: "#f97316" },
-  { code: "EG", name: "Египет", color: "#eab308" },
-  { code: "MA", name: "Марокко", color: "#ef4444" },
-  { code: "NG", name: "Нигерия", color: "#10b981" },
-  { code: "KE", name: "Кения", color: "#ef4444" },
-  { code: "CIS", name: "СНГ", color: "#06b6d4" },
-  { code: "EU", name: "Европа", color: "#3b82f6" },
-  { code: "ASIA", name: "Азия", color: "#f97316" },
-  { code: "LATAM", name: "Латинская Америка", color: "#10b981" },
+  { code: "WW", name: "Worldwide" },
+  { code: "RU", name: "Россия" },
+  { code: "US", name: "США" },
+  { code: "GB", name: "Великобритания" },
+  { code: "DE", name: "Германия" },
+  { code: "FR", name: "Франция" },
+  { code: "IT", name: "Италия" },
+  { code: "ES", name: "Испания" },
+  { code: "CA", name: "Канада" },
+  { code: "AU", name: "Австралия" },
+  { code: "JP", name: "Япония" },
+  { code: "CN", name: "Китай" },
+  { code: "IN", name: "Индия" },
+  { code: "BR", name: "Бразилия" },
+  { code: "MX", name: "Мексика" },
+  { code: "KR", name: "Южная Корея" },
+  { code: "NL", name: "Нидерланды" },
+  { code: "SE", name: "Швеция" },
+  { code: "NO", name: "Норвегия" },
+  { code: "FI", name: "Финляндия" },
+  { code: "DK", name: "Дания" },
+  { code: "PL", name: "Польша" },
+  { code: "CZ", name: "Чехия" },
+  { code: "AT", name: "Австрия" },
+  { code: "CH", name: "Швейцария" },
+  { code: "BE", name: "Бельгия" },
+  { code: "PT", name: "Португалия" },
+  { code: "GR", name: "Греция" },
+  { code: "TR", name: "Турция" },
+  { code: "IL", name: "Израиль" },
+  { code: "AE", name: "ОАЭ" },
+  { code: "SA", name: "Саудовская Аравия" },
+  { code: "ZA", name: "ЮАР" },
+  { code: "AR", name: "Аргентина" },
+  { code: "CL", name: "Чили" },
+  { code: "CO", name: "Колумбия" },
+  { code: "PE", name: "Перу" },
+  { code: "VE", name: "Венесуэла" },
+  { code: "TH", name: "Таиланд" },
+  { code: "VN", name: "Вьетнам" },
+  { code: "ID", name: "Индонезия" },
+  { code: "MY", name: "Малайзия" },
+  { code: "SG", name: "Сингапур" },
+  { code: "PH", name: "Филиппины" },
+  { code: "NZ", name: "Новая Зеландия" },
+  { code: "HK", name: "Гонконг" },
+  { code: "TW", name: "Тайвань" },
+  { code: "UA", name: "Украина" },
+  { code: "BY", name: "Беларусь" },
+  { code: "KZ", name: "Казахстан" },
+  { code: "UZ", name: "Узбекистан" },
+  { code: "GE", name: "Грузия" },
+  { code: "AM", name: "Армения" },
+  { code: "AZ", name: "Азербайджан" },
+  { code: "MD", name: "Молдова" },
+  { code: "EE", name: "Эстония" },
+  { code: "LV", name: "Латвия" },
+  { code: "LT", name: "Литва" },
+  { code: "RO", name: "Румыния" },
+  { code: "BG", name: "Болгария" },
+  { code: "RS", name: "Сербия" },
+  { code: "HR", name: "Хорватия" },
+  { code: "SI", name: "Словения" },
+  { code: "SK", name: "Словакия" },
+  { code: "HU", name: "Венгрия" },
+  { code: "IE", name: "Ирландия" },
+  { code: "IS", name: "Исландия" },
+  { code: "LU", name: "Люксембург" },
+  { code: "MT", name: "Мальта" },
+  { code: "CY", name: "Кипр" },
+  { code: "EG", name: "Египет" },
+  { code: "MA", name: "Марокко" },
+  { code: "NG", name: "Нигерия" },
+  { code: "KE", name: "Кения" },
+  { code: "CIS", name: "СНГ" },
+  { code: "EU", name: "Европа" },
+  { code: "ASIA", name: "Азия" },
+  { code: "LATAM", name: "Латинская Америка" },
 ];
 
 interface GeoMultiSelectorProps {
@@ -138,22 +139,25 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
         >
           <div className="flex flex-wrap gap-1 flex-1">
             {selectedOptions.length > 0 ? (
-              selectedOptions.map((option) => (
-                <Badge
-                  key={option!.code}
-                  variant="secondary"
-                  style={{ backgroundColor: `${option!.color}20`, color: option!.color }}
-                  className="gap-1 border-0"
-                >
-                  {option!.code}
-                  {!disabled && (
-                    <X
-                      className="h-3 w-3 cursor-pointer hover:opacity-70"
-                      onClick={(e) => handleRemove(option!.code, e)}
-                    />
-                  )}
-                </Badge>
-              ))
+              selectedOptions.map((option) => {
+                const color = getGeoColor(option!.code);
+                return (
+                  <Badge
+                    key={option!.code}
+                    variant="secondary"
+                    style={{ backgroundColor: `${color}20`, color: color }}
+                    className="gap-1 border-0"
+                  >
+                    {option!.code}
+                    {!disabled && (
+                      <X
+                        className="h-3 w-3 cursor-pointer hover:opacity-70"
+                        onClick={(e) => handleRemove(option!.code, e)}
+                      />
+                    )}
+                  </Badge>
+                );
+              })
             ) : (
               <span className="text-muted-foreground">Выберите GEO...</span>
             )}
@@ -175,33 +179,36 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
           <CommandList className="max-h-[300px]">
             <CommandEmpty>GEO не найдено</CommandEmpty>
             <CommandGroup>
-              {filteredOptions.map((option) => (
-                <CommandItem
-                  key={option.code}
-                  value={option.code}
-                  onSelect={() => handleSelect(option.code)}
-                  className="cursor-pointer"
-                >
-                  <div
-                    className={cn(
-                      "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                      selected.includes(option.code)
-                        ? "bg-primary text-primary-foreground"
-                        : "opacity-50 [&_svg]:invisible"
-                    )}
+              {filteredOptions.map((option) => {
+                const color = getGeoColor(option.code);
+                return (
+                  <CommandItem
+                    key={option.code}
+                    value={option.code}
+                    onSelect={() => handleSelect(option.code)}
+                    className="cursor-pointer"
                   >
-                    <Check className="h-4 w-4" />
-                  </div>
-                  <Badge
-                    variant="secondary"
-                    style={{ backgroundColor: `${option.color}20`, color: option.color }}
-                    className="mr-2 border-0 font-mono text-xs"
-                  >
-                    {option.code}
-                  </Badge>
-                  <span>{option.name}</span>
-                </CommandItem>
-              ))}
+                    <div
+                      className={cn(
+                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                        selected.includes(option.code)
+                          ? "bg-primary text-primary-foreground"
+                          : "opacity-50 [&_svg]:invisible"
+                      )}
+                    >
+                      <Check className="h-4 w-4" />
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      style={{ backgroundColor: `${color}20`, color: color }}
+                      className="mr-2 border-0 font-mono text-xs"
+                    >
+                      {option.code}
+                    </Badge>
+                    <span>{option.name}</span>
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>

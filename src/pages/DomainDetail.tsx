@@ -53,6 +53,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/components/language-provider";
 import DomainDetailV1 from "./DomainDetailV1";
 import { GeoMultiSelector } from "@/components/domains/GeoMultiSelector";
+import { getGeoColor } from "@/data/geoColors";
 
 export default function DomainDetail() {
   const { id } = useParams();
@@ -1254,39 +1255,25 @@ function ReadOnlyGeoView({
   const hidden = selected.slice(limit);
   const hasHidden = hidden.length > 0;
 
-  // Цветовая схема для континентов/регионов
-  const getRegionColor = (country: string) => {
-    // Приводим к 2-символьным кодам
-    const code = country.substring(0, 2).toUpperCase();
-    const europe = ['RU', 'DE', 'FR', 'IT', 'ES', 'GB', 'PL', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI'];
-    const asia = ['CN', 'JP', 'KR', 'IN', 'SG', 'TH', 'MY', 'ID', 'PH', 'VN'];
-    const americas = ['US', 'CA', 'MX', 'BR', 'AR', 'CL', 'CO', 'PE'];
-    
-    if (europe.includes(code)) return 'bg-blue-500/30 text-white';
-    if (asia.includes(code)) return 'bg-emerald-500/30 text-white';
-    if (americas.includes(code)) return 'bg-purple-500/30 text-white';
-    return 'bg-orange-500/30 text-white';
-  };
-
-  // Форматируем код страны до 2 символов
-  const formatCountryCode = (country: string) => {
-    return country.substring(0, 2).toUpperCase();
-  };
-
   return (
     <div className="space-y-2">
       {/* Выбранные страны с цветами */}
       <div className="flex flex-wrap items-center gap-1 min-h-10 py-2 px-3 rounded-md border-none bg-muted/30">
         {selected.length > 0 ? (
           <>
-            {visible.map((val) => (
-              <div 
-                key={val}
-                className={`${getRegionColor(val)} font-mono text-xs px-2 py-1 min-w-[2rem] text-center rounded-md`}
-              >
-                {formatCountryCode(val)}
-              </div>
-            ))}
+            {visible.map((val) => {
+              const color = getGeoColor(val);
+              return (
+                <Badge
+                  key={val}
+                  variant="secondary"
+                  style={{ backgroundColor: `${color}20`, color: color }}
+                  className="border-0 font-mono text-xs"
+                >
+                  {val}
+                </Badge>
+              );
+            })}
             {hasHidden && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -1296,14 +1283,19 @@ function ReadOnlyGeoView({
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-2">
                   <div className="flex flex-wrap gap-1">
-                    {hidden.map((val) => (
-                      <div 
-                        key={val} 
-                        className={`${getRegionColor(val)} font-mono text-xs px-2 py-1 min-w-[2rem] text-center rounded-md`}
-                      >
-                        {formatCountryCode(val)}
-                      </div>
-                    ))}
+                    {hidden.map((val) => {
+                      const color = getGeoColor(val);
+                      return (
+                        <Badge
+                          key={val}
+                          variant="secondary"
+                          style={{ backgroundColor: `${color}20`, color: color }}
+                          className="border-0 font-mono text-xs"
+                        >
+                          {val}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </PopoverContent>
               </Popover>
