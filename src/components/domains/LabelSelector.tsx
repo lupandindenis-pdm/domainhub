@@ -169,7 +169,7 @@ export function LabelSelector({
                     <div
                       key={label.id}
                       className={cn(
-                        "flex items-center justify-between rounded-md px-3 py-2.5 cursor-pointer transition-colors",
+                        "flex items-center justify-between rounded-md px-3 py-2.5 cursor-pointer transition-colors group",
                         isSelected
                           ? "bg-accent/50 border border-border"
                           : "hover:bg-accent/50"
@@ -183,9 +183,23 @@ export function LabelSelector({
                         />
                         <span className="text-sm">{label.name}</span>
                       </div>
-                      {isSelected && (
-                        <Check className="h-4 w-4 text-primary" />
-                      )}
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // TODO: Add delete label functionality
+                            toast.info("Удаление метки будет реализовано");
+                          }}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                        {isSelected && (
+                          <Check className="h-4 w-4 text-primary" />
+                        )}
+                      </div>
                     </div>
                   );
                 })}
