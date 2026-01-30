@@ -71,6 +71,7 @@ export default function DomainDetail() {
     status: domain?.status || '',
     geo: domain?.geo || '',
     department: domain?.department || '',
+    project: domain?.project || '',
     category: domain?.category || '',
     direction: domain?.direction || '',
     targetAction: domain?.targetAction || '',
@@ -181,6 +182,7 @@ export default function DomainDetail() {
       status: domain?.status || '',
       geo: domain?.geo || '',
       department: domain?.department || '',
+      project: domain?.project || '',
       category: domain?.category || '',
       direction: domain?.direction || '',
       targetAction: domain?.targetAction || '',
@@ -210,21 +212,58 @@ export default function DomainDetail() {
     setIsEditing(false);
   };
 
-  // Load edited data from localStorage
+  // Load edited data from localStorage or reset to domain data
   useEffect(() => {
-    if (!id) return;
+    if (!id || !domain) return;
+    
     try {
       const savedDomains = localStorage.getItem('editedDomains');
       if (savedDomains) {
         const editedDomains = JSON.parse(savedDomains);
         if (editedDomains[id]) {
           setFormData(editedDomains[id]);
+          return;
         }
       }
+      
+      // If no saved data, initialize with domain data
+      setFormData({
+        name: domain.name || '',
+        type: domain.type || '',
+        status: domain.status || '',
+        geo: domain.geo || '',
+        department: domain.department || '',
+        project: domain.project || '',
+        category: domain.category || '',
+        direction: domain.direction || '',
+        targetAction: domain.targetAction || '',
+        bonus: domain.bonus || '',
+        needsUpdate: domain.needsUpdate || false,
+        jiraTask: domain.jiraTask || '',
+        fileHosting: domain.fileHosting || '',
+        registrar: domain.registrar || '',
+        nsServers: domain.nsServers || [],
+        techIssues: domain.techIssues || [],
+        testMethod: domain.testMethod || '',
+        gaId: domain.gaId || '',
+        gtmId: domain.gtmId || '',
+        isInProgram: domain.isInProgram || false,
+        programLink: domain.programLink || '',
+        companyName: domain.companyName || '',
+        programStatus: domain.programStatus || '',
+        oneSignalId: domain.oneSignalId || '',
+        cloudflareAccount: domain.cloudflareAccount || '',
+        description: domain.description || '',
+        marketingNote: '',
+        itNote: '',
+        analyticsNote: '',
+        partnershipNote: '',
+        integrationsNote: ''
+      });
     } catch (error) {
       console.error('Failed to load edited data:', error);
     }
-  }, [id]);
+  }, [id, domain]);
 
   if (!domain) {
     return (
@@ -278,7 +317,7 @@ export default function DomainDetail() {
             <Input
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
-              className="text-3xl font-bold font-mono tracking-tight h-auto py-1 px-2 border-2 border-primary/50"
+              className="text-2xl font-bold font-mono tracking-tight h-auto py-2 px-3 border border-primary/30 bg-muted/30 focus-visible:ring-1 focus-visible:ring-primary/50 max-w-md"
             />
           ) : (
             <h1 
@@ -396,6 +435,7 @@ export default function DomainDetail() {
                           <SelectItem value="redirect">Редирект</SelectItem>
                           <SelectItem value="technical">Технический</SelectItem>
                           <SelectItem value="subdomain">Поддомен</SelectItem>
+                          <SelectItem value="unknown">Неизвестно</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : (
@@ -418,7 +458,12 @@ export default function DomainDetail() {
                       <BarChart3 className="h-4 w-4" />
                       Проект
                     </label>
-                    <Input value={domain.project} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                    <Input 
+                      value={formData.project || domain.project} 
+                      onChange={(e) => handleFieldChange('project', e.target.value)}
+                      readOnly={!isEditing}
+                      className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                    />
                   </div>
                 </div>
 
