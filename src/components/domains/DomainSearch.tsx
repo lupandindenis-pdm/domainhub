@@ -102,12 +102,12 @@ export function DomainSearch() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim().length > 0 && setIsOpen(true)}
-          className="pl-9 h-9"
+          className="pl-9 h-9 border-0 bg-secondary/80"
         />
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full mt-2 w-full rounded-lg border bg-popover shadow-lg z-50 overflow-hidden">
+        <div className="absolute top-full mt-2 w-full rounded-lg bg-popover shadow-lg z-50 overflow-hidden">
           <div className="max-h-[400px] overflow-y-auto scrollbar-hide">
             {results.map((domain) => {
               const label = getLabelForDomain(domain.id);
@@ -135,7 +135,7 @@ export function DomainSearch() {
                       {label && (
                         <>
                           <span>•</span>
-                          <span>{label.name}</span>
+                          <span style={{ color: label.color }}>{label.name}</span>
                         </>
                       )}
                     </div>
@@ -144,10 +144,10 @@ export function DomainSearch() {
                   {/* Navigate Icon - clickable */}
                   <button
                     onClick={() => handleNavigate(domain.id)}
-                    className="flex-shrink-0 p-1 rounded hover:bg-accent transition-colors"
+                    className="flex-shrink-0 p-1.5 rounded hover:bg-primary transition-all group"
                     aria-label={`Перейти к ${domain.name}`}
                   >
-                    <ChevronRight className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
                   </button>
                 </div>
               );
