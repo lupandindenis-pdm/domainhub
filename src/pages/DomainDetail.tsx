@@ -364,6 +364,31 @@ export default function DomainDetail() {
         </div>
 
         <div className="flex items-center gap-2">
+          {!isEditing && (
+            <LabelSelector
+              currentLabelId={domainLabelId}
+              labels={labels}
+              onLabelChange={(labelId) => {
+                setDomainLabelId(labelId);
+              }}
+              onCreateLabel={(name, color) => {
+                const newLabel = {
+                  id: `label-${Date.now()}`,
+                  name,
+                  color,
+                  projectId: domain.project,
+                };
+                setLabels([...labels, newLabel]);
+                setDomainLabelId(newLabel.id);
+              }}
+              onDeleteLabel={(labelId) => {
+                setLabels(labels.filter(l => l.id !== labelId));
+                if (domainLabelId === labelId) {
+                  setDomainLabelId(undefined);
+                }
+              }}
+            />
+          )}
           <div className="w-[264px] flex justify-end">
             {!isEditing ? (
               <Button onClick={() => setIsEditing(true)} className="gap-2">
@@ -483,33 +508,6 @@ export default function DomainDetail() {
 
                 {/* Column 2: Статус, GEO блок, Отдел */}
                 <div className="space-y-5">
-                  {!isEditing && (
-                    <div className="mb-2">
-                      <LabelSelector
-                        currentLabelId={domainLabelId}
-                        labels={labels}
-                        onLabelChange={(labelId) => {
-                          setDomainLabelId(labelId);
-                        }}
-                        onCreateLabel={(name, color) => {
-                          const newLabel = {
-                            id: `label-${Date.now()}`,
-                            name,
-                            color,
-                            projectId: domain.project,
-                          };
-                          setLabels([...labels, newLabel]);
-                          setDomainLabelId(newLabel.id);
-                        }}
-                        onDeleteLabel={(labelId) => {
-                          setLabels(labels.filter(l => l.id !== labelId));
-                          if (domainLabelId === labelId) {
-                            setDomainLabelId(undefined);
-                          }
-                        }}
-                      />
-                    </div>
-                  )}
                   <div className="space-y-2">
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
                       <Activity className="h-4 w-4" />
