@@ -149,7 +149,7 @@ export function LabelSelector({
                 </div>
               </div>
 
-              <div className="p-2 max-h-[300px] overflow-y-auto">
+              <div className="p-2 max-h-[300px] overflow-y-auto scrollbar-hide">
                 <div
                   className={cn(
                     "flex items-center justify-between rounded-md px-3 py-2.5 cursor-pointer transition-colors",
