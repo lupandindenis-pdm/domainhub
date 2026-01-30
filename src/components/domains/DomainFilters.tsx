@@ -219,7 +219,9 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
               onClick={onToggleShowHidden}
               className={cn(
                 "h-10 w-10 transition-colors",
-                showHidden ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80"
+                showHidden 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-secondary/50 border-0 hover:bg-secondary/80 text-yellow-500 hover:text-yellow-400"
               )}
               aria-label="Toggle show hidden domains"
             >
