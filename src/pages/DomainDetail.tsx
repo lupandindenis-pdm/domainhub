@@ -227,15 +227,15 @@ export default function DomainDetail() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="flex h-auto flex-wrap gap-1 bg-transparent p-0 justify-start">
-          <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border border-transparent data-[state=active]:border-primary px-4 py-2 rounded-md shadow-sm bg-card">
+      <Tabs defaultValue="general" className="space-y-6 mt-12">
+        <TabsList className="flex h-auto flex-wrap gap-2 bg-transparent p-0 justify-start">
+          <TabsTrigger value="general" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
             Общая информация
           </TabsTrigger>
-          <TabsTrigger value="department" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white border border-transparent px-4 py-2 rounded-md shadow-sm bg-card">
+          <TabsTrigger value="department" className="data-[state=active]:bg-purple-500/10 data-[state=active]:text-purple-600 data-[state=active]:border-purple-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
             Отдел
           </TabsTrigger>
-          <TabsTrigger value="integrations" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white border border-transparent px-4 py-2 rounded-md shadow-sm bg-card">
+          <TabsTrigger value="integrations" className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-600 data-[state=active]:border-orange-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
             Интеграции
           </TabsTrigger>
         </TabsList>
