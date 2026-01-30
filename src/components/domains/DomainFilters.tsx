@@ -3,7 +3,7 @@ import { X, Download, Check, ChevronDown, CheckSquare, Square, EyeOff } from "lu
 import { SingleSelectFilter } from "./SingleSelectFilter";
 import { DomainFilter, DomainType, DomainStatus, Label } from "@/types/domain";
 import { LabelBadge } from "./LabelBadge";
-import { projects } from "@/data/mockDomains";
+import { projects, folders } from "@/data/mockDomains";
 import { useLanguage } from "@/components/language-provider";
 import {
   Popover,
@@ -150,6 +150,7 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
     filters.types?.length || 
     filters.statuses?.length || 
     filters.projects?.length ||
+    filters.folders?.length ||
     filters.labelId;
 
   const clearFilters = () => {
@@ -191,6 +192,13 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
           options={projects.map(p => ({ value: p, label: p }))}
           selectedValues={filters.projects}
           onChange={(values) => onFiltersChange({ ...filters, projects: values })}
+        />
+
+        <MultiSelectFilter
+          title="Папки"
+          options={folders.map(f => ({ value: f, label: f }))}
+          selectedValues={filters.folders}
+          onChange={(values) => onFiltersChange({ ...filters, folders: values })}
         />
 
         <SingleSelectFilter

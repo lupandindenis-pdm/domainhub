@@ -5,7 +5,7 @@ import {
   History, 
   Settings, 
   Users, 
-  Bell,
+  Folder,
   FileText,
   Shield
 } from "lucide-react";
@@ -39,7 +39,7 @@ export function AppSidebar() {
 
   const managementItems = [
     { title: t("history"), url: "/history", icon: History },
-    { title: t("alerts"), url: "/alerts", icon: Bell },
+    { title: "Папки", url: "/folders", icon: Folder },
     { title: t("reports"), url: "/reports", icon: FileText },
   ];
 

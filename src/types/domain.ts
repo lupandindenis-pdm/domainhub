@@ -127,4 +127,5 @@ export interface DomainFilter {
   registrars?: string[];
   geo?: string[];
   labelId?: string;
+  folders?: string[];
 }

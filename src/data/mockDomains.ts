@@ -9,6 +9,14 @@ export const mockLabels: Label[] = [
   { id: "label-6", name: "Продакшн", color: "#8b5cf6", projectId: "E-commerce Platform" },
 ];
 
+export const folders = [
+  "Основные",
+  "Тестовые",
+  "Архив",
+  "Партнерские",
+  "Промо",
+];
+
 export const mockDomains: Domain[] = [
   {
     id: "1",
