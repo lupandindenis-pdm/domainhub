@@ -309,7 +309,7 @@ export default function DomainDetail() {
     <div className="container py-6 space-y-6 max-w-7xl mx-auto">
       {/* Top Navigation & Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <Button variant="ghost" size="icon" onClick={() => navigate("/domains")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
@@ -337,18 +337,18 @@ export default function DomainDetail() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0"
             onClick={() => window.open(`https://${domain.name}`, "_blank")}
           >
             <ExternalLink className="h-5 w-5" />
           </Button>
           {domain.needsUpdate && (
-             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6">
+             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap">
               <AlertTriangle className="h-3 w-3" /> Требует обновления
             </Badge>
           )}
           {domain.hasGeoBlock && (
-            <Badge variant="destructive" className="gap-1 h-6">
+            <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
               <Globe className="h-3 w-3" /> GEO Block
             </Badge>
           )}
@@ -385,10 +385,10 @@ export default function DomainDetail() {
             </Button>
           ) : (
             <div className="flex gap-2">
-              <Button onClick={handleCancel} variant="outline" className="gap-2">
+              <Button onClick={handleCancel} variant="outline" className="gap-2 min-w-[120px]">
                 Отмена
               </Button>
-              <Button onClick={handleSave} className="gap-2 bg-green-600 hover:bg-green-700">
+              <Button onClick={handleSave} className="gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]">
                 <CheckCircle className="h-4 w-4" />
                 Сохранить
               </Button>
@@ -426,15 +426,20 @@ export default function DomainDetail() {
                     </label>
                     {isEditing ? (
                       <Select value={formData.type} onValueChange={(value) => handleFieldChange('type', value)}>
-                        <SelectTrigger className="bg-muted/50 border-none">
+                        <SelectTrigger className="bg-muted/50">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="product">Домен продукта</SelectItem>
+                          <SelectItem value="landing">Лендинг</SelectItem>
+                          <SelectItem value="seo">SEO</SelectItem>
+                          <SelectItem value="mirror">Зеркало</SelectItem>
+                          <SelectItem value="site">Сайт</SelectItem>
+                          <SelectItem value="subdomain">Поддомен</SelectItem>
                           <SelectItem value="referral">Реферальный</SelectItem>
                           <SelectItem value="redirect">Редирект</SelectItem>
                           <SelectItem value="technical">Технический</SelectItem>
-                          <SelectItem value="subdomain">Поддомен</SelectItem>
+                          <SelectItem value="product">Домен продукта</SelectItem>
+                          <SelectItem value="b2b">B2B</SelectItem>
                           <SelectItem value="unknown">Неизвестно</SelectItem>
                         </SelectContent>
                       </Select>
@@ -476,15 +481,17 @@ export default function DomainDetail() {
                     </label>
                     {isEditing ? (
                       <Select value={formData.status} onValueChange={(value) => handleFieldChange('status', value)}>
-                        <SelectTrigger className="bg-muted/50 border-none">
+                        <SelectTrigger className="bg-muted/50">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="actual">Актуальный</SelectItem>
-                          <SelectItem value="spare">Запасной</SelectItem>
                           <SelectItem value="not_actual">Не актуальный</SelectItem>
                           <SelectItem value="not_configured">Не настроен</SelectItem>
                           <SelectItem value="unknown">Неизвестно</SelectItem>
+                          <SelectItem value="expiring">Истекает</SelectItem>
+                          <SelectItem value="expired">Истёк</SelectItem>
+                          <SelectItem value="spare">Запасной</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : (
@@ -513,7 +520,7 @@ export default function DomainDetail() {
                     </label>
                     {isEditing ? (
                       <Select value={formData.department} onValueChange={(value) => handleFieldChange('department', value)}>
-                        <SelectTrigger className="bg-muted/50 border-none">
+                        <SelectTrigger className="bg-muted/50">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
