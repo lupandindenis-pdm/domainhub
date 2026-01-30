@@ -387,22 +387,24 @@ export default function DomainDetail() {
               }
             }}
           />
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)} className="gap-2">
-              <Edit className="h-4 w-4" />
-              Редактировать
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button onClick={handleCancel} variant="outline" className="gap-2 min-w-[120px]">
-                Отмена
+          <div className="w-[264px] flex justify-end">
+            {!isEditing ? (
+              <Button onClick={() => setIsEditing(true)} className="gap-2">
+                <Edit className="h-4 w-4" />
+                Редактировать
               </Button>
-              <Button onClick={handleSave} className="gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]">
-                <CheckCircle className="h-4 w-4" />
-                Сохранить
-              </Button>
-            </div>
-          )}
+            ) : (
+              <div className="flex gap-2">
+                <Button onClick={handleCancel} variant="outline" className="gap-2 min-w-[120px]">
+                  Отмена
+                </Button>
+                <Button onClick={handleSave} className="gap-2 bg-green-600 hover:bg-green-700 min-w-[120px]">
+                  <CheckCircle className="h-4 w-4" />
+                  Сохранить
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
