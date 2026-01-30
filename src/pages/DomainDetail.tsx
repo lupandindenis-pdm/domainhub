@@ -13,6 +13,8 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Calendar } from "@/components/ui/calendar";
@@ -396,168 +398,476 @@ export default function DomainDetail() {
             </div>
 
             <TabsContent value="marketing" className="space-y-6 mt-2">
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Megaphone className="h-5 w-5 text-blue-500" /> Категоризация</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <InfoRow label="Категория" value={domain.category || "—"} />
-                    <InfoRow label="Направление" value={domain.direction || "—"} />
-                    <InfoRow label="Целевое действие" value={domain.targetAction || "—"} />
-                    <InfoRow label="Бонус" value={domain.bonus || "Нет"} />
-                  </CardContent>
-                </Card>
+              <div className="w-full">
+                <div className="p-6 space-y-8">
+                  {/* Two columns */}
+                  <div className="grid gap-8 md:grid-cols-2">
+                    {/* Column 1 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Tag className="h-4 w-4" />
+                          Категория
+                        </label>
+                        <Input value={domain.category || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><AlertCircle className="h-5 w-5 text-blue-500" /> Состояние контента</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-secondary/50 rounded-lg">
-                      <span className="font-medium">Требует обновления</span>
-                      <Badge variant={domain.needsUpdate ? "destructive" : "secondary"}>
-                        {domain.needsUpdate ? "ДА" : "НЕТ"}
-                      </Badge>
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4" />
+                          Направление
+                        </label>
+                        <Input value={domain.direction || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Activity className="h-4 w-4" />
+                          Целевое действие
+                        </label>
+                        <Input value={domain.targetAction || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
                     </div>
-                    {domain.jiraTask && (
-                      <InfoRow label="Задача Jira" value={domain.jiraTask} isLink />
-                    )}
-                  </CardContent>
-                </Card>
+
+                    {/* Column 2 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Tag className="h-4 w-4" />
+                          Бонус
+                        </label>
+                        <Input value={domain.bonus || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4" />
+                          Требует обновления
+                        </label>
+                        <Input value={domain.needsUpdate ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Ссылка на задачу Jira
+                        </label>
+                        <Input value={domain.jiraTask || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Comment Section */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Примечание
+                      </label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 gap-2 text-xs"
+                        onClick={() => setIsCommentOpen(!isCommentOpen)}
+                      >
+                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                      </Button>
+                    </div>
+                    
+                    <div className={cn(
+                      "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                    )}>
+                      {domain.description ? (
+                        <span className="text-muted-foreground">
+                          {isCommentOpen 
+                            ? domain.description 
+                            : (domain.description.length > 100 
+                                ? `${domain.description.substring(0, 100)}...` 
+                                : domain.description
+                              )
+                          }
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground italic">Примечание отсутствует</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
             <TabsContent value="it" className="space-y-6 mt-2">
-              <div className="grid gap-6 md:grid-cols-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Server className="h-5 w-5 text-slate-500" /> Инфраструктура</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <InfoRow label="Регистратор" value={domain.registrar} />
-                    <InfoRow label="Хостинг файлов" value={domain.fileHosting || "—"} />
-                    <InfoRow label="IP-адрес" value={domain.ipAddress} copyable />
-                    <InfoRow label="CDN" value={domain.cdn || "Нет"} />
-                    <InfoRow label="Дата продления" value={domain.expirationDate ? format(parseISO(domain.expirationDate), "dd.MM.yyyy") : "—"} />
-                    <div className="space-y-2">
-                      <span className="text-sm text-muted-foreground">NS-записи</span>
-                      <div className="bg-secondary p-2 rounded text-xs font-mono">
-                        {domain.nsServers.map(ns => <div key={ns}>{ns}</div>)}
+              <div className="w-full">
+                <div className="p-6 space-y-8">
+                  {/* Two columns */}
+                  <div className="grid gap-8 md:grid-cols-2">
+                    {/* Column 1 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Server className="h-4 w-4" />
+                          Хостинг файлов
+                        </label>
+                        <Input value={domain.fileHosting || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Globe className="h-4 w-4" />
+                          Регистратор
+                        </label>
+                        <Input value={domain.registrar || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Server className="h-4 w-4" />
+                          NS-записи
+                        </label>
+                        <div className="relative">
+                          <Input 
+                            value={domain.nsServers && domain.nsServers.length > 0 ? domain.nsServers.join(", ") : "—"} 
+                            readOnly 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 font-mono text-sm"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-muted"
+                            onClick={() => {
+                              if (domain.nsServers && domain.nsServers.length > 0) {
+                                navigator.clipboard.writeText(domain.nsServers.join(", "));
+                                toast.success("NS-записи скопированы");
+                              }
+                            }}
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4" />
+                          Тех. ограничения
+                        </label>
+                        <Input value={domain.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Code2 className="h-5 w-5 text-slate-500" /> Качество и Мониторинг</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <InfoRow label="Метод тестирования" value={domain.testMethod || "—"} />
-                    <InfoRow label="SSL статус" value={domain.sslStatus} />
-                    <InfoRow label="Последняя проверка" value={domain.lastCheck ? format(parseISO(domain.lastCheck), "dd.MM.yyyy HH:mm") : "—"} />
-                    {domain.uptimeMonitor && <InfoRow label="Мониторинг" value={domain.uptimeMonitor} isLink />}
+                    {/* Column 2 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Ссылка на Jira
+                        </label>
+                        <Input value={domain.jiraTask || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <CalendarIcon className="h-4 w-4" />
+                          Дата покупки
+                        </label>
+                        <Input value={domain.expirationDate ? format(parseISO(domain.expirationDate), "dd.MM.yyyy") : "—"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <CalendarIcon className="h-4 w-4" />
+                          Дата продления
+                        </label>
+                        <Input value={domain.expirationDate ? format(parseISO(domain.expirationDate), "dd.MM.yyyy") : "—"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Code2 className="h-4 w-4" />
+                          Метод тестирования
+                        </label>
+                        <Input value={domain.testMethod || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Comment Section */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Примечание
+                      </label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 gap-2 text-xs"
+                        onClick={() => setIsCommentOpen(!isCommentOpen)}
+                      >
+                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                      </Button>
+                    </div>
                     
-                    {domain.techIssues && domain.techIssues.length > 0 && (
-                       <div className="mt-4 p-3 border border-destructive/20 bg-destructive/5 rounded-lg">
-                         <span className="text-sm font-semibold text-destructive mb-2 block">Технические проблемы:</span>
-                         <ul className="list-disc list-inside text-sm text-destructive/80">
-                           {domain.techIssues.map((issue, i) => <li key={i}>{issue}</li>)}
-                         </ul>
-                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    <div className={cn(
+                      "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                    )}>
+                      {domain.description ? (
+                        <span className="text-muted-foreground">
+                          {isCommentOpen 
+                            ? domain.description 
+                            : (domain.description.length > 100 
+                                ? `${domain.description.substring(0, 100)}...` 
+                                : domain.description
+                              )
+                          }
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground italic">Примечание отсутствует</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
             <TabsContent value="analytics" className="space-y-6 mt-2">
-              <div className="grid gap-6 md:grid-cols-3">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Google Analytics</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{domain.gaId || "Не подключен"}</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">GTM Container</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{domain.gtmId || "Не подключен"}</div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">Уники ({domain.uniqueUsersPeriod || "за период"})</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{domain.uniqueUsers?.toLocaleString() || "—"}</div>
-                  </CardContent>
-                </Card>
+              <div className="w-full">
+                <div className="p-6 space-y-8">
+                  {/* Two columns */}
+                  <div className="grid gap-8 md:grid-cols-2">
+                    {/* Column 1 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4" />
+                          Номер счетчика GA
+                        </label>
+                        <Input value={domain.gaId || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+                    </div>
+
+                    {/* Column 2 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Code2 className="h-4 w-4" />
+                          Номер счетчика GTM
+                        </label>
+                        <Input value={domain.gtmId || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Comment Section */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Примечание
+                      </label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 gap-2 text-xs"
+                        onClick={() => setIsCommentOpen(!isCommentOpen)}
+                      >
+                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                      </Button>
+                    </div>
+                    
+                    <div className={cn(
+                      "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                    )}>
+                      {domain.description ? (
+                        <span className="text-muted-foreground">
+                          {isCommentOpen 
+                            ? domain.description 
+                            : (domain.description.length > 100 
+                                ? `${domain.description.substring(0, 100)}...` 
+                                : domain.description
+                              )
+                          }
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground italic">Примечание отсутствует</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
             <TabsContent value="partnership" className="space-y-6 mt-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Users className="h-5 w-5 text-emerald-500" /> Партнёрская программа</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Наличие в ПП</span>
-                        <Badge variant={domain.isInProgram ? "default" : "secondary"}>
-                           {domain.isInProgram ? "Участвует" : "Не участвует"}
-                        </Badge>
+              <div className="w-full">
+                <div className="p-6 space-y-8">
+                  {/* Two columns */}
+                  <div className="grid gap-8 md:grid-cols-2">
+                    {/* Column 1 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Наличие в ПП
+                        </label>
+                        <Input value={domain.isInProgram ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
                       </div>
-                      {domain.isInProgram && (
-                        <>
-                           <InfoRow label="Статус" value={domain.programStatus || "—"} />
-                           <InfoRow label="Имя компании" value={domain.companyName || "—"} />
-                        </>
-                      )}
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Ссылка в ПП
+                        </label>
+                        <Input value={domain.programLink || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
                     </div>
-                    <div>
-                       {domain.programLink && (
-                         <div className="p-4 bg-secondary rounded-lg flex flex-col gap-2">
-                           <span className="text-sm font-medium">Ссылка на размещение</span>
-                           <a href={domain.programLink} target="_blank" rel="noreferrer" className="text-primary hover:underline break-all text-sm">
-                             {domain.programLink}
-                           </a>
-                         </div>
-                       )}
+
+                    {/* Column 2 */}
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Tag className="h-4 w-4" />
+                          Имя компании
+                        </label>
+                        <Input value={domain.companyName || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                          <Activity className="h-4 w-4" />
+                          Статус в ПП
+                        </label>
+                        <Input value={domain.programStatus || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+
+                  <Separator />
+
+                  {/* Comment Section */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Примечание
+                      </label>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 gap-2 text-xs"
+                        onClick={() => setIsCommentOpen(!isCommentOpen)}
+                      >
+                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                      </Button>
+                    </div>
+                    
+                    <div className={cn(
+                      "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                    )}>
+                      {domain.description ? (
+                        <span className="text-muted-foreground">
+                          {isCommentOpen 
+                            ? domain.description 
+                            : (domain.description.length > 100 
+                                ? `${domain.description.substring(0, 100)}...` 
+                                : domain.description
+                              )
+                          }
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground italic">Примечание отсутствует</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </TabsContent>
 
         {/* 3. INTEGRATIONS TAB */}
         <TabsContent value="integrations" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Layers className="h-5 w-5 text-orange-500" /> Интеграции</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <InfoRow label="OneSignal App ID" value={domain.oneSignalId || "Не настроен"} copyable={!!domain.oneSignalId} />
-              
-              <div className="mt-4">
-                <h4 className="text-sm font-medium mb-3">Другие сервисы</h4>
-                <div className="flex flex-wrap gap-2">
-                  {domain.otherIntegrations?.map(int => (
-                    <Badge key={int} variant="secondary" className="px-3 py-1">{int}</Badge>
-                  )) || <span className="text-sm text-muted-foreground">Нет интеграций</span>}
+          <div className="w-full">
+            <div className="p-6 space-y-8">
+              {/* Two columns */}
+              <div className="grid gap-8 md:grid-cols-2">
+                {/* Column 1 */}
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Layers className="h-4 w-4" />
+                      OneSignal App ID
+                    </label>
+                    <Input value={domain.oneSignalId || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      CloudFlare аккаунт
+                    </label>
+                    <Input value={domain.cloudflareAccount || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+
+              <Separator />
+
+              {/* Comment Section */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Примечание
+                  </label>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 gap-2 text-xs"
+                    onClick={() => setIsCommentOpen(!isCommentOpen)}
+                  >
+                    {isCommentOpen ? 'Свернуть' : 'Развернуть'}
+                    <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                  </Button>
+                </div>
+                
+                <div className={cn(
+                  "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                  isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                )}>
+                  {domain.description ? (
+                    <span className="text-muted-foreground">
+                      {isCommentOpen 
+                        ? domain.description 
+                        : (domain.description.length > 100 
+                            ? `${domain.description.substring(0, 100)}...` 
+                            : domain.description
+                          )
+                      }
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground italic">Примечание отсутствует</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
