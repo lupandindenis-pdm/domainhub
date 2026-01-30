@@ -48,7 +48,17 @@ export default function Domains() {
     }
   });
 
-  // Listen for localStorage changes to sync labels and assignments across tabs/components
+  // Load edited domains from localStorage
+  const [editedDomains, setEditedDomains] = useState<Record<string, any>>(() => {
+    try {
+      const saved = localStorage.getItem('editedDomains');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Listen for localStorage changes to sync labels, assignments, and edited domains across tabs/components
   useEffect(() => {
     const handleStorageChange = () => {
       try {
@@ -61,8 +71,13 @@ export default function Domains() {
         if (savedAssignments) {
           setDomainLabelAssignments(JSON.parse(savedAssignments));
         }
+
+        const savedEditedDomains = localStorage.getItem('editedDomains');
+        if (savedEditedDomains) {
+          setEditedDomains(JSON.parse(savedEditedDomains));
+        }
       } catch (error) {
-        console.error('Failed to load labels from localStorage:', error);
+        console.error('Failed to load data from localStorage:', error);
       }
     };
 
@@ -88,8 +103,29 @@ export default function Domains() {
     }
   }, [hiddenDomainIds]);
 
+  // Merge mockDomains with edited domains from localStorage
+  const domains = useMemo(() => {
+    return mockDomains.map(domain => {
+      const editedData = editedDomains[domain.id];
+      if (editedData) {
+        // Merge edited data with original domain data
+        return {
+          ...domain,
+          ...editedData,
+          // Preserve original fields that shouldn't be overwritten
+          id: domain.id,
+          registrationDate: domain.registrationDate,
+          expirationDate: domain.expirationDate,
+          createdAt: domain.createdAt,
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      return domain;
+    });
+  }, [editedDomains]);
+
   const filteredDomains = useMemo(() => {
-    const filtered = mockDomains.filter((domain) => {
+    const filtered = domains.filter((domain) => {
       // Hidden filter - show only hidden or only visible based on showHidden toggle
       if (showHidden) {
         if (!hiddenDomainIds.has(domain.id)) {
@@ -188,7 +224,7 @@ export default function Domains() {
   };
 
   const handleExportSelected = () => {
-    const selectedDomains = mockDomains.filter(d => selectedDomainIds.has(d.id));
+    const selectedDomains = domains.filter(d => selectedDomainIds.has(d.id));
     const headers = [
       t("export.domain"),
       t("export.type"),
