@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label as LabelUI } from "@/components/ui/label";
-import { Tag, Plus, X, Check, Search } from "lucide-react";
+import { Tag, Plus, X, Check, Search, Ban } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -18,6 +18,7 @@ interface LabelSelectorProps {
   labels: Label[];
   onLabelChange: (labelId: string | undefined) => void;
   onCreateLabel: (name: string, color: string) => void;
+  onDeleteLabel: (labelId: string) => void;
 }
 
 const LABEL_COLORS = [
@@ -44,6 +45,7 @@ export function LabelSelector({
   labels,
   onLabelChange,
   onCreateLabel,
+  onDeleteLabel,
 }: LabelSelectorProps) {
   const [open, setOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -157,7 +159,10 @@ export function LabelSelector({
                   )}
                   onClick={() => handleSelectLabel(undefined)}
                 >
-                  <span className="text-sm text-muted-foreground">Без метки</span>
+                  <div className="flex items-center gap-2.5">
+                    <Ban className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Без метки</span>
+                  </div>
                 </div>
 
                 {filteredLabels.map((label) => {
@@ -186,8 +191,11 @@ export function LabelSelector({
                         className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // TODO: Add delete label functionality
-                          toast.info("Удаление метки будет реализовано");
+                          onDeleteLabel(label.id);
+                          if (selectedLabelId === label.id) {
+                            setSelectedLabelId(undefined);
+                          }
+                          toast.success("Метка удалена");
                         }}
                       >
                         <X className="h-3.5 w-3.5" />

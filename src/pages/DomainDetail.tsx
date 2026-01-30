@@ -201,7 +201,6 @@ export default function DomainDetail() {
             labels={labels}
             onLabelChange={(labelId) => {
               setDomainLabelId(labelId);
-              // TODO: Save to backend
             }}
             onCreateLabel={(name, color) => {
               const newLabel = {
@@ -212,6 +211,12 @@ export default function DomainDetail() {
               };
               setLabels([...labels, newLabel]);
               setDomainLabelId(newLabel.id);
+            }}
+            onDeleteLabel={(labelId) => {
+              setLabels(labels.filter(l => l.id !== labelId));
+              if (domainLabelId === labelId) {
+                setDomainLabelId(undefined);
+              }
             }}
           />
           <Button onClick={() => navigate(`/domains/${id}/edit`)} className="gap-2">

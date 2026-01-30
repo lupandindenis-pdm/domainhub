@@ -27,6 +27,40 @@ export default function Domains() {
     }
   });
   const [showHidden, setShowHidden] = useState(false);
+  
+  // Load domain label assignments from localStorage
+  const [domainLabelAssignments, setDomainLabelAssignments] = useState<Record<string, string>>(() => {
+    try {
+      const saved = localStorage.getItem('domainLabelAssignments');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Listen for localStorage changes to sync labels across tabs/components
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const saved = localStorage.getItem('domainLabelAssignments');
+        if (saved) {
+          setDomainLabelAssignments(JSON.parse(saved));
+        }
+      } catch (error) {
+        console.error('Failed to load domain label assignments:', error);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically for changes within the same tab
+    const interval = setInterval(handleStorageChange, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
 
   const buildShortSha = __BUILD_SHA__ === "dev" ? "dev" : __BUILD_SHA__.slice(0, 7);
 
@@ -82,9 +116,10 @@ export default function Domains() {
         return false;
       }
 
-      // Label filter
+      // Label filter - use localStorage assignments
       if (debouncedFilters.labelId) {
-        if (domain.labelId !== debouncedFilters.labelId) {
+        const assignedLabelId = domainLabelAssignments[domain.id] || domain.labelId;
+        if (assignedLabelId !== debouncedFilters.labelId) {
           return false;
         }
       }
@@ -92,15 +127,21 @@ export default function Domains() {
       return true;
     });
 
+    // Map domains with their assigned labels from localStorage
+    const domainsWithLabels = filtered.map(domain => ({
+      ...domain,
+      labelId: domainLabelAssignments[domain.id] || domain.labelId,
+    }));
+
     // Remove selected domains that are no longer in filtered results
-    const filteredIds = new Set(filtered.map(d => d.id));
+    const filteredIds = new Set(domainsWithLabels.map(d => d.id));
     setSelectedDomainIds(prev => {
       const newSet = new Set([...prev].filter(id => filteredIds.has(id)));
       return newSet.size !== prev.size ? newSet : prev;
     });
 
-    return filtered;
-  }, [debouncedFilters, hiddenDomainIds, showHidden]);
+    return domainsWithLabels;
+  }, [debouncedFilters, hiddenDomainIds, showHidden, domainLabelAssignments]);
 
   const handleToggleBulkMode = () => {
     const newMode = !bulkSelectMode;
