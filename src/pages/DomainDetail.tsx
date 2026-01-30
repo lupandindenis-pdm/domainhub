@@ -309,8 +309,8 @@ export default function DomainDetail() {
     unknown: "bg-gray-500/20 text-gray-700 dark:text-gray-300",
   };
 
-  const statusColorClass = statusColors[domain.status] || "bg-muted/50";
-  const typeColorClass = typeColors[domain.type] || "bg-muted/50";
+  const statusColorClass = statusColors[formData.status || domain.status] || "bg-muted/50";
+  const typeColorClass = typeColors[formData.type || domain.type] || "bg-muted/50";
 
   return (
     <div className="container py-6 space-y-6 max-w-7xl mx-auto">
