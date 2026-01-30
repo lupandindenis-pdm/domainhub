@@ -132,23 +132,6 @@ export default function DomainDetail() {
           >
             <ExternalLink className="h-5 w-5" />
           </Button>
-          {domainLabelId && (() => {
-            const label = labels.find(l => l.id === domainLabelId);
-            return label ? <LabelBadge label={label} /> : null;
-          })()}
-          {domain.needsUpdate && (
-             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6">
-              <AlertTriangle className="h-3 w-3" /> Требует обновления
-            </Badge>
-          )}
-          {domain.hasGeoBlock && (
-            <Badge variant="destructive" className="gap-1 h-6">
-              <Globe className="h-3 w-3" /> GEO Block
-            </Badge>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
           <LabelSelector
             currentLabelId={domainLabelId}
             labels={labels}
@@ -166,7 +149,29 @@ export default function DomainDetail() {
               setDomainLabelId(newLabel.id);
               // TODO: Save to backend
             }}
-          />
+          >
+            {domainLabelId && (() => {
+              const label = labels.find(l => l.id === domainLabelId);
+              return label ? (
+                <span className="cursor-pointer">
+                  <LabelBadge label={label} />
+                </span>
+              ) : null;
+            })()}
+          </LabelSelector>
+          {domain.needsUpdate && (
+             <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6">
+              <AlertTriangle className="h-3 w-3" /> Требует обновления
+            </Badge>
+          )}
+          {domain.hasGeoBlock && (
+            <Badge variant="destructive" className="gap-1 h-6">
+              <Globe className="h-3 w-3" /> GEO Block
+            </Badge>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
           <Button onClick={() => navigate(`/domains/${id}/edit`)} className="gap-2">
             <Edit className="h-4 w-4" />
             Редактировать
