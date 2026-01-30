@@ -364,29 +364,31 @@ export default function DomainDetail() {
         </div>
 
         <div className="flex items-center gap-2">
-          <LabelSelector
-            currentLabelId={domainLabelId}
-            labels={labels}
-            onLabelChange={(labelId) => {
-              setDomainLabelId(labelId);
-            }}
-            onCreateLabel={(name, color) => {
-              const newLabel = {
-                id: `label-${Date.now()}`,
-                name,
-                color,
-                projectId: domain.project,
-              };
-              setLabels([...labels, newLabel]);
-              setDomainLabelId(newLabel.id);
-            }}
-            onDeleteLabel={(labelId) => {
-              setLabels(labels.filter(l => l.id !== labelId));
-              if (domainLabelId === labelId) {
-                setDomainLabelId(undefined);
-              }
-            }}
-          />
+          {!isEditing && (
+            <LabelSelector
+              currentLabelId={domainLabelId}
+              labels={labels}
+              onLabelChange={(labelId) => {
+                setDomainLabelId(labelId);
+              }}
+              onCreateLabel={(name, color) => {
+                const newLabel = {
+                  id: `label-${Date.now()}`,
+                  name,
+                  color,
+                  projectId: domain.project,
+                };
+                setLabels([...labels, newLabel]);
+                setDomainLabelId(newLabel.id);
+              }}
+              onDeleteLabel={(labelId) => {
+                setLabels(labels.filter(l => l.id !== labelId));
+                if (domainLabelId === labelId) {
+                  setDomainLabelId(undefined);
+                }
+              }}
+            />
+          )}
           <div className="w-[264px] flex justify-end">
             {!isEditing ? (
               <Button onClick={() => setIsEditing(true)} className="gap-2">
