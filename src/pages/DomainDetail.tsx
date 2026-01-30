@@ -63,7 +63,12 @@ export default function DomainDetail() {
   const domain = mockDomains.find((d) => d.id === id);
   
   const [version, setVersion] = useState<'v1' | 'v2'>('v2');
-  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const [isMarketingNoteOpen, setIsMarketingNoteOpen] = useState(false);
+  const [isItNoteOpen, setIsItNoteOpen] = useState(false);
+  const [isAnalyticsNoteOpen, setIsAnalyticsNoteOpen] = useState(false);
+  const [isPartnershipNoteOpen, setIsPartnershipNoteOpen] = useState(false);
+  const [isIntegrationsNoteOpen, setIsIntegrationsNoteOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   
   // Form data state
@@ -313,7 +318,7 @@ export default function DomainDetail() {
   const typeColorClass = typeColors[formData.type || domain.type] || "bg-muted/50";
 
   return (
-    <div className="container py-6 space-y-6 max-w-7xl mx-auto">
+    <div className="container py-6 space-y-6 max-w-7xl mx-auto" style={{ scrollbarGutter: "stable" }}>
       {/* Top Navigation & Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3 flex-wrap">
@@ -591,15 +596,14 @@ export default function DomainDetail() {
                        variant="ghost" 
                        size="sm" 
                        className="h-8 gap-2 text-xs"
-                       onClick={() => setIsCommentOpen(!isCommentOpen)}
+                       onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
                      >
-                         {isCommentOpen ? 'Свернуть' : 'Развернуть'}
-                         <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                         {isDescriptionOpen ? 'Свернуть' : 'Развернуть'}
                      </Button>
                  </div>
                  
                  {/* Single container with conditional content */}
-                 {isEditing ? (
+                 {isEditing && isDescriptionOpen ? (
                    <Textarea
                      value={formData.description}
                      onChange={(e) => handleFieldChange('description', e.target.value)}
@@ -607,13 +611,17 @@ export default function DomainDetail() {
                      placeholder="Введите комментарий..."
                    />
                  ) : (
-                   <div className={cn(
-                     "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                     isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
-                   )}>
+                   <div
+                     className={cn(
+                       "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                       isDescriptionOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                     )}
+                     onClick={() => isEditing && setIsDescriptionOpen(true)}
+                     role={isEditing ? "button" : undefined}
+                   >
                      {formData.description || domain.description ? (
                        <span className="text-muted-foreground">
-                         {isCommentOpen 
+                         {isDescriptionOpen 
                            ? (formData.description || domain.description)
                            : ((formData.description || domain.description).length > 100 
                                ? `${(formData.description || domain.description).substring(0, 100)}...` 
@@ -777,20 +785,18 @@ export default function DomainDetail() {
                         <FileText className="h-4 w-4" />
                         Примечание
                       </label>
-                      {!isEditing && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 gap-2 text-xs"
-                          onClick={() => setIsCommentOpen(!isCommentOpen)}
-                        >
-                          {isCommentOpen ? 'Свернуть' : 'Развернуть'}
-                          <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
-                        </Button>
-                      )}
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 gap-2 text-xs"
+                        onClick={() => setIsMarketingNoteOpen(!isMarketingNoteOpen)}
+                      >
+                        {isMarketingNoteOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isMarketingNoteOpen && "rotate-180")} />
+                      </Button>
                     </div>
                     
-                    {isEditing ? (
+                    {isEditing && isMarketingNoteOpen ? (
                       <Textarea
                         value={formData.marketingNote}
                         onChange={(e) => handleFieldChange('marketingNote', e.target.value)}
@@ -798,13 +804,17 @@ export default function DomainDetail() {
                         placeholder="Введите примечание для маркетинга..."
                       />
                     ) : (
-                      <div className={cn(
-                        "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                        isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
-                      )}>
+                      <div
+                        className={cn(
+                          "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
+                          isMarketingNoteOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                        )}
+                        onClick={() => isEditing && setIsMarketingNoteOpen(true)}
+                        role={isEditing ? "button" : undefined}
+                      >
                         {formData.marketingNote ? (
                           <span className="text-muted-foreground">
-                            {isCommentOpen 
+                            {isMarketingNoteOpen
                               ? formData.marketingNote 
                               : (formData.marketingNote.length > 100 
                                   ? `${formData.marketingNote.substring(0, 100)}...` 
@@ -930,20 +940,20 @@ export default function DomainDetail() {
                         variant="ghost" 
                         size="sm" 
                         className="h-8 gap-2 text-xs"
-                        onClick={() => setIsCommentOpen(!isCommentOpen)}
+                        onClick={() => setIsAnalyticsNoteOpen(!isAnalyticsNoteOpen)}
                       >
-                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
-                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                        {isAnalyticsNoteOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isAnalyticsNoteOpen && "rotate-180")} />
                       </Button>
                     </div>
                     
                     <div className={cn(
                       "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                      isAnalyticsNoteOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
                     )}>
                       {domain.description ? (
                         <span className="text-muted-foreground">
-                          {isCommentOpen 
+                          {isAnalyticsNoteOpen 
                             ? domain.description 
                             : (domain.description.length > 100 
                                 ? `${domain.description.substring(0, 100)}...` 
@@ -1001,20 +1011,20 @@ export default function DomainDetail() {
                         variant="ghost" 
                         size="sm" 
                         className="h-8 gap-2 text-xs"
-                        onClick={() => setIsCommentOpen(!isCommentOpen)}
+                        onClick={() => setIsAnalyticsNoteOpen(!isAnalyticsNoteOpen)}
                       >
-                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
-                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                        {isAnalyticsNoteOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isAnalyticsNoteOpen && "rotate-180")} />
                       </Button>
                     </div>
                     
                     <div className={cn(
                       "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                      isAnalyticsNoteOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
                     )}>
                       {domain.description ? (
                         <span className="text-muted-foreground">
-                          {isCommentOpen 
+                          {isAnalyticsNoteOpen 
                             ? domain.description 
                             : (domain.description.length > 100 
                                 ? `${domain.description.substring(0, 100)}...` 
@@ -1088,20 +1098,20 @@ export default function DomainDetail() {
                         variant="ghost" 
                         size="sm" 
                         className="h-8 gap-2 text-xs"
-                        onClick={() => setIsCommentOpen(!isCommentOpen)}
+                        onClick={() => setIsPartnershipNoteOpen(!isPartnershipNoteOpen)}
                       >
-                        {isCommentOpen ? 'Свернуть' : 'Развернуть'}
-                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                        {isPartnershipNoteOpen ? 'Свернуть' : 'Развернуть'}
+                        <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isPartnershipNoteOpen && "rotate-180")} />
                       </Button>
                     </div>
                     
                     <div className={cn(
                       "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                      isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                      isPartnershipNoteOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
                     )}>
                       {domain.description ? (
                         <span className="text-muted-foreground">
-                          {isCommentOpen 
+                          {isPartnershipNoteOpen 
                             ? domain.description 
                             : (domain.description.length > 100 
                                 ? `${domain.description.substring(0, 100)}...` 
@@ -1162,20 +1172,20 @@ export default function DomainDetail() {
                     variant="ghost" 
                     size="sm" 
                     className="h-8 gap-2 text-xs"
-                    onClick={() => setIsCommentOpen(!isCommentOpen)}
+                    onClick={() => setIsIntegrationsNoteOpen(!isIntegrationsNoteOpen)}
                   >
-                    {isCommentOpen ? 'Свернуть' : 'Развернуть'}
-                    <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isCommentOpen && "rotate-180")} />
+                    {isIntegrationsNoteOpen ? 'Свернуть' : 'Развернуть'}
+                    <ChevronsUpDown className={cn("h-3 w-3 transition-transform", isIntegrationsNoteOpen && "rotate-180")} />
                   </Button>
                 </div>
                 
                 <div className={cn(
                   "w-full rounded-md border-none bg-muted/30 px-3 py-2 text-sm shadow-sm transition-all duration-200 flex items-center",
-                  isCommentOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
+                  isIntegrationsNoteOpen ? "min-h-[100px] whitespace-pre-wrap items-start" : "min-h-10"
                 )}>
                   {domain.description ? (
                     <span className="text-muted-foreground">
-                      {isCommentOpen 
+                      {isIntegrationsNoteOpen 
                         ? domain.description 
                         : (domain.description.length > 100 
                             ? `${domain.description.substring(0, 100)}...` 
