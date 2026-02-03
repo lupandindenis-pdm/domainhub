@@ -142,6 +142,8 @@ export default function DomainDetail() {
 
   const [isEditing, setIsEditing] = useState(false);
 
+  const [domainError, setDomainError] = useState<string>('');
+
   
 
   // Form data state
@@ -322,11 +324,109 @@ export default function DomainDetail() {
 
 
 
+  // Validate domain name
+
+  const validateDomain = (domain: string): string => {
+
+    if (!domain || domain.trim() === '') {
+
+      return 'Домен не может быть пустым';
+
+    }
+
+    
+
+    // Remove protocol and www if present for validation
+
+    let cleanDomain = domain.trim();
+
+    cleanDomain = cleanDomain.replace(/^https?:\/\//, '');
+
+    cleanDomain = cleanDomain.replace(/^www\./, '');
+
+    cleanDomain = cleanDomain.replace(/\/$/, '');
+
+    
+
+    // Check for spaces
+
+    if (cleanDomain.includes(' ')) {
+
+      return 'Домен не может содержать пробелы';
+
+    }
+
+    
+
+    // Check for invalid characters
+
+    const invalidChars = /[^a-zA-Z0-9.-\/:#?&=_]/;
+
+    if (invalidChars.test(cleanDomain)) {
+
+      return 'Домен содержит недопустимые символы';
+
+    }
+
+    
+
+    // Check if domain has at least one dot (unless it's localhost)
+
+    if (!cleanDomain.includes('.') && !cleanDomain.startsWith('localhost')) {
+
+      return 'Домен должен содержать хотя бы одну точку (например: example.com)';
+
+    }
+
+    
+
+    // Check domain length
+
+    if (cleanDomain.length > 253) {
+
+      return 'Домен слишком длинный (максимум 253 символа)';
+
+    }
+
+    
+
+    // Check if domain starts or ends with dash or dot
+
+    const parts = cleanDomain.split('/');
+
+    const domainPart = parts[0];
+
+    if (domainPart.startsWith('-') || domainPart.endsWith('-') || domainPart.startsWith('.') || domainPart.endsWith('.')) {
+
+      return 'Домен не может начинаться или заканчиваться дефисом или точкой';
+
+    }
+
+    
+
+    return '';
+
+  };
+
+
+
   // Handle form field changes
 
   const handleFieldChange = (field: string, value: any) => {
 
     setFormData(prev => ({ ...prev, [field]: value }));
+
+    
+
+    // Validate domain name on change
+
+    if (field === 'name') {
+
+      const error = validateDomain(value);
+
+      setDomainError(error);
+
+    }
 
   };
 
@@ -335,6 +435,22 @@ export default function DomainDetail() {
   // Handle save
 
   const handleSave = () => {
+
+    // Validate domain before saving
+
+    const error = validateDomain(formData.name);
+
+    if (error) {
+
+      setDomainError(error);
+
+      toast.error('Исправьте ошибки перед сохранением');
+
+      return;
+
+    }
+
+    
 
     // Save to localStorage or API
 
@@ -368,6 +484,8 @@ export default function DomainDetail() {
 
       
 
+      setDomainError('');
+
       toast.success('Изменения сохранены');
 
       setIsEditing(false);
@@ -387,6 +505,12 @@ export default function DomainDetail() {
   // Handle cancel
 
   const handleCancel = () => {
+
+    // Clear validation error
+
+    setDomainError('');
+
+    
 
     // Load saved data from localStorage or use original domain data
 
@@ -707,19 +831,41 @@ export default function DomainDetail() {
             <div className="flex-1 min-w-0 max-w-lg">
               {isEditing ? (
 
-                <input
+                <div className="space-y-1">
 
-                  type="text"
+                  <input
 
-                  value={formData.name}
+                    type="text"
 
-                  onChange={(e) => handleFieldChange('name', e.target.value)}
+                    value={formData.name}
 
-                  className="text-2xl font-bold font-mono tracking-tight flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 w-full border-b-2 border-b-primary/50 focus:border-b-primary pb-1 rounded-t transition-colors break-all"
+                    onChange={(e) => handleFieldChange('name', e.target.value)}
 
-                  style={{ boxShadow: 'none', textWrap: 'balance' }}
+                    className={cn(
 
-                />
+                      "text-2xl font-bold font-mono tracking-tight flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 w-full border-b-2 pb-1 rounded-t transition-colors break-all",
+
+                      domainError ? "border-b-red-500 focus:border-b-red-600" : "border-b-primary/50 focus:border-b-primary"
+
+                    )}
+
+                    style={{ boxShadow: 'none', textWrap: 'balance' }}
+
+                  />
+
+                  {domainError && (
+
+                    <div className="flex items-center gap-1 text-red-500 text-sm px-2">
+
+                      <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+
+                      <span>{domainError}</span>
+
+                    </div>
+
+                  )}
+
+                </div>
 
               ) : (
 
