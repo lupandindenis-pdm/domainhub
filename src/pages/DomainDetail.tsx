@@ -845,7 +845,7 @@ export default function DomainDetail() {
 
                       "text-2xl font-bold font-mono tracking-tight flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 w-full border-b-2 pb-1 rounded-t transition-colors break-all",
 
-                      domainError ? "border-b-red-500 focus:border-b-red-600" : "border-b-primary/50 focus:border-b-primary"
+                      domainError ? "border-b-amber-500 focus:border-b-amber-600" : "border-b-primary/50 focus:border-b-primary"
 
                     )}
 
@@ -855,7 +855,7 @@ export default function DomainDetail() {
 
                   {domainError && (
 
-                    <div className="flex items-center gap-1 text-red-500 text-sm px-2">
+                    <div className="flex items-center gap-1 text-amber-500 text-sm px-2">
 
                       <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
 
