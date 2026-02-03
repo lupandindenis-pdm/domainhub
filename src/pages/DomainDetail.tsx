@@ -715,9 +715,9 @@ export default function DomainDetail() {
 
                   onChange={(e) => handleFieldChange('name', e.target.value)}
 
-                  className="text-2xl font-bold font-mono tracking-tight h-[44px] flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 flex-1 min-w-[300px] border-b-2 border-b-primary/50 focus:border-b-primary pb-1 rounded-t transition-colors"
+                  className="text-2xl font-bold font-mono tracking-tight flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 flex-1 min-w-[300px] border-b-2 border-b-primary/50 focus:border-b-primary pb-1 rounded-t transition-colors break-all"
 
-                  style={{ boxShadow: 'none' }}
+                  style={{ boxShadow: 'none', textWrap: 'balance' }}
 
                 />
 
