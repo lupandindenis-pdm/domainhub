@@ -135,6 +135,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 }
 
@@ -177,22 +179,8 @@
   }
 }
 
-/* Scrollbar styling */
+/* Hide scrollbars while keeping scroll */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--secondary));
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  width: 0;
+  height: 0;
 }

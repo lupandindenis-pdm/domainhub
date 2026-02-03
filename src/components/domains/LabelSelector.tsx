@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label as LabelUI } from "@/components/ui/label";
-import { Tag, Plus, X, Check, Search, Ban } from "lucide-react";
+import { Tag, Plus, X, Check, Search, Ban, Edit2 } from "lucide-react";
+
 import {
   Popover,
   PopoverContent,
@@ -18,6 +19,7 @@ interface LabelSelectorProps {
   labels: Label[];
   onLabelChange: (labelId: string | undefined) => void;
   onCreateLabel: (name: string, color: string) => void;
+  onUpdateLabel: (labelId: string, name: string, color: string) => void;
   onDeleteLabel: (labelId: string) => void;
 }
 
@@ -45,10 +47,13 @@ export function LabelSelector({
   labels,
   onLabelChange,
   onCreateLabel,
+  onUpdateLabel,
   onDeleteLabel,
 }: LabelSelectorProps) {
   const [open, setOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingLabelId, setEditingLabelId] = useState<string | undefined>();
   const [newLabelName, setNewLabelName] = useState("");
   const [newLabelColor, setNewLabelColor] = useState(LABEL_COLORS[0]);
   const [selectedLabelId, setSelectedLabelId] = useState<string | undefined>(currentLabelId);
@@ -72,6 +77,8 @@ export function LabelSelector({
   const handleCancel = () => {
     setSelectedLabelId(currentLabelId);
     setIsCreating(false);
+    setIsEditing(false);
+    setEditingLabelId(undefined);
     setNewLabelName("");
     setNewLabelColor(LABEL_COLORS[0]);
     setSearchQuery("");
@@ -91,23 +98,44 @@ export function LabelSelector({
     toast.success("Метка создана");
   };
 
+  const handleEditLabel = (label: Label) => {
+    setIsEditing(true);
+    setEditingLabelId(label.id);
+    setNewLabelName(label.name);
+    setNewLabelColor(label.color);
+  };
+
+  const handleUpdateLabel = () => {
+    if (!newLabelName.trim() || !editingLabelId) {
+      toast.error("Введите название метки");
+      return;
+    }
+
+    // Update label keeping the same ID
+    onUpdateLabel(editingLabelId, newLabelName.trim(), newLabelColor);
+    
+    setIsEditing(false);
+    setEditingLabelId(undefined);
+    setNewLabelName("");
+    setNewLabelColor(LABEL_COLORS[0]);
+    toast.success("Метка обновлена");
+  };
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          size="sm"
-          className={cn(
-            "gap-2 h-9 border-border/50",
-            currentLabel && "border-0"
-          )}
+          className="gap-2 border-0 w-full"
           style={
             currentLabel
               ? {
                   backgroundColor: `${currentLabel.color}20`,
                   color: currentLabel.color,
                 }
-              : undefined
+              : {
+                  backgroundColor: 'transparent',
+                }
           }
         >
           {currentLabel ? (
@@ -135,7 +163,7 @@ export function LabelSelector({
             </div>
           </div>
 
-          {!isCreating ? (
+          {!isCreating && !isEditing ? (
             <>
               <div className="p-3 border-b">
                 <div className="relative">
@@ -185,21 +213,34 @@ export function LabelSelector({
                         />
                         <span className="text-sm">{label.name}</span>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteLabel(label.id);
-                          if (selectedLabelId === label.id) {
-                            setSelectedLabelId(undefined);
-                          }
-                          toast.success("Метка удалена");
-                        }}
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditLabel(label);
+                          }}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteLabel(label.id);
+                            if (selectedLabelId === label.id) {
+                              setSelectedLabelId(undefined);
+                            }
+                            toast.success("Метка удалена");
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
@@ -223,7 +264,7 @@ export function LabelSelector({
                 </Button>
               </div>
             </>
-          ) : (
+          ) : isCreating ? (
             <div className="p-4 space-y-4">
               <div className="space-y-2">
                 <LabelUI htmlFor="label-name" className="text-sm font-medium">
@@ -279,6 +320,66 @@ export function LabelSelector({
                   disabled={!newLabelName.trim()}
                 >
                   Создать
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 space-y-4">
+              <div className="space-y-2">
+                <LabelUI htmlFor="edit-label-name" className="text-sm font-medium">
+                  Название
+                </LabelUI>
+                <Input
+                  id="edit-label-name"
+                  placeholder="Введите название"
+                  value={newLabelName}
+                  onChange={(e) => setNewLabelName(e.target.value)}
+                  autoFocus
+                />
+              </div>
+
+              <div className="space-y-2">
+                <LabelUI className="text-sm font-medium">Цвет</LabelUI>
+                <div className="grid grid-cols-8 gap-2">
+                  {LABEL_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      className={cn(
+                        "h-8 w-8 rounded-md border-2 transition-all",
+                        newLabelColor === color
+                          ? "border-foreground scale-110"
+                          : "border-transparent hover:scale-105"
+                      )}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setNewLabelColor(color)}
+                      aria-label={`Select color ${color}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setEditingLabelId(undefined);
+                    setNewLabelName("");
+                    setNewLabelColor(LABEL_COLORS[0]);
+                  }}
+                >
+                  Отмена
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={handleUpdateLabel}
+                  disabled={!newLabelName.trim()}
+                >
+                  Сохранить
                 </Button>
               </div>
             </div>
