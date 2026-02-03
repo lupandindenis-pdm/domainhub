@@ -704,7 +704,7 @@ export default function DomainDetail() {
 
             </Button>
 
-            <div className="flex items-start gap-2 flex-1 min-w-0 max-w-lg overflow-hidden">
+            <div className="flex-1 min-w-0 max-w-lg">
               {isEditing ? (
 
                 <input
@@ -715,7 +715,7 @@ export default function DomainDetail() {
 
                   onChange={(e) => handleFieldChange('name', e.target.value)}
 
-                  className="text-2xl font-bold font-mono tracking-tight flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 flex-1 min-w-[300px] border-b-2 border-b-primary/50 focus:border-b-primary pb-1 rounded-t transition-colors break-all"
+                  className="text-2xl font-bold font-mono tracking-tight flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 w-full border-b-2 border-b-primary/50 focus:border-b-primary pb-1 rounded-t transition-colors break-all"
 
                   style={{ boxShadow: 'none', textWrap: 'balance' }}
 
@@ -723,53 +723,39 @@ export default function DomainDetail() {
 
               ) : (
 
-                <>
+                <h1 
 
-                  <h1 
+                  className="text-2xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors break-all line-clamp-2"
 
-                    className="text-2xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors break-all line-clamp-2 min-w-0 flex-1"
+                  style={{ textWrap: 'balance' }}
 
-                    style={{ textWrap: 'balance' }}
+                  onClick={() => {
 
-                    onClick={() => {
+                    try {
 
-                      try {
+                      navigator.clipboard.writeText(formData.name || domain.name);
 
-                        navigator.clipboard.writeText(formData.name || domain.name);
+                      toast.success("Домен скопирован в буфер обмена");
 
-                        toast.success("Домен скопирован в буфер обмена");
+                    } catch (error) {
 
-                      } catch (error) {
+                      toast.error("Ошибка копирования");
 
-                        toast.error("Ошибка копирования");
+                    }
 
-                      }
+                  }}
 
-                    }}
+                  onDoubleClick={() => {
 
-                  >
+                    window.open(`https://${formData.name || domain.name}`, "_blank");
 
-                    {formData.name || domain.name}
+                  }}
 
-                  </h1>
+                >
 
-                  <Button
+                  {formData.name || domain.name}
 
-                    variant="ghost"
-
-                    size="icon"
-
-                    className="h-8 w-8 text-muted-foreground hover:text-foreground flex-shrink-0 mt-1"
-
-                    onClick={() => window.open(`https://${formData.name || domain.name}`, "_blank")}
-
-                  >
-
-                    <ExternalLink className="h-5 w-5" />
-
-                  </Button>
-
-                </>
+                </h1>
 
               )}
 
