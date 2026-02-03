@@ -704,7 +704,7 @@ export default function DomainDetail() {
 
             </Button>
 
-            <div className="flex items-start gap-2 flex-1 min-w-0 max-w-xl overflow-hidden">
+            <div className="flex items-start gap-2 flex-1 min-w-0 max-w-lg overflow-hidden">
               {isEditing ? (
 
                 <input
@@ -727,7 +727,7 @@ export default function DomainDetail() {
 
                   <h1 
 
-                    className="text-2xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors break-all line-clamp-2 min-w-0"
+                    className="text-2xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors break-all line-clamp-2 min-w-0 flex-1"
 
                     style={{ textWrap: 'balance' }}
 
