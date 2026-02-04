@@ -104,7 +104,7 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                       <Copy className="h-4 w-4" />
                     </Button>
                     <div className="min-w-0 flex-1">
-                      <div className="inline-flex items-center gap-2">
+                      <div className="inline-flex items-center gap-1.5">
                         <span className="font-mono text-sm font-normal break-all line-clamp-2 inline-block" style={{ textWrap: 'balance', maxWidth: 'fit-content' }}>
                           {domain.name}
                           <Button
