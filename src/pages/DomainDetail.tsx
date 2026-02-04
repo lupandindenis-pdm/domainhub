@@ -378,7 +378,7 @@ export default function DomainDetail() {
 
     // Check for invalid characters
 
-    const invalidChars = /[^a-zA-Z0-9.-\/:#?&=_]/;
+    const invalidChars = /[^a-zA-Z0-9.\/:#?&=_-]/;
 
     if (invalidChars.test(cleanDomain)) {
 
@@ -876,7 +876,7 @@ export default function DomainDetail() {
 
                         }}
 
-                        className="text-2xl font-bold font-mono tracking-tight bg-transparent outline-none px-2 w-full transition-colors break-all text-yellow-400"
+                        className="text-2xl font-bold font-mono tracking-tight bg-transparent outline-none px-2 w-full transition-colors break-all text-green-400"
 
                         style={{ textWrap: 'balance' }}
 
@@ -944,29 +944,29 @@ export default function DomainDetail() {
 
             </div>
 
-            <div className="flex items-center gap-2 flex-shrink-0">
+          </div>
 
-              {domain.needsUpdate && (
+          <div className="flex items-center gap-2 pl-14 mt-2">
 
-                <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap">
+            {domain.needsUpdate && (
 
-                  <AlertTriangle className="h-3 w-3" /> Требует обновления
+              <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap">
 
-                </Badge>
+                <AlertTriangle className="h-3 w-3" /> Требует обновления
 
-              )}
+              </Badge>
 
-              {domain.hasGeoBlock && (
+            )}
 
-                <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
+            {domain.hasGeoBlock && (
 
-                  <Globe className="h-3 w-3" /> GEO Block
+              <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
 
-                </Badge>
+                <Globe className="h-3 w-3" /> GEO Block
 
-              )}
+              </Badge>
 
-            </div>
+            )}
 
           </div>
 
