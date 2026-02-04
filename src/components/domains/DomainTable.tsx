@@ -103,34 +103,36 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <div className="min-w-0 flex-1 flex items-center gap-2">
-                      <span className="font-mono text-sm font-normal break-all line-clamp-2 inline max-w-fit" style={{ textWrap: 'balance' }}>
-                        {domain.name}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 inline-flex items-center justify-center ml-1 align-middle text-muted-foreground hover:text-primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const url = `https://${domain.name}`;
-                            try {
-                              const validatedUrl = new URL(url);
-                              if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
-                                window.open(validatedUrl.href, "_blank", "noopener,noreferrer");
+                    <div className="min-w-0 flex-1">
+                      <div className="inline-flex items-center gap-2">
+                        <span className="font-mono text-sm font-normal break-all line-clamp-2 inline-block" style={{ textWrap: 'balance', maxWidth: 'fit-content' }}>
+                          {domain.name}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 inline-flex items-center justify-center ml-1 align-middle text-muted-foreground hover:text-primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const url = `https://${domain.name}`;
+                              try {
+                                const validatedUrl = new URL(url);
+                                if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
+                                  window.open(validatedUrl.href, "_blank", "noopener,noreferrer");
+                                }
+                              } catch (error) {
+                                toast.error(t("common.invalid_url"));
                               }
-                            } catch (error) {
-                              toast.error(t("common.invalid_url"));
-                            }
-                          }}
-                          aria-label={`Open domain: ${domain.name}`}
-                        >
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </Button>
-                      </span>
-                      {domain.labelId && (() => {
-                        const label = labels.find(l => l.id === domain.labelId);
-                        return label ? <LabelBadge label={label} /> : null;
-                      })()}
+                            }}
+                            aria-label={`Open domain: ${domain.name}`}
+                          >
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </Button>
+                        </span>
+                        {domain.labelId && (() => {
+                          const label = labels.find(l => l.id === domain.labelId);
+                          return label ? <LabelBadge label={label} /> : null;
+                        })()}
+                      </div>
                     </div>
                   </div>
                 </TableCell>
