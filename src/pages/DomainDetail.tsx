@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -144,6 +144,8 @@ export default function DomainDetail() {
 
   const [domainError, setDomainError] = useState<string>('');
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   
 
   // Form data state
@@ -235,6 +237,22 @@ export default function DomainDetail() {
     }
 
   });
+
+  
+
+  // Auto-resize textarea
+
+  useEffect(() => {
+
+    if (textareaRef.current && isEditing) {
+
+      textareaRef.current.style.height = 'auto';
+
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+
+    }
+
+  }, [formData.name, isEditing]);
 
   
 
@@ -816,9 +834,9 @@ export default function DomainDetail() {
 
       {/* Top Navigation & Header */}
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4">
 
-        <div className="flex flex-col gap-2 min-w-0 flex-1">
+        <div className="flex flex-col gap-2 min-w-0">
 
           <div className="flex items-center gap-3 min-w-0">
 
@@ -833,9 +851,9 @@ export default function DomainDetail() {
 
                 <div className="space-y-1">
 
-                  <input
+                  <textarea
 
-                    type="text"
+                    ref={textareaRef}
 
                     value={formData.name}
 
@@ -843,13 +861,13 @@ export default function DomainDetail() {
 
                     className={cn(
 
-                      "text-2xl font-bold font-mono tracking-tight flex items-center bg-primary/5 hover:bg-primary/10 border-none outline-none focus:outline-none focus:ring-0 px-2 w-full border-b-2 pb-1 rounded-t transition-colors break-all",
+                      "text-2xl font-bold font-mono tracking-tight bg-transparent border-none outline-none focus:outline-none focus:ring-0 px-2 w-full border-b-2 pb-1 rounded-t transition-colors break-all resize-none text-yellow-400",
 
                       domainError ? "border-b-amber-500 focus:border-b-amber-600" : "border-b-primary/50 focus:border-b-primary"
 
                     )}
 
-                    style={{ boxShadow: 'none', textWrap: 'balance' }}
+                    style={{ boxShadow: 'none', textWrap: 'balance', overflow: 'hidden' }}
 
                   />
 
@@ -909,35 +927,12 @@ export default function DomainDetail() {
 
           </div>
 
-          <div className="flex items-center gap-2 pl-14">
-
-            {domain.needsUpdate && (
-
-               <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap">
-
-                <AlertTriangle className="h-3 w-3" /> Требует обновления
-
-              </Badge>
-
-            )}
-
-            {domain.hasGeoBlock && (
-
-              <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
-
-                <Globe className="h-3 w-3" /> GEO Block
-
-              </Badge>
-
-            )}
-
-          </div>
 
         </div>
 
 
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 justify-end">
 
           {!isEditing ? (
 
@@ -1084,6 +1079,26 @@ export default function DomainDetail() {
             Интеграции
 
           </TabsTrigger>
+
+          {domain.needsUpdate && (
+
+            <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap ml-auto">
+
+              <AlertTriangle className="h-3 w-3" /> Требует обновления
+
+            </Badge>
+
+          )}
+
+          {domain.hasGeoBlock && (
+
+            <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
+
+              <Globe className="h-3 w-3" /> GEO Block
+
+            </Badge>
+
+          )}
 
         </TabsList>
 
