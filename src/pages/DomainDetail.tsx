@@ -838,16 +838,18 @@ export default function DomainDetail() {
 
         <div className="flex flex-col gap-2 min-w-0">
 
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-3 min-w-0 justify-between">
 
-            <Button variant="ghost" size="icon" onClick={() => navigate("/domains")} className="flex-shrink-0">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
 
-              <ArrowLeft className="h-5 w-5" />
+              <Button variant="ghost" size="icon" onClick={() => navigate("/domains")} className="flex-shrink-0">
 
-            </Button>
+                <ArrowLeft className="h-5 w-5" />
 
-            <div className="flex-1 min-w-0 max-w-lg">
-              {isEditing ? (
+              </Button>
+
+              <div className="flex-1 min-w-0 max-w-lg">
+                {isEditing ? (
 
                 <div className="space-y-1">
 
@@ -920,6 +922,32 @@ export default function DomainDetail() {
                   {formData.name || domain.name}
 
                 </h1>
+
+              )}
+
+              </div>
+
+            </div>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+
+              {domain.needsUpdate && (
+
+                <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap">
+
+                  <AlertTriangle className="h-3 w-3" /> Требует обновления
+
+                </Badge>
+
+              )}
+
+              {domain.hasGeoBlock && (
+
+                <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
+
+                  <Globe className="h-3 w-3" /> GEO Block
+
+                </Badge>
 
               )}
 
@@ -1079,26 +1107,6 @@ export default function DomainDetail() {
             Интеграции
 
           </TabsTrigger>
-
-          {domain.needsUpdate && (
-
-            <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap ml-auto">
-
-              <AlertTriangle className="h-3 w-3" /> Требует обновления
-
-            </Badge>
-
-          )}
-
-          {domain.hasGeoBlock && (
-
-            <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
-
-              <Globe className="h-3 w-3" /> GEO Block
-
-            </Badge>
-
-          )}
 
         </TabsList>
 
