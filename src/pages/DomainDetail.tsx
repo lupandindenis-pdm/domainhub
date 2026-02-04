@@ -848,82 +848,97 @@ export default function DomainDetail() {
 
               </Button>
 
-              <div className="flex-1 min-w-0 max-w-lg">
-                {isEditing ? (
+              <div className="flex-1 min-w-0 max-w-md">
 
-                <div className="space-y-1">
+                <div className="relative">
 
-                  <textarea
+                  {isEditing ? (
 
-                    ref={textareaRef}
+                    <div className="space-y-1">
 
-                    value={formData.name}
+                      <div
 
-                    onChange={(e) => handleFieldChange('name', e.target.value)}
+                        contentEditable
 
-                    className={cn(
+                        suppressContentEditableWarning
 
-                      "text-2xl font-bold font-mono tracking-tight bg-transparent border-none outline-none focus:outline-none focus:ring-0 px-2 w-full border-b-2 pb-1 rounded-t transition-colors break-all resize-none text-yellow-400",
+                        onInput={(e) => {
 
-                      domainError ? "border-b-amber-500 focus:border-b-amber-600" : "border-b-primary/50 focus:border-b-primary"
+                          const text = e.currentTarget.textContent || '';
 
-                    )}
+                          handleFieldChange('name', text);
 
-                    style={{ boxShadow: 'none', textWrap: 'balance', overflow: 'hidden' }}
+                        }}
 
-                  />
+                        onBlur={(e) => {
 
-                  {domainError && (
+                          e.currentTarget.textContent = formData.name;
 
-                    <div className="flex items-center gap-1 text-amber-500 text-sm px-2">
+                        }}
 
-                      <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+                        className="text-2xl font-bold font-mono tracking-tight bg-transparent outline-none px-2 w-full transition-colors break-all text-yellow-400"
 
-                      <span>{domainError}</span>
+                        style={{ textWrap: 'balance' }}
+
+                      >
+
+                        {formData.name}
+
+                      </div>
+
+                      {domainError && (
+
+                        <div className="flex items-center gap-1 text-amber-500 text-sm px-2">
+
+                          <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+
+                          <span>{domainError}</span>
+
+                        </div>
+
+                      )}
+
+                    </div>
+
+                  ) : (
+
+                    <div 
+
+                      className="text-2xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors break-all px-2"
+
+                      style={{ textWrap: 'balance' }}
+
+                      onClick={() => {
+
+                        try {
+
+                          navigator.clipboard.writeText(formData.name || domain.name);
+
+                          toast.success("Домен скопирован в буфер обмена");
+
+                        } catch (error) {
+
+                          toast.error("Ошибка копирования");
+
+                        }
+
+                      }}
+
+                      onDoubleClick={() => {
+
+                        window.open(`https://${formData.name || domain.name}`, "_blank");
+
+                      }}
+
+                    >
+
+                      {formData.name || domain.name}
 
                     </div>
 
                   )}
 
                 </div>
-
-              ) : (
-
-                <h1 
-
-                  className="text-2xl font-bold font-mono tracking-tight cursor-pointer hover:text-yellow-400/80 transition-colors break-all line-clamp-2"
-
-                  style={{ textWrap: 'balance' }}
-
-                  onClick={() => {
-
-                    try {
-
-                      navigator.clipboard.writeText(formData.name || domain.name);
-
-                      toast.success("Домен скопирован в буфер обмена");
-
-                    } catch (error) {
-
-                      toast.error("Ошибка копирования");
-
-                    }
-
-                  }}
-
-                  onDoubleClick={() => {
-
-                    window.open(`https://${formData.name || domain.name}`, "_blank");
-
-                  }}
-
-                >
-
-                  {formData.name || domain.name}
-
-                </h1>
-
-              )}
 
               </div>
 
