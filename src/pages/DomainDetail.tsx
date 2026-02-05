@@ -45,7 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { cn } from "@/lib/utils";
 
-import { projects, departments } from "@/data/mockDomains";
+import { projects, departments, marketingCategories } from "@/data/mockDomains";
 import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES, DOMAIN_TYPE_CONFIG, DOMAIN_STATUS_CONFIG, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
 
 import { 
@@ -1257,11 +1257,29 @@ export default function DomainDetail() {
 
                           {projects.map((project) => (
 
-                            <SelectItem key={project} value={project}>
+                            <SelectPrimitive.Item
 
-                              {project}
+                              key={project}
 
-                            </SelectItem>
+                              value={project}
+
+                              className={cn(
+
+                                "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                "focus:bg-violet-500/10 focus:text-violet-600",
+
+                                "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                formData.project === project && "bg-violet-500/10 text-violet-600"
+
+                              )}
+
+                            >
+
+                              <SelectPrimitive.ItemText>{project}</SelectPrimitive.ItemText>
+
+                            </SelectPrimitive.Item>
 
                           ))}
 
@@ -1409,11 +1427,29 @@ export default function DomainDetail() {
 
                           {departments.map((dept) => (
 
-                            <SelectItem key={dept} value={dept}>
+                            <SelectPrimitive.Item
 
-                              {dept}
+                              key={dept}
 
-                            </SelectItem>
+                              value={dept}
+
+                              className={cn(
+
+                                "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                "focus:bg-violet-500/10 focus:text-violet-600",
+
+                                "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                formData.department === dept && "bg-violet-500/10 text-violet-600"
+
+                              )}
+
+                            >
+
+                              <SelectPrimitive.ItemText>{dept}</SelectPrimitive.ItemText>
+
+                            </SelectPrimitive.Item>
 
                           ))}
 
@@ -1655,17 +1691,63 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input 
+                        {isEditing ? (
 
-                          value={formData.category || "Нет"} 
+                          <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)}>
 
-                          onChange={(e) => handleFieldChange('category', e.target.value)}
+                            <SelectTrigger className="bg-muted/50">
 
-                          readOnly={!isEditing}
+                              <SelectValue placeholder="Выберите категорию" />
 
-                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                            </SelectTrigger>
 
-                        />
+                            <SelectContent>
+
+                              {marketingCategories.map((category) => (
+
+                                <SelectPrimitive.Item
+
+                                  key={category}
+
+                                  value={category}
+
+                                  className={cn(
+
+                                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                    "focus:bg-violet-500/10 focus:text-violet-600",
+
+                                    "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                    formData.category === category && "bg-violet-500/10 text-violet-600"
+
+                                  )}
+
+                                >
+
+                                  <SelectPrimitive.ItemText>{category}</SelectPrimitive.ItemText>
+
+                                </SelectPrimitive.Item>
+
+                              ))}
+
+                            </SelectContent>
+
+                          </Select>
+
+                        ) : (
+
+                          <Input 
+
+                            value={formData.category || "Нет"} 
+
+                            readOnly
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+
+                          />
+
+                        )}
 
                       </div>
 
