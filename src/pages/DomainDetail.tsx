@@ -1285,11 +1285,6 @@ export default function DomainDetail() {
 
                 </div>
 
-                {/* Визуальное разделение между колонками */}
-                <div className="flex items-center justify-center">
-                  <div className="w-1 h-1 rounded-full bg-border/30" />
-                </div>
-
                 {/* Column 2: Статус, GEO блок, Отдел */}
 
                 <div className="space-y-5">
