@@ -22,29 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-
-const domainTypes: { value: DomainType; label: string }[] = [
-  { value: "landing", label: "badges.landing" },
-  { value: "seo", label: "badges.seo" },
-  { value: "mirror", label: "badges.mirror" },
-  { value: "site", label: "badges.site" },
-  { value: "subdomain", label: "badges.subdomain" },
-  { value: "referral", label: "badges.referral" },
-  { value: "redirect", label: "badges.redirect" },
-  { value: "technical", label: "badges.technical" },
-  { value: "product", label: "badges.product" },
-  { value: "b2b", label: "badges.b2b" },
-];
-
-const domainStatuses: { value: DomainStatus; label: string }[] = [
-  { value: "actual", label: "status.actual" },
-  { value: "not_actual", label: "status.not_actual" },
-  { value: "not_configured", label: "status.not_configured" },
-  { value: "unknown", label: "status.unknown" },
-  { value: "expiring", label: "status.expiring" },
-  { value: "expired", label: "status.expired" },
-  { value: "spare", label: "status.spare" },
-];
+import { DOMAIN_TYPES, DOMAIN_STATUSES } from "@/constants/domainTypes";
 
 interface DomainFiltersProps {
   filters: DomainFilter;
@@ -200,14 +178,14 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
 
         <MultiSelectFilter
           title={t("filters.all_types")}
-          options={domainTypes}
+          options={DOMAIN_TYPES}
           selectedValues={filters.types}
           onChange={(values) => onFiltersChange({ ...filters, types: values as DomainType[] })}
         />
 
         <MultiSelectFilter
           title={t("filters.all_statuses")}
-          options={domainStatuses}
+          options={DOMAIN_STATUSES}
           selectedValues={filters.statuses}
           onChange={(values) => onFiltersChange({ ...filters, statuses: values as DomainStatus[] })}
         />

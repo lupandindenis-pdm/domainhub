@@ -45,6 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 import { projects, departments } from "@/data/mockDomains";
+import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES } from "@/constants/domainTypes";
 
 import { 
 
@@ -1165,27 +1166,11 @@ export default function DomainDetail() {
 
                         <SelectContent>
 
-                          <SelectItem value="landing">Лендинг</SelectItem>
-
-                          <SelectItem value="seo">SEO</SelectItem>
-
-                          <SelectItem value="mirror">Зеркало</SelectItem>
-
-                          <SelectItem value="site">Сайт</SelectItem>
-
-                          <SelectItem value="subdomain">Поддомен</SelectItem>
-
-                          <SelectItem value="referral">Реферальный</SelectItem>
-
-                          <SelectItem value="redirect">Редирект</SelectItem>
-
-                          <SelectItem value="technical">Технический</SelectItem>
-
-                          <SelectItem value="product">Домен продукта</SelectItem>
-
-                          <SelectItem value="b2b">B2B</SelectItem>
-
-                          <SelectItem value="unknown">Неизвестно</SelectItem>
+                          {DOMAIN_TYPES.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
 
                         </SelectContent>
 
@@ -1195,7 +1180,7 @@ export default function DomainDetail() {
 
                       <div className={cn("flex items-center h-10 px-3 rounded-md border-none text-sm truncate", typeColorClass)}>
 
-                        {t(`badges.${formData.type || domain.type}`)}
+                        {DOMAIN_TYPE_LABELS[formData.type || domain.type]}
 
                       </div>
 
