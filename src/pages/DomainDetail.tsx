@@ -889,12 +889,6 @@ export default function DomainDetail() {
 
                         }}
 
-                        onBlur={(e) => {
-
-                          e.currentTarget.textContent = formData.name;
-
-                        }}
-
                         className="text-2xl font-bold font-mono tracking-tight bg-transparent outline-none px-2 w-full transition-colors break-all text-green-400"
 
                         style={{ textWrap: 'balance' }}
