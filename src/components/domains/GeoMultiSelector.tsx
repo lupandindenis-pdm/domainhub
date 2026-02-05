@@ -180,7 +180,7 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
                 placeholder="Поиск GEO..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-9 h-9 focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
           </div>
