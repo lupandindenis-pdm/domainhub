@@ -144,12 +144,18 @@ export default function DomainDetail() {
 
   const [isEditing, setIsEditing] = useState(false);
 
+  // Normalize category and bonus values - if not in list, use default
+  const normalizeValue = (value: string, list: string[]) => {
+    if (!value) return list[0] || '';
+    return list.includes(value) ? value : list[0] || '';
+  };
+
   // Ensure category and bonus have default values when entering edit mode
   const ensureDefaults = () => {
     setFormData(prev => ({
       ...prev,
-      category: prev.category || marketingCategories[0] || '',
-      bonus: prev.bonus || bonusTypes[0] || ''
+      category: normalizeValue(prev.category, marketingCategories),
+      bonus: normalizeValue(prev.bonus, bonusTypes)
     }));
   };
 
@@ -177,13 +183,13 @@ export default function DomainDetail() {
 
     project: domain?.project || '',
 
-    category: domain?.category || marketingCategories[0] || '',
+    category: normalizeValue(domain?.category || '', marketingCategories),
 
     direction: domain?.direction || '',
 
     targetAction: domain?.targetAction || '',
 
-    bonus: domain?.bonus || bonusTypes[0] || '',
+    bonus: normalizeValue(domain?.bonus || '', bonusTypes),
 
     needsUpdate: domain?.needsUpdate || false,
 
@@ -591,13 +597,13 @@ export default function DomainDetail() {
 
       project: domain?.project || '',
 
-      category: domain?.category || marketingCategories[0] || '',
+      category: normalizeValue(domain?.category || '', marketingCategories),
 
       direction: domain?.direction || '',
 
       targetAction: domain?.targetAction || '',
 
-      bonus: domain?.bonus || bonusTypes[0] || '',
+      bonus: normalizeValue(domain?.bonus || '', bonusTypes),
 
       needsUpdate: domain?.needsUpdate || false,
 
@@ -695,13 +701,13 @@ export default function DomainDetail() {
 
         project: domain.project || '',
 
-        category: domain.category || marketingCategories[0] || '',
+        category: normalizeValue(domain.category || '', marketingCategories),
 
         direction: domain.direction || '',
 
         targetAction: domain.targetAction || '',
 
-        bonus: domain.bonus || bonusTypes[0] || '',
+        bonus: normalizeValue(domain.bonus || '', bonusTypes),
 
         needsUpdate: domain.needsUpdate || false,
 
@@ -1715,7 +1721,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/30">
+                          <SelectTrigger className="bg-[#1a1f2e]">
 
                             <SelectValue />
 
@@ -1829,7 +1835,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/30">
+                          <SelectTrigger className="bg-[#1a1f2e]">
 
                             <SelectValue />
 
