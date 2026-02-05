@@ -192,7 +192,7 @@ export default function Domains() {
     });
 
     return domainsWithLabels;
-  }, [debouncedFilters, hiddenDomainIds, showHidden, domainLabelAssignments]);
+  }, [domains, debouncedFilters, hiddenDomainIds, showHidden, domainLabelAssignments]);
 
   const handleToggleBulkMode = () => {
     const newMode = !bulkSelectMode;
