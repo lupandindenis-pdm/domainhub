@@ -10,6 +10,7 @@ import { getGeoColor } from "@/data/geoColors";
 
 // Список всех стран с кодами
 const geoOptions = [
+  { code: "GLOBAL", name: "Global" },
   { code: "WW", name: "Worldwide" },
   { code: "RU", name: "Россия" },
   { code: "US", name: "США" },
