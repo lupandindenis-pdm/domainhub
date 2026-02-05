@@ -45,7 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 import { projects, departments } from "@/data/mockDomains";
-import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES } from "@/constants/domainTypes";
+import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES, DOMAIN_STATUS_CONFIG, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
 
 import { 
 
@@ -1302,19 +1302,17 @@ export default function DomainDetail() {
 
                         <SelectContent>
 
-                          <SelectItem value="actual">Актуальный</SelectItem>
-
-                          <SelectItem value="not_actual">Не актуальный</SelectItem>
-
-                          <SelectItem value="not_configured">Не настроен</SelectItem>
-
-                          <SelectItem value="unknown">Неизвестно</SelectItem>
-
-                          <SelectItem value="expiring">Истекает</SelectItem>
-
-                          <SelectItem value="expired">Истёк</SelectItem>
-
-                          <SelectItem value="spare">Запасной</SelectItem>
+                          {Object.entries(DOMAIN_STATUS_CONFIG).map(([value, config]) => {
+                            const Icon = config.icon;
+                            return (
+                              <SelectItem key={value} value={value}>
+                                <div className="flex items-center gap-2">
+                                  <Icon className={cn("h-4 w-4", config.className)} />
+                                  <span>{config.label}</span>
+                                </div>
+                              </SelectItem>
+                            );
+                          })}
 
                         </SelectContent>
 
@@ -1326,7 +1324,7 @@ export default function DomainDetail() {
 
                         <span className="text-sm">
 
-                           {t(`status.${formData.status || domain.status}`)}
+                           {DOMAIN_STATUS_LABELS[formData.status || domain.status]}
 
                         </span>
 
