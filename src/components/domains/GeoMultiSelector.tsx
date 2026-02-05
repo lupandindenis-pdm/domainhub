@@ -173,8 +173,8 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command>
-          <div className="p-3 pb-0">
-            <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2.5 mb-3">
+          <div className="p-4 pb-3">
+            <div className="flex items-center gap-2 rounded-md bg-secondary/50 px-3 py-2">
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <Input
                 placeholder="Поиск GEO..."
@@ -184,7 +184,7 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
               />
             </div>
           </div>
-          <CommandList className="max-h-[300px]">
+          <CommandList className="max-h-[300px] px-2 pb-2">
             <CommandEmpty>GEO не найдено</CommandEmpty>
             <CommandGroup>
               {filteredOptions.map((option) => {
