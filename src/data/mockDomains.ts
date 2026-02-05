@@ -489,6 +489,7 @@ export const departments = [
 ];
 
 export const marketingCategories = [
+  "Нет",
   "Бонус",
   "Акция",
   "Турнир",

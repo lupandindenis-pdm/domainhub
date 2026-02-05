@@ -1267,11 +1267,11 @@ export default function DomainDetail() {
 
                                 "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                "focus:bg-violet-500/10 focus:text-violet-600",
+                                "focus:bg-violet-500/10",
 
                                 "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                formData.project === project && "bg-violet-500/10 text-violet-600"
+                                formData.project === project && "bg-violet-500/10"
 
                               )}
 
@@ -1437,11 +1437,11 @@ export default function DomainDetail() {
 
                                 "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                "focus:bg-violet-500/10 focus:text-violet-600",
+                                "focus:bg-violet-500/10",
 
                                 "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                formData.department === dept && "bg-violet-500/10 text-violet-600"
+                                formData.department === dept && "bg-violet-500/10"
 
                               )}
 
@@ -1715,11 +1715,11 @@ export default function DomainDetail() {
 
                                     "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                    "focus:bg-violet-500/10 focus:text-violet-600",
+                                    "focus:bg-violet-500/10",
 
                                     "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                    formData.category === category && "bg-violet-500/10 text-violet-600"
+                                    formData.category === category && "bg-violet-500/10"
 
                                   )}
 
