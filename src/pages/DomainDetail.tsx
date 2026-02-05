@@ -673,101 +673,58 @@ export default function DomainDetail() {
 
     
 
+    // Always start with actual data from mockDomains
+    const baseData = {
+      name: domain.name || '',
+      type: domain.type || '',
+      status: domain.status || '',
+      geo: domain.geo || [],
+      blockedGeo: domain.blockedGeo || [],
+      department: domain.department || '',
+      project: domain.project || '',
+      category: normalizeValue(domain.category || '', marketingCategories),
+      direction: domain.direction || '',
+      targetAction: domain.targetAction || '',
+      bonus: normalizeValue(domain.bonus || '', bonusTypes),
+      needsUpdate: domain.needsUpdate || false,
+      jiraTask: domain.jiraTask || '',
+      fileHosting: domain.fileHosting || '',
+      registrar: domain.registrar || '',
+      nsServers: domain.nsServers || [],
+      techIssues: domain.techIssues || [],
+      testMethod: domain.testMethod || '',
+      gaId: domain.gaId || '',
+      gtmId: domain.gtmId || '',
+      isInProgram: domain.isInProgram || false,
+      programLink: domain.programLink || '',
+      companyName: domain.companyName || '',
+      programStatus: domain.programStatus || '',
+      oneSignalId: domain.oneSignalId || '',
+      cloudflareAccount: domain.cloudflareAccount || '',
+      description: domain.description || '',
+      marketingNote: '',
+      itNote: '',
+      analyticsNote: '',
+      partnershipNote: '',
+      integrationsNote: ''
+    };
+
     try {
-
       const savedDomains = localStorage.getItem('editedDomains');
-
       if (savedDomains) {
-
         const editedDomains = JSON.parse(savedDomains);
-
         if (editedDomains[id]) {
-
-          setFormData(editedDomains[id]);
-
+          // Merge saved edits with actual mockDomains data
+          setFormData({ ...baseData, ...editedDomains[id] });
           return;
-
         }
-
       }
-
-      
-
-      // If no saved data, initialize with domain data
-
-      setFormData({
-
-        name: domain.name || '',
-
-        type: domain.type || '',
-
-        status: domain.status || '',
-
-        geo: domain.geo || [],
-
-        blockedGeo: domain.blockedGeo || [],
-
-        department: domain.department || '',
-
-        project: domain.project || '',
-
-        category: normalizeValue(domain.category || '', marketingCategories),
-
-        direction: domain.direction || '',
-
-        targetAction: domain.targetAction || '',
-
-        bonus: normalizeValue(domain.bonus || '', bonusTypes),
-
-        needsUpdate: domain.needsUpdate || false,
-
-        jiraTask: domain.jiraTask || '',
-
-        fileHosting: domain.fileHosting || '',
-
-        registrar: domain.registrar || '',
-
-        nsServers: domain.nsServers || [],
-
-        techIssues: domain.techIssues || [],
-
-        testMethod: domain.testMethod || '',
-
-        gaId: domain.gaId || '',
-
-        gtmId: domain.gtmId || '',
-
-        isInProgram: domain.isInProgram || false,
-
-        programLink: domain.programLink || '',
-
-        companyName: domain.companyName || '',
-
-        programStatus: domain.programStatus || '',
-
-        oneSignalId: domain.oneSignalId || '',
-
-        cloudflareAccount: domain.cloudflareAccount || '',
-
-        description: domain.description || '',
-
-        marketingNote: '',
-
-        itNote: '',
-
-        analyticsNote: '',
-
-        partnershipNote: '',
-
-        integrationsNote: ''
-
-      });
-
     } catch (error) {
-
       console.error('Failed to load edited data:', error);
-
     }
+
+    // If no saved data, use base data from mockDomains
+    setFormData(baseData);
 
   }, [id, domain]);
 
