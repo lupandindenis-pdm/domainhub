@@ -1405,13 +1405,15 @@ export default function DomainDetail() {
 
                         <SelectContent>
 
-                          <SelectItem value="Marketing">Маркетинг</SelectItem>
+                          {departments.map((dept) => (
 
-                          <SelectItem value="IT">IT</SelectItem>
+                            <SelectItem key={dept} value={dept}>
 
-                          <SelectItem value="Business Development">Бизнес-развитие</SelectItem>
+                              {dept}
 
-                          <SelectItem value="Sales">Продажи</SelectItem>
+                            </SelectItem>
+
+                          ))}
 
                         </SelectContent>
 
