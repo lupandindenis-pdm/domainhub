@@ -2945,7 +2945,7 @@ function ReadOnlyGeoView({
 
       {/* Выбранные страны с цветами */}
 
-      <div className="flex flex-wrap items-center gap-1 min-h-10 py-2 px-3 rounded-md border-none bg-muted/30">
+      <div className="flex flex-wrap items-center gap-1 min-h-10 py-2 px-3 rounded-md border-none bg-muted/50">
 
         {selected.length > 0 ? (
 
