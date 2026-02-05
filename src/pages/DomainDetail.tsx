@@ -2797,7 +2797,7 @@ function ReadOnlyGeoView({
 
   selected,
 
-  limit = 3 
+  limit = 10 
 
 }: { 
 
