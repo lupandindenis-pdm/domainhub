@@ -183,31 +183,28 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
             <CommandGroup>
               {filteredOptions.map((option) => {
                 const color = getGeoColor(option.code);
+                const isSelected = selected.includes(option.code);
                 return (
                   <CommandItem
                     key={option.code}
                     value={option.code}
                     onSelect={() => handleSelect(option.code)}
-                    className="cursor-pointer"
+                    className={cn(
+                      "cursor-pointer",
+                      isSelected && "bg-accent"
+                    )}
                   >
-                    <div
-                      className={cn(
-                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                        selected.includes(option.code)
-                          ? "bg-primary text-primary-foreground"
-                          : "opacity-50 [&_svg]:invisible"
-                      )}
-                    >
-                      <Check className="h-4 w-4" />
-                    </div>
                     <Badge
                       variant="secondary"
                       style={{ backgroundColor: `${color}20`, color: color }}
-                      className="mr-2 border-0 font-mono text-xs"
+                      className={cn(
+                        "mr-2 border-0 font-mono text-xs",
+                        isSelected && "font-bold ring-2 ring-primary/50"
+                      )}
                     >
                       {option.code}
                     </Badge>
-                    <span>{option.name}</span>
+                    <span className={cn(isSelected && "font-semibold")}>{option.name}</span>
                   </CommandItem>
                 );
               })}
