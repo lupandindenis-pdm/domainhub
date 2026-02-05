@@ -145,21 +145,23 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
               selectedOptions.map((option) => {
                 const color = getGeoColor(option!.code);
                 return (
-                  <div key={option!.code} className="flex items-center gap-1">
-                    <Badge
-                      variant="secondary"
-                      style={{ backgroundColor: `${color}20`, color: color }}
-                      className="border-0"
-                    >
-                      {option!.code}
-                    </Badge>
+                  <Badge
+                    key={option!.code}
+                    variant="secondary"
+                    style={{ backgroundColor: `${color}20`, color: color }}
+                    className="gap-1 border-0 pr-1"
+                  >
+                    {option!.code}
                     {!disabled && (
-                      <X
-                        className="h-3 w-3 cursor-pointer hover:opacity-70 hover:text-destructive"
+                      <button
+                        type="button"
+                        className="ml-1 hover:text-destructive focus:outline-none"
                         onClick={(e) => handleRemove(option!.code, e)}
-                      />
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     )}
-                  </div>
+                  </Badge>
                 );
               })
             ) : (
