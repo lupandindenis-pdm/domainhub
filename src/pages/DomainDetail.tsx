@@ -162,6 +162,7 @@ export default function DomainDetail() {
   const [domainError, setDomainError] = useState<string>('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editableDivRef = useRef<HTMLDivElement>(null);
 
   
 
@@ -270,6 +271,15 @@ export default function DomainDetail() {
     }
 
   }, [formData.name, isEditing]);
+
+  // Set initial value for contentEditable div
+  useEffect(() => {
+    if (editableDivRef.current && isEditing) {
+      if (editableDivRef.current.textContent !== formData.name) {
+        editableDivRef.current.textContent = formData.name;
+      }
+    }
+  }, [isEditing]);
 
   
 
@@ -877,6 +887,8 @@ export default function DomainDetail() {
 
                       <div
 
+                        ref={editableDivRef}
+
                         contentEditable
 
                         suppressContentEditableWarning
@@ -893,11 +905,7 @@ export default function DomainDetail() {
 
                         style={{ textWrap: 'balance' }}
 
-                      >
-
-                        {formData.name}
-
-                      </div>
+                      />
 
                       {domainError && (
 
