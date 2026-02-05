@@ -27,6 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import * as SelectPrimitive from "@radix-ui/react-select";
 
 import { Switch } from "@/components/ui/switch";
 
@@ -1305,12 +1306,16 @@ export default function DomainDetail() {
                           {Object.entries(DOMAIN_STATUS_CONFIG).map(([value, config]) => {
                             const Icon = config.icon;
                             return (
-                              <SelectItem key={value} value={value}>
+                              <SelectPrimitive.Item
+                                key={value}
+                                value={value}
+                                className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                              >
                                 <div className="flex items-center gap-2">
-                                  <Icon className={cn("h-4 w-4", config.className)} />
-                                  <span>{config.label}</span>
+                                  <Icon className="h-4 w-4" />
+                                  <SelectPrimitive.ItemText>{config.label}</SelectPrimitive.ItemText>
                                 </div>
-                              </SelectItem>
+                              </SelectPrimitive.Item>
                             );
                           })}
 

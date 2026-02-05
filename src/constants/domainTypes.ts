@@ -76,50 +76,41 @@ export const DOMAIN_STATUSES: { value: DomainStatus; label: string }[] = [
  * Конфигурация статусов с иконками
  * Используется в селекте статусов для отображения иконок
  */
-export const DOMAIN_STATUS_CONFIG: Record<DomainStatus, { label: string; icon: LucideIcon; className: string }> = {
+export const DOMAIN_STATUS_CONFIG: Record<DomainStatus, { label: string; icon: LucideIcon }> = {
   actual: {
     label: DOMAIN_STATUS_LABELS.actual,
-    icon: CheckCircle,
-    className: "text-emerald-600"
+    icon: CheckCircle
   },
   not_actual: {
     label: DOMAIN_STATUS_LABELS.not_actual,
-    icon: XCircle,
-    className: "text-rose-600"
+    icon: XCircle
   },
   unknown: {
     label: DOMAIN_STATUS_LABELS.unknown,
-    icon: AlertCircle,
-    className: "text-amber-600"
+    icon: AlertCircle
   },
   not_configured: {
     label: DOMAIN_STATUS_LABELS.not_configured,
-    icon: Clock,
-    className: "text-slate-600"
+    icon: Clock
   },
   spare: {
     label: DOMAIN_STATUS_LABELS.spare,
-    icon: Pause,
-    className: "text-indigo-600"
+    icon: Pause
   },
   expiring: {
     label: DOMAIN_STATUS_LABELS.expiring,
-    icon: Timer,
-    className: "text-orange-600"
+    icon: Timer
   },
   expired: {
     label: DOMAIN_STATUS_LABELS.expired,
-    icon: XCircle,
-    className: "text-red-600"
+    icon: XCircle
   },
   blocked: {
     label: DOMAIN_STATUS_LABELS.blocked,
-    icon: Ban,
-    className: "text-red-600"
+    icon: Ban
   },
   test: {
     label: DOMAIN_STATUS_LABELS.test,
-    icon: FlaskConical,
-    className: "text-purple-600"
+    icon: FlaskConical
   },
 };
