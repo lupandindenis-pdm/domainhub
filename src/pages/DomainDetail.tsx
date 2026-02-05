@@ -492,15 +492,17 @@ export default function DomainDetail() {
 
       const editedDomains = savedDomains ? JSON.parse(savedDomains) : {};
 
-      editedDomains[id!] = { ...formData, name: cleanedName, updatedAt: new Date().toISOString() };
+      const updatedAt = new Date().toISOString();
+
+      editedDomains[id!] = { ...formData, name: cleanedName, updatedAt };
 
       localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
 
       
 
-      // Update form data with cleaned name
+      // Update form data with cleaned name and updatedAt
 
-      setFormData(prev => ({ ...prev, name: cleanedName }));
+      setFormData(prev => ({ ...prev, name: cleanedName, updatedAt }));
 
       
 
