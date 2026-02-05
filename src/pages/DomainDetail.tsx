@@ -962,7 +962,7 @@ export default function DomainDetail() {
 
             )}
 
-            {formData.blockedGeo && formData.blockedGeo.length > 0 && (
+            {!isEditing && formData.blockedGeo && formData.blockedGeo.length > 0 && (
 
               <Badge variant="destructive" className="gap-1 h-6 flex-shrink-0 whitespace-nowrap">
 
