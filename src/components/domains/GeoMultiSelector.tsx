@@ -173,8 +173,8 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
         <Command>
-          <div className="p-3">
-            <div className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 border border-border/50">
+          <div className="p-3 pb-0">
+            <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2.5 mb-3">
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <Input
                 placeholder="Поиск GEO..."
