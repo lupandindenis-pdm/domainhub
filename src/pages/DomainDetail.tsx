@@ -1706,7 +1706,7 @@ export default function DomainDetail() {
 
                         {isEditing ? (
 
-                          <Select value={formData.category || "Нет категории"} onValueChange={(value) => handleFieldChange('category', value)}>
+                          <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)}>
 
                             <SelectTrigger className="bg-muted/50">
 
@@ -1752,7 +1752,7 @@ export default function DomainDetail() {
 
                           <Input 
 
-                            value={formData.category || "Нет"} 
+                            value={formData.category || "Нет категории"} 
 
                             readOnly
 
@@ -1836,7 +1836,7 @@ export default function DomainDetail() {
 
                         {isEditing ? (
 
-                          <Select value={formData.bonus || "Нет бонуса"} onValueChange={(value) => handleFieldChange('bonus', value)}>
+                          <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)}>
 
                             <SelectTrigger className="bg-muted/50">
 
@@ -1882,7 +1882,7 @@ export default function DomainDetail() {
 
                           <Input 
 
-                            value={formData.bonus || "Нет"} 
+                            value={formData.bonus || "Нет бонуса"} 
 
                             readOnly
 
