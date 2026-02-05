@@ -177,13 +177,13 @@ export default function DomainDetail() {
 
     project: domain?.project || '',
 
-    category: domain?.category || '',
+    category: domain?.category || marketingCategories[0] || '',
 
     direction: domain?.direction || '',
 
     targetAction: domain?.targetAction || '',
 
-    bonus: domain?.bonus || '',
+    bonus: domain?.bonus || bonusTypes[0] || '',
 
     needsUpdate: domain?.needsUpdate || false,
 
@@ -591,13 +591,13 @@ export default function DomainDetail() {
 
       project: domain?.project || '',
 
-      category: domain?.category || '',
+      category: domain?.category || marketingCategories[0] || '',
 
       direction: domain?.direction || '',
 
       targetAction: domain?.targetAction || '',
 
-      bonus: domain?.bonus || '',
+      bonus: domain?.bonus || bonusTypes[0] || '',
 
       needsUpdate: domain?.needsUpdate || false,
 
@@ -695,13 +695,13 @@ export default function DomainDetail() {
 
         project: domain.project || '',
 
-        category: domain.category || '',
+        category: domain.category || marketingCategories[0] || '',
 
         direction: domain.direction || '',
 
         targetAction: domain.targetAction || '',
 
-        bonus: domain.bonus || '',
+        bonus: domain.bonus || bonusTypes[0] || '',
 
         needsUpdate: domain.needsUpdate || false,
 
@@ -1715,7 +1715,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50">
+                          <SelectTrigger className="bg-muted/30">
 
                             <SelectValue />
 
@@ -1829,7 +1829,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50">
+                          <SelectTrigger className="bg-muted/30">
 
                             <SelectValue />
 
