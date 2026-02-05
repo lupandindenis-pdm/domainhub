@@ -138,9 +138,9 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
           role="combobox"
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-between bg-muted/50 border-none hover:bg-muted/70 min-h-10 h-auto py-2"
+          className="w-full justify-between bg-muted/50 border-none hover:bg-muted/70 min-h-10 h-auto py-2 gap-2"
         >
-          <div className="flex flex-wrap gap-1 flex-1">
+          <div className="flex flex-wrap gap-1 flex-1 min-w-0">
             {selectedOptions.length > 0 ? (
               selectedOptions.map((option) => {
                 const color = getGeoColor(option!.code);
@@ -168,7 +168,7 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
               <span className="text-muted-foreground">Выберите GEO...</span>
             )}
           </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
