@@ -144,6 +144,15 @@ export default function DomainDetail() {
 
   const [isEditing, setIsEditing] = useState(false);
 
+  // Ensure category and bonus have default values when entering edit mode
+  const ensureDefaults = () => {
+    setFormData(prev => ({
+      ...prev,
+      category: prev.category || marketingCategories[0] || '',
+      bonus: prev.bonus || bonusTypes[0] || ''
+    }));
+  };
+
   const [domainError, setDomainError] = useState<string>('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -1049,7 +1058,7 @@ export default function DomainDetail() {
 
               </div>
 
-              <Button onClick={() => setIsEditing(true)} className="gap-2 w-[144px]">
+              <Button onClick={() => { ensureDefaults(); setIsEditing(true); }} className="gap-2 w-[144px]">
 
                 <Edit className="h-4 w-4" />
 
@@ -1704,63 +1713,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        {isEditing ? (
+                        <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)} disabled={!isEditing}>
 
-                          <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)}>
+                          <SelectTrigger className="bg-muted/50">
 
-                            <SelectTrigger className="bg-muted/50">
+                            <SelectValue />
 
-                              <SelectValue />
+                          </SelectTrigger>
 
-                            </SelectTrigger>
+                          <SelectContent>
 
-                            <SelectContent>
+                            {marketingCategories.map((category) => (
 
-                              {marketingCategories.map((category) => (
+                              <SelectPrimitive.Item
 
-                                <SelectPrimitive.Item
+                                key={category}
 
-                                  key={category}
+                                value={category}
 
-                                  value={category}
+                                className={cn(
 
-                                  className={cn(
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+                                  "focus:bg-violet-500/10",
 
-                                    "focus:bg-violet-500/10",
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                    "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                                  formData.category === category && "bg-violet-500/10"
 
-                                    formData.category === category && "bg-violet-500/10"
+                                )}
 
-                                  )}
+                              >
 
-                                >
+                                <SelectPrimitive.ItemText>{category}</SelectPrimitive.ItemText>
 
-                                  <SelectPrimitive.ItemText>{category}</SelectPrimitive.ItemText>
+                              </SelectPrimitive.Item>
 
-                                </SelectPrimitive.Item>
+                            ))}
 
-                              ))}
+                          </SelectContent>
 
-                            </SelectContent>
-
-                          </Select>
-
-                        ) : (
-
-                          <Input 
-
-                            value={formData.category || "Нет категории"} 
-
-                            readOnly
-
-                            className="bg-muted/50 text-base border-none focus-visible:ring-0" 
-
-                          />
-
-                        )}
+                        </Select>
 
                       </div>
 
@@ -1834,63 +1827,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        {isEditing ? (
+                        <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)} disabled={!isEditing}>
 
-                          <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)}>
+                          <SelectTrigger className="bg-muted/50">
 
-                            <SelectTrigger className="bg-muted/50">
+                            <SelectValue />
 
-                              <SelectValue />
+                          </SelectTrigger>
 
-                            </SelectTrigger>
+                          <SelectContent>
 
-                            <SelectContent>
+                            {bonusTypes.map((bonus) => (
 
-                              {bonusTypes.map((bonus) => (
+                              <SelectPrimitive.Item
 
-                                <SelectPrimitive.Item
+                                key={bonus}
 
-                                  key={bonus}
+                                value={bonus}
 
-                                  value={bonus}
+                                className={cn(
 
-                                  className={cn(
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+                                  "focus:bg-violet-500/10",
 
-                                    "focus:bg-violet-500/10",
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                    "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                                  formData.bonus === bonus && "bg-violet-500/10"
 
-                                    formData.bonus === bonus && "bg-violet-500/10"
+                                )}
 
-                                  )}
+                              >
 
-                                >
+                                <SelectPrimitive.ItemText>{bonus}</SelectPrimitive.ItemText>
 
-                                  <SelectPrimitive.ItemText>{bonus}</SelectPrimitive.ItemText>
+                              </SelectPrimitive.Item>
 
-                                </SelectPrimitive.Item>
+                            ))}
 
-                              ))}
+                          </SelectContent>
 
-                            </SelectContent>
-
-                          </Select>
-
-                        ) : (
-
-                          <Input 
-
-                            value={formData.bonus || "Нет бонуса"} 
-
-                            readOnly
-
-                            className="bg-muted/50 text-base border-none focus-visible:ring-0" 
-
-                          />
-
-                        )}
+                        </Select>
 
                       </div>
 
