@@ -46,7 +46,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
 import { projects, departments } from "@/data/mockDomains";
-import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES, DOMAIN_STATUS_CONFIG, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
+import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES, DOMAIN_TYPE_CONFIG, DOMAIN_STATUS_CONFIG, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
 
 import { 
 
@@ -1167,11 +1167,21 @@ export default function DomainDetail() {
 
                         <SelectContent>
 
-                          {DOMAIN_TYPES.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
+                          {Object.entries(DOMAIN_TYPE_CONFIG).map(([value, config]) => {
+                            const Icon = config.icon;
+                            return (
+                              <SelectPrimitive.Item
+                                key={value}
+                                value={value}
+                                className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Icon className="h-4 w-4" />
+                                  <SelectPrimitive.ItemText>{config.label}</SelectPrimitive.ItemText>
+                                </div>
+                              </SelectPrimitive.Item>
+                            );
+                          })}
 
                         </SelectContent>
 

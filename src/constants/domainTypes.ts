@@ -8,7 +8,17 @@ import {
   Timer,
   Ban,
   FlaskConical,
-  LucideIcon
+  LucideIcon,
+  Zap,
+  Search,
+  Copy,
+  Globe,
+  Network,
+  Gift,
+  ArrowRight,
+  Wrench,
+  Package,
+  Briefcase
 } from "lucide-react";
 
 /**
@@ -26,6 +36,52 @@ export const DOMAIN_TYPE_LABELS: Record<DomainType, string> = {
   technical: "Технический",
   product: "Домен продукта",
   b2b: "B2B",
+};
+
+/**
+ * Конфигурация типов доменов с иконками
+ */
+export const DOMAIN_TYPE_CONFIG: Record<DomainType, { label: string; icon: LucideIcon }> = {
+  landing: {
+    label: DOMAIN_TYPE_LABELS.landing,
+    icon: Zap
+  },
+  seo: {
+    label: DOMAIN_TYPE_LABELS.seo,
+    icon: Search
+  },
+  mirror: {
+    label: DOMAIN_TYPE_LABELS.mirror,
+    icon: Copy
+  },
+  site: {
+    label: DOMAIN_TYPE_LABELS.site,
+    icon: Globe
+  },
+  subdomain: {
+    label: DOMAIN_TYPE_LABELS.subdomain,
+    icon: Network
+  },
+  referral: {
+    label: DOMAIN_TYPE_LABELS.referral,
+    icon: Gift
+  },
+  redirect: {
+    label: DOMAIN_TYPE_LABELS.redirect,
+    icon: ArrowRight
+  },
+  technical: {
+    label: DOMAIN_TYPE_LABELS.technical,
+    icon: Wrench
+  },
+  product: {
+    label: DOMAIN_TYPE_LABELS.product,
+    icon: Package
+  },
+  b2b: {
+    label: DOMAIN_TYPE_LABELS.b2b,
+    icon: Briefcase
+  },
 };
 
 /**
