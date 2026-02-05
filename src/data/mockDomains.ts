@@ -480,10 +480,12 @@ export const projects = [
 ];
 
 export const departments = [
-  "Marketing",
   "IT",
-  "Business Development",
-  "Sales",
+  "Marketing",
+  "Partners",
+  "SEO",
+  "Integration",
+  "Other",
 ];
 
 export const registrars = [
