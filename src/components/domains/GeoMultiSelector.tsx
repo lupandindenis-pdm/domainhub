@@ -119,6 +119,7 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
   };
 
   const handleRemove = (code: string, e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     const newSelected = selected.filter((c) => c !== code);
     console.log('GEO удален:', code, 'Новый список:', newSelected);
@@ -144,20 +145,21 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
               selectedOptions.map((option) => {
                 const color = getGeoColor(option!.code);
                 return (
-                  <Badge
-                    key={option!.code}
-                    variant="secondary"
-                    style={{ backgroundColor: `${color}20`, color: color }}
-                    className="gap-1 border-0"
-                  >
-                    {option!.code}
+                  <div key={option!.code} className="flex items-center gap-1">
+                    <Badge
+                      variant="secondary"
+                      style={{ backgroundColor: `${color}20`, color: color }}
+                      className="border-0"
+                    >
+                      {option!.code}
+                    </Badge>
                     {!disabled && (
                       <X
-                        className="h-3 w-3 cursor-pointer hover:opacity-70"
+                        className="h-3 w-3 cursor-pointer hover:opacity-70 hover:text-destructive"
                         onClick={(e) => handleRemove(option!.code, e)}
                       />
                     )}
-                  </Badge>
+                  </div>
                 );
               })
             ) : (
