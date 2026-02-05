@@ -81,13 +81,20 @@ export default function Domains() {
       }
     };
 
+    // Load immediately on mount
+    handleStorageChange();
+
     window.addEventListener('storage', handleStorageChange);
     
     // Also check periodically for changes within the same tab
     const interval = setInterval(handleStorageChange, 1000);
 
+    // Reload when window gains focus
+    window.addEventListener('focus', handleStorageChange);
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', handleStorageChange);
       clearInterval(interval);
     };
   }, []);
