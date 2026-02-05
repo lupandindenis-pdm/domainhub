@@ -492,7 +492,7 @@ export default function DomainDetail() {
 
       const editedDomains = savedDomains ? JSON.parse(savedDomains) : {};
 
-      editedDomains[id!] = { ...formData, name: cleanedName };
+      editedDomains[id!] = { ...formData, name: cleanedName, updatedAt: new Date().toISOString() };
 
       localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
 
@@ -1577,7 +1577,7 @@ export default function DomainDetail() {
 
               <span>Последнее изменение: </span>
 
-              <span>{new Date().toLocaleDateString()}</span>
+              <span>{formData.updatedAt ? new Date(formData.updatedAt).toLocaleDateString() : 'Не изменялся'}</span>
 
             </div>
 
