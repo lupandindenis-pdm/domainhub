@@ -1,4 +1,5 @@
 import { Domain, DomainHistoryEntry, Label } from "@/types/domain";
+import { Server, Megaphone, Users, Search, Puzzle, MoreHorizontal } from "lucide-react";
 
 export const mockLabels: Label[] = [
   { id: "label-1", name: "Приоритет", color: "#ef4444", projectId: "Corporate Website" },
@@ -488,6 +489,15 @@ export const departments = [
   "Other",
 ];
 
+export const departmentConfig: Record<string, { label: string; icon: any }> = {
+  IT: { label: "IT", icon: Server },
+  Marketing: { label: "Marketing", icon: Megaphone },
+  Partners: { label: "Partners", icon: Users },
+  SEO: { label: "SEO", icon: Search },
+  Integration: { label: "Integration", icon: Puzzle },
+  Other: { label: "Other", icon: MoreHorizontal },
+};
+
 export const marketingCategories = [
   "Нет",
   "Бонус",
@@ -503,6 +513,23 @@ export const marketingCategories = [
   "Предложение по сроку (ограничено во времени)",
   "Просто кнопка",
   "Другое",
+];
+
+export const bonusTypes = [
+  "Нет",
+  "Welcome Bonus (Приветственный)",
+  "First Deposit Bonus",
+  "No Deposit Bonus (Без депозита)",
+  "Бонусы по приглашению (Refer a Friend)",
+  "Бонусы по промокоду",
+  "Бонусы к праздникам и событиям",
+  "Free Bet (для беттинга)",
+  "Free Spins (Фриспины)",
+  "Бонусы за активность",
+  "Loyalty / VIP-бонусы",
+  "Cashback",
+  "Reload Bonus",
+  "Без бонуса",
 ];
 
 export const registrars = [

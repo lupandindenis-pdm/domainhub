@@ -45,7 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { cn } from "@/lib/utils";
 
-import { projects, departments, marketingCategories } from "@/data/mockDomains";
+import { projects, departments, marketingCategories, departmentConfig, bonusTypes } from "@/data/mockDomains";
 import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES, DOMAIN_TYPE_CONFIG, DOMAIN_STATUS_CONFIG, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
 
 import { 
@@ -1175,7 +1175,12 @@ export default function DomainDetail() {
                               <SelectPrimitive.Item
                                 key={value}
                                 value={value}
-                                className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                className={cn(
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+                                  "focus:bg-violet-500/10",
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                                  formData.type === value && "bg-violet-500/10"
+                                )}
                               >
                                 <div className="flex items-center gap-2">
                                   <Icon className="h-4 w-4" />
@@ -1337,7 +1342,12 @@ export default function DomainDetail() {
                               <SelectPrimitive.Item
                                 key={value}
                                 value={value}
-                                className="relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                className={cn(
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+                                  "focus:bg-violet-500/10",
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                                  formData.status === value && "bg-violet-500/10"
+                                )}
                               >
                                 <div className="flex items-center gap-2">
                                   <Icon className="h-4 w-4" />
@@ -1425,33 +1435,36 @@ export default function DomainDetail() {
 
                         <SelectContent>
 
-                          {departments.map((dept) => (
+                          {departments.map((dept) => {
+                            const Icon = departmentConfig[dept]?.icon;
+                            return (
+                              <SelectPrimitive.Item
 
-                            <SelectPrimitive.Item
+                                key={dept}
 
-                              key={dept}
+                                value={dept}
 
-                              value={dept}
+                                className={cn(
 
-                              className={cn(
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+                                  "focus:bg-violet-500/10",
 
-                                "focus:bg-violet-500/10",
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+                                  formData.department === dept && "bg-violet-500/10"
 
-                                formData.department === dept && "bg-violet-500/10"
+                                )}
 
-                              )}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {Icon && <Icon className="h-4 w-4" />}
+                                  <SelectPrimitive.ItemText>{dept}</SelectPrimitive.ItemText>
+                                </div>
 
-                            >
-
-                              <SelectPrimitive.ItemText>{dept}</SelectPrimitive.ItemText>
-
-                            </SelectPrimitive.Item>
-
-                          ))}
+                              </SelectPrimitive.Item>
+                            );
+                          })}
 
                         </SelectContent>
 
@@ -1821,17 +1834,63 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input 
+                        {isEditing ? (
 
-                          value={formData.bonus || "Нет"} 
+                          <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)}>
 
-                          onChange={(e) => handleFieldChange('bonus', e.target.value)}
+                            <SelectTrigger className="bg-muted/50">
 
-                          readOnly={!isEditing}
+                              <SelectValue placeholder="Выберите тип бонуса" />
 
-                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                            </SelectTrigger>
 
-                        />
+                            <SelectContent>
+
+                              {bonusTypes.map((bonus) => (
+
+                                <SelectPrimitive.Item
+
+                                  key={bonus}
+
+                                  value={bonus}
+
+                                  className={cn(
+
+                                    "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                    "focus:bg-violet-500/10",
+
+                                    "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                    formData.bonus === bonus && "bg-violet-500/10"
+
+                                  )}
+
+                                >
+
+                                  <SelectPrimitive.ItemText>{bonus}</SelectPrimitive.ItemText>
+
+                                </SelectPrimitive.Item>
+
+                              ))}
+
+                            </SelectContent>
+
+                          </Select>
+
+                        ) : (
+
+                          <Input 
+
+                            value={formData.bonus || "Нет"} 
+
+                            readOnly
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+
+                          />
+
+                        )}
 
                       </div>
 
