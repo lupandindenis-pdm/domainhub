@@ -130,6 +130,10 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
     .map((code) => geoOptions.find((opt) => opt.code === code))
     .filter(Boolean);
 
+  const MAX_VISIBLE = 10;
+  const visibleOptions = selectedOptions.slice(0, MAX_VISIBLE);
+  const remainingCount = selectedOptions.length - MAX_VISIBLE;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -138,37 +142,43 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
           role="combobox"
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-between bg-muted/50 border-none hover:bg-muted/70 min-h-10 h-auto py-2 gap-2"
+          className="w-full justify-start bg-muted/50 border-none hover:bg-muted/70 min-h-10 h-auto py-2"
         >
-          <div className="flex flex-wrap gap-1 flex-1 min-w-0">
+          <div className="flex flex-wrap gap-1 flex-1">
             {selectedOptions.length > 0 ? (
-              selectedOptions.map((option) => {
-                const color = getGeoColor(option!.code);
-                return (
-                  <Badge
-                    key={option!.code}
-                    variant="secondary"
-                    style={{ backgroundColor: `${color}20`, color: color }}
-                    className="gap-1 border-0 pr-1"
-                  >
-                    {option!.code}
-                    {!disabled && (
-                      <button
-                        type="button"
-                        className="ml-1 hover:text-destructive focus:outline-none"
-                        onClick={(e) => handleRemove(option!.code, e)}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    )}
+              <>
+                {visibleOptions.map((option) => {
+                  const color = getGeoColor(option!.code);
+                  return (
+                    <Badge
+                      key={option!.code}
+                      variant="secondary"
+                      style={{ backgroundColor: `${color}20`, color: color }}
+                      className="gap-1 border-0 pr-1"
+                    >
+                      {option!.code}
+                      {!disabled && (
+                        <button
+                          type="button"
+                          className="ml-1 hover:text-destructive focus:outline-none"
+                          onClick={(e) => handleRemove(option!.code, e)}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </Badge>
+                  );
+                })}
+                {remainingCount > 0 && (
+                  <Badge variant="secondary" className="border-0">
+                    +{remainingCount}
                   </Badge>
-                );
-              })
+                )}
+              </>
             ) : (
               <span className="text-muted-foreground">Выберите GEO...</span>
             )}
           </div>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[400px] p-0" align="start">
