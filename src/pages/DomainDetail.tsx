@@ -1721,7 +1721,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-[#1a1f2e]">
+                          <SelectTrigger className="bg-muted/50">
 
                             <SelectValue />
 
@@ -1835,7 +1835,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-[#1a1f2e]">
+                          <SelectTrigger className="bg-muted/50">
 
                             <SelectValue />
 
