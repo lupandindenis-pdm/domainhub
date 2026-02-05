@@ -1706,11 +1706,11 @@ export default function DomainDetail() {
 
                         {isEditing ? (
 
-                          <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)}>
+                          <Select value={formData.category || "Нет категории"} onValueChange={(value) => handleFieldChange('category', value)}>
 
                             <SelectTrigger className="bg-muted/50">
 
-                              <SelectValue placeholder="Выберите категорию" />
+                              <SelectValue />
 
                             </SelectTrigger>
 
@@ -1836,11 +1836,11 @@ export default function DomainDetail() {
 
                         {isEditing ? (
 
-                          <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)}>
+                          <Select value={formData.bonus || "Нет бонуса"} onValueChange={(value) => handleFieldChange('bonus', value)}>
 
                             <SelectTrigger className="bg-muted/50">
 
-                              <SelectValue placeholder="Выберите тип бонуса" />
+                              <SelectValue />
 
                             </SelectTrigger>
 

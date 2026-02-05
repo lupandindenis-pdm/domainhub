@@ -499,7 +499,7 @@ export const departmentConfig: Record<string, { label: string; icon: any }> = {
 };
 
 export const marketingCategories = [
-  "Нет",
+  "Нет категории",
   "Бонус",
   "Акция",
   "Турнир",
@@ -516,7 +516,7 @@ export const marketingCategories = [
 ];
 
 export const bonusTypes = [
-  "Нет",
+  "Нет бонуса",
   "Welcome Bonus (Приветственный)",
   "First Deposit Bonus",
   "No Deposit Bonus (Без депозита)",
@@ -529,7 +529,6 @@ export const bonusTypes = [
   "Loyalty / VIP-бонусы",
   "Cashback",
   "Reload Bonus",
-  "Без бонуса",
 ];
 
 export const registrars = [
