@@ -130,10 +130,6 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
     .map((code) => geoOptions.find((opt) => opt.code === code))
     .filter(Boolean);
 
-  const MAX_VISIBLE = 10;
-  const visibleOptions = selectedOptions.slice(0, MAX_VISIBLE);
-  const remainingCount = selectedOptions.length - MAX_VISIBLE;
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -146,35 +142,28 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
         >
           <div className="flex flex-wrap gap-1 flex-1">
             {selectedOptions.length > 0 ? (
-              <>
-                {visibleOptions.map((option) => {
-                  const color = getGeoColor(option!.code);
-                  return (
-                    <Badge
-                      key={option!.code}
-                      variant="secondary"
-                      style={{ backgroundColor: `${color}20`, color: color }}
-                      className="gap-1 border-0 pr-1"
-                    >
-                      {option!.code}
-                      {!disabled && (
-                        <button
-                          type="button"
-                          className="ml-1 hover:text-destructive focus:outline-none"
-                          onClick={(e) => handleRemove(option!.code, e)}
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      )}
-                    </Badge>
-                  );
-                })}
-                {remainingCount > 0 && (
-                  <Badge variant="secondary" className="border-0">
-                    +{remainingCount}
+              selectedOptions.map((option) => {
+                const color = getGeoColor(option!.code);
+                return (
+                  <Badge
+                    key={option!.code}
+                    variant="secondary"
+                    style={{ backgroundColor: `${color}20`, color: color }}
+                    className="gap-1 border-0 pr-1"
+                  >
+                    {option!.code}
+                    {!disabled && (
+                      <button
+                        type="button"
+                        className="ml-1 hover:text-destructive focus:outline-none"
+                        onClick={(e) => handleRemove(option!.code, e)}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
                   </Badge>
-                )}
-              </>
+                );
+              })
             ) : (
               <span className="text-muted-foreground">Выберите GEO...</span>
             )}
