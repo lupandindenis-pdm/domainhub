@@ -195,8 +195,9 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
                     value={option.code}
                     onSelect={() => handleSelect(option.code)}
                     className={cn(
-                      "cursor-pointer",
-                      isSelected && "bg-accent"
+                      "cursor-pointer transition-colors",
+                      "hover:bg-violet-500/10",
+                      isSelected && "bg-violet-500/10"
                     )}
                   >
                     <Badge
