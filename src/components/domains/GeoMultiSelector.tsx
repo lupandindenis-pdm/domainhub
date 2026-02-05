@@ -120,7 +120,9 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
 
   const handleRemove = (code: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange(selected.filter((c) => c !== code));
+    const newSelected = selected.filter((c) => c !== code);
+    console.log('GEO удален:', code, 'Новый список:', newSelected);
+    onChange(newSelected);
   };
 
   const selectedOptions = selected
