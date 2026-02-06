@@ -2191,7 +2191,7 @@ export default function DomainDetail() {
 
                           <Input 
 
-                            value={formData.fileHosting || ""} 
+                            value={!isEditing && !formData.fileHosting ? "Не указано" : (formData.fileHosting || "")} 
 
                             onChange={(e) => handleFieldChange('fileHosting', e.target.value)}
 
@@ -2259,7 +2259,7 @@ export default function DomainDetail() {
 
                           <Input 
 
-                            value={formData.registrar || ""} 
+                            value={!isEditing && !formData.registrar ? "Не указано" : (formData.registrar || "")} 
 
                             onChange={(e) => handleFieldChange('registrar', e.target.value)}
 
@@ -2489,7 +2489,7 @@ export default function DomainDetail() {
 
                           <Input 
 
-                            value={formData.jiraTaskIT || ""} 
+                            value={!isEditing && !formData.jiraTaskIT ? "Не указано" : (formData.jiraTaskIT || "")} 
 
                             onChange={(e) => handleFieldChange('jiraTaskIT', e.target.value)}
 
@@ -2845,7 +2845,7 @@ export default function DomainDetail() {
 
                           <Input 
 
-                            value={formData.gaId || ""} 
+                            value={!isEditing && !formData.gaId ? "Не указано" : (formData.gaId || "")} 
 
                             onChange={(e) => handleFieldChange('gaId', e.target.value)}
 
@@ -2919,7 +2919,7 @@ export default function DomainDetail() {
 
                           <Input 
 
-                            value={formData.gtmId || ""} 
+                            value={!isEditing && !formData.gtmId ? "Не указано" : (formData.gtmId || "")} 
 
                             onChange={(e) => handleFieldChange('gtmId', e.target.value)}
 
@@ -3145,7 +3145,7 @@ export default function DomainDetail() {
 
                         <Input 
 
-                          value={formData.programLink || ""} 
+                          value={!isEditing && !formData.programLink ? "Не указано" : (formData.programLink || "")} 
 
                           onChange={(e) => handleFieldChange('programLink', e.target.value)}
 
@@ -3179,7 +3179,7 @@ export default function DomainDetail() {
 
                         <Input 
 
-                          value={formData.companyName || ""} 
+                          value={!isEditing && !formData.companyName ? "Не указано" : (formData.companyName || "")} 
 
                           onChange={(e) => handleFieldChange('companyName', e.target.value)}
 
@@ -3373,7 +3373,7 @@ export default function DomainDetail() {
 
                     <Input 
 
-                      value={formData.oneSignalId || ""} 
+                      value={!isEditing && !formData.oneSignalId ? "Не указано" : (formData.oneSignalId || "")} 
 
                       onChange={(e) => handleFieldChange('oneSignalId', e.target.value)}
 
@@ -3407,7 +3407,7 @@ export default function DomainDetail() {
 
                     <Input 
 
-                      value={formData.cloudflareAccount || ""} 
+                      value={!isEditing && !formData.cloudflareAccount ? "Не указано" : (formData.cloudflareAccount || "")} 
 
                       onChange={(e) => handleFieldChange('cloudflareAccount', e.target.value)}
 
