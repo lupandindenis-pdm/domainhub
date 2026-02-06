@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Copy, ExternalLink, Globe, FolderKanban, Tag, Activity, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useMemo, useEffect, useRef } from "react";
@@ -31,7 +32,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { projects } from "@/data/mockDomains";
-import { DOMAIN_TYPES } from "@/constants/domainTypes";
+import { DOMAIN_TYPES, DOMAIN_STATUSES } from "@/constants/domainTypes";
 
 interface DomainTableProps {
   domains: Domain[];
@@ -127,29 +128,43 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                     </Button>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-sm font-normal break-all line-clamp-2 max-w-xs" style={{ textWrap: 'balance', display: 'inline-block' }}>
-                          {domain.name}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 inline-flex items-center justify-center ml-1 align-middle text-muted-foreground hover:text-primary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const url = `https://${domain.name}`;
-                              try {
-                                const validatedUrl = new URL(url);
-                                if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
-                                  window.open(validatedUrl.href, "_blank", "noopener,noreferrer");
-                                }
-                              } catch (error) {
-                                toast.error(t("common.invalid_url"));
-                              }
+                        {quickEditMode && onUpdateDomain ? (
+                          <Input
+                            value={domain.name}
+                            onChange={(e) => {
+                              onUpdateDomain(domain.id, { name: e.target.value });
                             }}
-                            aria-label={`Open domain: ${domain.name}`}
-                          >
-                            <ExternalLink className="h-3.5 w-3.5" />
-                          </Button>
-                        </span>
+                            onBlur={() => {
+                              toast.success("Домен обновлен");
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-8 font-mono text-sm bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary"
+                          />
+                        ) : (
+                          <span className="font-mono text-sm font-normal break-all line-clamp-2 max-w-xs" style={{ textWrap: 'balance', display: 'inline-block' }}>
+                            {domain.name}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 inline-flex items-center justify-center ml-1 align-middle text-muted-foreground hover:text-primary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const url = `https://${domain.name}`;
+                                try {
+                                  const validatedUrl = new URL(url);
+                                  if (validatedUrl.protocol === 'https:' || validatedUrl.protocol === 'http:') {
+                                    window.open(validatedUrl.href, "_blank", "noopener,noreferrer");
+                                  }
+                                } catch (error) {
+                                  toast.error(t("common.invalid_url"));
+                                }
+                              }}
+                              aria-label={`Open domain: ${domain.name}`}
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </Button>
+                          </span>
+                        )}
                         {domain.labelId && (() => {
                           const label = labels.find(l => l.id === domain.labelId);
                           return label ? <LabelBadge label={label} /> : null;
@@ -205,10 +220,10 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                       <PopoverTrigger asChild>
                         <Button
                           variant="ghost"
-                          className="h-8 w-full justify-start px-2 hover:bg-muted/50"
+                          className="h-8 w-full justify-between px-2 hover:bg-muted/50 font-normal text-sm"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <DomainTypeBadge type={domain.type} />
+                          <span className="truncate">{DOMAIN_TYPES.find(t => t.value === domain.type)?.label || domain.type}</span>
                           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
@@ -243,7 +258,45 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                   )}
                 </TableCell>
                 <TableCell className="py-3">
-                  <DomainStatusBadge status={domain.status} />
+                  {quickEditMode && onUpdateDomain ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-full justify-between px-2 hover:bg-muted/50 font-normal text-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span className="truncate">{DOMAIN_STATUSES.find(s => s.value === domain.status)?.label || domain.status}</span>
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0" align="start" onClick={(e) => e.stopPropagation()}>
+                        <Command>
+                          <CommandInput placeholder="Поиск статуса..." />
+                          <CommandList>
+                            <CommandEmpty>Статус не найден</CommandEmpty>
+                            <CommandGroup>
+                              {DOMAIN_STATUSES.map((status) => (
+                                <CommandItem
+                                  key={status.value}
+                                  onSelect={() => {
+                                    onUpdateDomain(domain.id, { status: status.value });
+                                    toast.success("Статус обновлен", {
+                                      description: `${domain.name} → ${status.label}`,
+                                    });
+                                  }}
+                                >
+                                  {status.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <DomainStatusBadge status={domain.status} />
+                  )}
                 </TableCell>
               </TableRow>
             );
