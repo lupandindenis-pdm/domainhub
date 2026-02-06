@@ -2676,7 +2676,7 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Select value={formData.testMethod || "Не известно"} onValueChange={(value) => handleFieldChange('testMethod', value)} disabled={!isEditing}>
+                        <Select value={formData.testMethod} onValueChange={(value) => handleFieldChange('testMethod', value)} disabled={!isEditing}>
 
                           <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
