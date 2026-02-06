@@ -18,8 +18,8 @@ export type DomainLifespan = "short" | "mid" | "long";
 
 // New Enums
 export type DomainCategory = "Landing" | "Micro-site" | "Promo" | "Blog" | "Support" | "Other";
-export type DomainDirection = "Acquisition" | "Retention" | "Brand" | "SEO" | "Email" | "Social" | "Partnerships";
-export type TargetAction = "Lead" | "Purchase" | "Sign-up" | "Download" | "Contact" | "Other";
+export type DomainDirection = string;
+export type TargetAction = string;
 export type TestMethod = "Manual" | "Auto" | "Local" | "Mixed";
 export type ProgramStatus = "Active" | "Inactive" | "Moderation" | "Paused";
 
@@ -60,7 +60,7 @@ export interface Domain {
   // New Fields
   // Marketing
   category?: DomainCategory;
-  needsUpdate?: boolean;
+  needsUpdate?: string;
   jiraTask?: string;
   direction?: DomainDirection;
   bonus?: string;

@@ -49,9 +49,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Landing",
-    needsUpdate: false,
-    direction: "Brand",
-    targetAction: "Contact",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     fileHosting: "Vercel",
     testMethod: "Auto",
     gaId: "UA-12345678-1",
@@ -98,11 +99,11 @@ export const mockDomains: Domain[] = [
 
     // New Fields
     category: "Micro-site",
-    needsUpdate: true,
-    jiraTask: "PROD-123",
-    direction: "Acquisition",
-    bonus: "None",
-    targetAction: "Sign-up",
+    needsUpdate: "Нет",
+    jiraTask: "",
+    direction: "Не выбрано",
+    bonus: "Нет бонуса",
+    targetAction: "Нет",
     fileHosting: "AWS S3",
     techIssues: ["Legacy PHP version"],
     testMethod: "Manual",
@@ -151,9 +152,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Promo",
-    needsUpdate: false,
-    direction: "Retention",
-    targetAction: "Purchase",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     testMethod: "Mixed",
     landingName: "NY 2024 Promo",
     hasGeoBlock: true,
@@ -192,9 +194,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Support",
-    needsUpdate: false,
-    direction: "Partnerships",
-    targetAction: "Other",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     fileHosting: "DigitalOcean",
     testMethod: "Auto",
     landingName: "EU Mirror",
@@ -232,9 +235,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Blog",
-    needsUpdate: true,
-    direction: "SEO",
-    targetAction: "Lead",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     testMethod: "Manual",
     landingName: "SEO Satellite 01",
     hasGeoBlock: false,
@@ -271,9 +275,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Landing",
-    needsUpdate: false,
-    direction: "Partnerships",
-    targetAction: "Sign-up",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     testMethod: "Auto",
     isInProgram: true,
     programStatus: "Active",
@@ -312,8 +317,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Other",
-    direction: "Brand",
-    targetAction: "Other",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     testMethod: "Auto",
     landingName: "Short Link Service",
     hasGeoBlock: false,
@@ -350,8 +357,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Other",
-    direction: "Brand",
-    targetAction: "Other",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     testMethod: "Auto",
     landingName: "Internal API",
     hasGeoBlock: true,
@@ -388,9 +397,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Landing",
-    needsUpdate: false,
-    direction: "Acquisition",
-    targetAction: "Lead",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     testMethod: "Mixed",
     landingName: "B2B Platform",
     hasGeoBlock: false,
@@ -427,8 +437,10 @@ export const mockDomains: Domain[] = [
     
     // New Fields
     category: "Other",
-    direction: "Brand",
-    targetAction: "Other",
+    needsUpdate: "Нет",
+    direction: "Не выбрано",
+    targetAction: "Нет",
+    jiraTask: "",
     testMethod: "Auto",
     landingName: "Staging Env",
     hasGeoBlock: true,
@@ -529,6 +541,52 @@ export const bonusTypes = [
   "Loyalty / VIP-бонусы",
   "Cashback",
   "Reload Bonus",
+];
+
+export const marketingDirections = [
+  "Не выбрано",
+  "Gambling",
+  "Betting",
+  "GB",
+  "Live Казино",
+  "Фастгейм",
+  "Киберспорт",
+  "Лотереи",
+  "TV игры",
+  "Покер",
+  "Бинго",
+  "Aviator",
+  "Crash",
+  "Sports ивент",
+  "Мини-игры (Mines, Dice, Plinko и пр.)",
+  "Депозит / Пополнение",
+  "Вывод / Верификация",
+  "Платежные методы",
+  "Мобильное приложение",
+  "Реферальная программа",
+  "Партнёрская программа",
+];
+
+export const needsUpdateOptions = [
+  "Нет",
+  "Да",
+  "Требует уточнения",
+];
+
+export const targetActions = [
+  "Нет",
+  "Переход на главную",
+  "Короткая форма реги",
+  "Рега по кнопке",
+  "Участие в ивенте по кнопке",
+  "Переход на событие по кнопке",
+  "Рега на главной",
+  "Сломалось зеркало",
+  "Установка прилы или переход на сайт",
+  "Установка АПК",
+  "Переход на деп",
+  "Установка ПВА на ИОС",
+  "Стать агентом",
 ];
 
 export const registrars = [

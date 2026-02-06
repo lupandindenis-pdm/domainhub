@@ -45,7 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { cn } from "@/lib/utils";
 
-import { projects, departments, marketingCategories, departmentConfig, bonusTypes } from "@/data/mockDomains";
+import { projects, departments, marketingCategories, departmentConfig, bonusTypes, marketingDirections, needsUpdateOptions, targetActions } from "@/data/mockDomains";
 import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES, DOMAIN_TYPE_CONFIG, DOMAIN_STATUS_CONFIG, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
 
 import { 
@@ -94,7 +94,9 @@ import {
 
   Activity,
 
-  Tag
+  Tag,
+
+  Check
 
 } from "lucide-react";
 
@@ -192,7 +194,7 @@ export default function DomainDetail() {
 
     bonus: normalizeValue(domain?.bonus || '', bonusTypes),
 
-    needsUpdate: domain?.needsUpdate || false,
+    needsUpdate: domain?.needsUpdate || "Нет",
 
     jiraTask: domain?.jiraTask || '',
 
@@ -615,7 +617,7 @@ export default function DomainDetail() {
 
       bonus: normalizeValue(domain?.bonus || '', bonusTypes),
 
-      needsUpdate: domain?.needsUpdate || false,
+      needsUpdate: domain?.needsUpdate || "Нет",
 
       jiraTask: domain?.jiraTask || '',
 
@@ -686,7 +688,7 @@ export default function DomainDetail() {
       direction: domain.direction || '',
       targetAction: domain.targetAction || '',
       bonus: normalizeValue(domain.bonus || '', bonusTypes),
-      needsUpdate: domain.needsUpdate || false,
+      needsUpdate: domain.needsUpdate || "Нет",
       jiraTask: domain.jiraTask || '',
       fileHosting: domain.fileHosting || '',
       registrar: domain.registrar || '',
@@ -1734,17 +1736,55 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input 
+                        {isEditing ? (
 
-                          value={formData.direction || "Нет"} 
+                          <Select value={formData.direction || "Не выбрано"} onValueChange={(value) => handleFieldChange('direction', value)}>
 
-                          onChange={(e) => handleFieldChange('direction', e.target.value)}
+                            <SelectTrigger className="bg-muted/50 text-base border-none focus-visible:ring-0">
 
-                          readOnly={!isEditing}
+                              <SelectValue />
 
-                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                            </SelectTrigger>
 
-                        />
+                            <SelectContent>
+
+                              {marketingDirections.map((direction) => (
+
+                                <SelectPrimitive.Item
+
+                                  key={direction}
+
+                                  value={direction}
+
+                                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+
+                                >
+
+                                  <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+
+                                    <SelectPrimitive.ItemIndicator>
+
+                                      <Check className="h-4 w-4" />
+
+                                    </SelectPrimitive.ItemIndicator>
+
+                                  </span>
+
+                                  <SelectPrimitive.ItemText>{direction}</SelectPrimitive.ItemText>
+
+                                </SelectPrimitive.Item>
+
+                              ))}
+
+                            </SelectContent>
+
+                          </Select>
+
+                        ) : (
+
+                          <Input value={formData.direction || "Не выбрано"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+
+                        )}
 
                       </div>
 
@@ -1760,17 +1800,55 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input 
+                        {isEditing ? (
 
-                          value={formData.targetAction || "Нет"} 
+                          <Select value={formData.targetAction || "Нет"} onValueChange={(value) => handleFieldChange('targetAction', value)}>
 
-                          onChange={(e) => handleFieldChange('targetAction', e.target.value)}
+                            <SelectTrigger className="bg-muted/50 text-base border-none focus-visible:ring-0">
 
-                          readOnly={!isEditing}
+                              <SelectValue />
 
-                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                            </SelectTrigger>
 
-                        />
+                            <SelectContent>
+
+                              {targetActions.map((action) => (
+
+                                <SelectPrimitive.Item
+
+                                  key={action}
+
+                                  value={action}
+
+                                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+
+                                >
+
+                                  <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+
+                                    <SelectPrimitive.ItemIndicator>
+
+                                      <Check className="h-4 w-4" />
+
+                                    </SelectPrimitive.ItemIndicator>
+
+                                  </span>
+
+                                  <SelectPrimitive.ItemText>{action}</SelectPrimitive.ItemText>
+
+                                </SelectPrimitive.Item>
+
+                              ))}
+
+                            </SelectContent>
+
+                          </Select>
+
+                        ) : (
+
+                          <Input value={formData.targetAction || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+
+                        )}
 
                       </div>
 
@@ -1850,23 +1928,51 @@ export default function DomainDetail() {
 
                         {isEditing ? (
 
-                          <div className="flex items-center h-10 px-3 rounded-md bg-muted/50">
+                          <Select value={formData.needsUpdate || "Нет"} onValueChange={(value) => handleFieldChange('needsUpdate', value)}>
 
-                            <Switch 
+                            <SelectTrigger className="bg-muted/50 text-base border-none focus-visible:ring-0">
 
-                              checked={formData.needsUpdate}
+                              <SelectValue />
 
-                              onCheckedChange={(checked) => handleFieldChange('needsUpdate', checked)}
+                            </SelectTrigger>
 
-                            />
+                            <SelectContent>
 
-                            <span className="ml-2 text-sm">{formData.needsUpdate ? "Да" : "Нет"}</span>
+                              {needsUpdateOptions.map((option) => (
 
-                          </div>
+                                <SelectPrimitive.Item
+
+                                  key={option}
+
+                                  value={option}
+
+                                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+
+                                >
+
+                                  <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+
+                                    <SelectPrimitive.ItemIndicator>
+
+                                      <Check className="h-4 w-4" />
+
+                                    </SelectPrimitive.ItemIndicator>
+
+                                  </span>
+
+                                  <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
+
+                                </SelectPrimitive.Item>
+
+                              ))}
+
+                            </SelectContent>
+
+                          </Select>
 
                         ) : (
 
-                          <Input value={formData.needsUpdate ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                          <Input value={formData.needsUpdate || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
 
                         )}
 
@@ -1884,17 +1990,57 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input 
+                        <div className="relative">
 
-                          value={formData.jiraTask || "Нет"} 
+                          <Input 
 
-                          onChange={(e) => handleFieldChange('jiraTask', e.target.value)}
+                            value={formData.jiraTask || "Нет"} 
 
-                          readOnly={!isEditing}
+                            onChange={(e) => handleFieldChange('jiraTask', e.target.value)}
 
-                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+                            readOnly={!isEditing}
 
-                        />
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
+
+                          />
+
+                          {!isEditing && formData.jiraTask && formData.jiraTask !== "Нет" && (
+
+                            <Button
+
+                              variant="ghost"
+
+                              size="icon"
+
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-transparent hover:text-yellow-400"
+
+                              onClick={(e) => {
+
+                                e.stopPropagation();
+
+                                try {
+
+                                  navigator.clipboard.writeText(formData.jiraTask);
+
+                                  toast.success("Ссылка скопирована");
+
+                                } catch (error) {
+
+                                  toast.error("Не удалось скопировать");
+
+                                }
+
+                              }}
+
+                            >
+
+                              <Copy className="h-4 w-4" />
+
+                            </Button>
+
+                          )}
+
+                        </div>
 
                       </div>
 
