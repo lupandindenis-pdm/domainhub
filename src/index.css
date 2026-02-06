@@ -187,5 +187,5 @@
 
 /* Editing mode - yellow color for input label icons */
 .editing-mode label svg {
-  color: #ca8a04; /* yellow-600 - not too bright */
+  color: #a16207; /* yellow-700 - less bright */
 }
