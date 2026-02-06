@@ -222,11 +222,13 @@ export default function DomainDetail() {
 
     isInProgram: domain?.isInProgram || false,
 
+    isInProgramStatus: domain?.isInProgram ? "Да" : (domain?.isInProgramStatus || "Не известно"),
+
     programLink: domain?.programLink || '',
 
     companyName: domain?.companyName || '',
 
-    programStatus: domain?.programStatus || '',
+    programStatus: domain?.programStatus || 'Не известно',
 
     oneSignalId: domain?.oneSignalId || '',
 
@@ -653,11 +655,13 @@ export default function DomainDetail() {
 
       isInProgram: domain?.isInProgram || false,
 
+      isInProgramStatus: domain?.isInProgram ? "Да" : (domain?.isInProgramStatus || "Не известно"),
+
       programLink: domain?.programLink || '',
 
       companyName: domain?.companyName || '',
 
-      programStatus: domain?.programStatus || '',
+      programStatus: domain?.programStatus || 'Не известно',
 
       oneSignalId: domain?.oneSignalId || '',
 
@@ -718,9 +722,10 @@ export default function DomainDetail() {
       gaId: domain.gaId || '',
       gtmId: domain.gtmId || '',
       isInProgram: domain.isInProgram || false,
+      isInProgramStatus: domain.isInProgram ? "Да" : (domain.isInProgramStatus || "Не известно"),
       programLink: domain.programLink || '',
       companyName: domain.companyName || '',
-      programStatus: domain.programStatus || '',
+      programStatus: domain.programStatus || 'Не известно',
       oneSignalId: domain.oneSignalId || '',
       cloudflareAccount: domain.cloudflareAccount || '',
       description: domain.description || '',
@@ -3082,7 +3087,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.isInProgram ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Select value={formData.isInProgramStatus} onValueChange={(value) => handleFieldChange('isInProgramStatus', value)} disabled={!isEditing}>
+
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+
+                            <SelectValue />
+
+                          </SelectTrigger>
+
+                          <SelectContent>
+
+                            {["Не известно", "Да", "Нет"].map((option) => (
+
+                              <SelectPrimitive.Item
+
+                                key={option}
+
+                                value={option}
+
+                                className={cn(
+
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                  "focus:bg-violet-500/10",
+
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                  formData.isInProgramStatus === option && "bg-violet-500/10"
+
+                                )}
+
+                              >
+
+                                <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
+
+                              </SelectPrimitive.Item>
+
+                            ))}
+
+                          </SelectContent>
+
+                        </Select>
 
                       </div>
 
@@ -3098,7 +3143,19 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.programLink || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Input 
+
+                          value={formData.programLink || ""} 
+
+                          onChange={(e) => handleFieldChange('programLink', e.target.value)}
+
+                          readOnly={!isEditing}
+
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+
+                          placeholder="Не указано"
+
+                        />
 
                       </div>
 
@@ -3120,7 +3177,19 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.companyName || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Input 
+
+                          value={formData.companyName || ""} 
+
+                          onChange={(e) => handleFieldChange('companyName', e.target.value)}
+
+                          readOnly={!isEditing}
+
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+
+                          placeholder="Не указано"
+
+                        />
 
                       </div>
 
@@ -3136,7 +3205,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.programStatus || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Select value={formData.programStatus} onValueChange={(value) => handleFieldChange('programStatus', value)} disabled={!isEditing}>
+
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+
+                            <SelectValue />
+
+                          </SelectTrigger>
+
+                          <SelectContent>
+
+                            {["Не известно", "Активен", "Не активен", "Запасной"].map((option) => (
+
+                              <SelectPrimitive.Item
+
+                                key={option}
+
+                                value={option}
+
+                                className={cn(
+
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                  "focus:bg-violet-500/10",
+
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                  formData.programStatus === option && "bg-violet-500/10"
+
+                                )}
+
+                              >
+
+                                <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
+
+                              </SelectPrimitive.Item>
+
+                            ))}
+
+                          </SelectContent>
+
+                        </Select>
 
                       </div>
 
