@@ -184,3 +184,8 @@
   width: 0;
   height: 0;
 }
+
+/* Editing mode - blue color for input label icons */
+.editing-mode label svg {
+  color: #3b82f6; /* blue-500 */
+}

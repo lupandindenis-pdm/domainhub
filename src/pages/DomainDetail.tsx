@@ -1106,7 +1106,7 @@ export default function DomainDetail() {
 
       {/* Main Content Tabs */}
 
-      <Tabs defaultValue="general" className="space-y-6 mt-12">
+      <Tabs defaultValue="general" className={cn("space-y-6 mt-12", isEditing && "editing-mode")}>
 
         <TabsList className="flex h-auto flex-wrap gap-2 bg-transparent p-0 justify-start pl-6 mt-4">
 
