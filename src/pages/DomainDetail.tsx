@@ -210,7 +210,11 @@ export default function DomainDetail() {
 
     jiraTaskIT: Array.isArray(domain?.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain?.jiraTaskIT || ''),
 
-    testMethod: domain?.testMethod || '',
+    testMethod: domain?.testMethod || 'Не известно',
+
+    purchaseDate: domain?.purchaseDate || '',
+
+    renewalDate: domain?.renewalDate || '',
 
     gaId: domain?.gaId || '',
 
@@ -637,7 +641,11 @@ export default function DomainDetail() {
 
       jiraTaskIT: Array.isArray(domain?.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain?.jiraTaskIT || ''),
 
-      testMethod: domain?.testMethod || '',
+      testMethod: domain?.testMethod || 'Не известно',
+
+      purchaseDate: domain?.purchaseDate || '',
+
+      renewalDate: domain?.renewalDate || '',
 
       gaId: domain?.gaId || '',
 
@@ -704,7 +712,9 @@ export default function DomainDetail() {
       techIssues: domain.techIssues || [],
       hasTechIssues: domain.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет",
       jiraTaskIT: Array.isArray(domain.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain.jiraTaskIT || ''),
-      testMethod: domain.testMethod || '',
+      testMethod: domain.testMethod || 'Не известно',
+      purchaseDate: domain.purchaseDate || '',
+      renewalDate: domain.renewalDate || '',
       gaId: domain.gaId || '',
       gtmId: domain.gtmId || '',
       isInProgram: domain.isInProgram || false,
@@ -2370,7 +2380,9 @@ export default function DomainDetail() {
 
                                 try {
 
-                                  navigator.clipboard.writeText(formData.nsServers.join(", "));
+                                  const validNs = formData.nsServers.filter(ns => ns && ns.trim());
+
+                                  navigator.clipboard.writeText(validNs.join(", "));
 
                                   toast.success("NS-записи скопированы");
 
@@ -2536,7 +2548,55 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.expirationDate ? format(parseISO(domain.expirationDate), "dd.MM.yyyy") : "—"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Popover>
+
+                          <PopoverTrigger asChild>
+
+                            <Button
+
+                              variant="outline"
+
+                              disabled={!isEditing}
+
+                              className={cn(
+
+                                "w-full justify-start text-left font-normal bg-muted/50 border-none hover:bg-muted/70 disabled:opacity-100 disabled:cursor-default",
+
+                                !formData.purchaseDate && "text-muted-foreground"
+
+                              )}
+
+                            >
+
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+
+                              {formData.purchaseDate ? format(parseISO(formData.purchaseDate), "dd.MM.yyyy") : <span>Не указано</span>}
+
+                            </Button>
+
+                          </PopoverTrigger>
+
+                          <PopoverContent className="w-auto p-0" align="start">
+
+                            <Calendar
+
+                              mode="single"
+
+                              selected={formData.purchaseDate ? parseISO(formData.purchaseDate) : undefined}
+
+                              onSelect={(date) => {
+
+                                handleFieldChange('purchaseDate', date ? date.toISOString() : '');
+
+                              }}
+
+                              initialFocus
+
+                            />
+
+                          </PopoverContent>
+
+                        </Popover>
 
                       </div>
 
@@ -2552,7 +2612,55 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.expirationDate ? format(parseISO(domain.expirationDate), "dd.MM.yyyy") : "—"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Popover>
+
+                          <PopoverTrigger asChild>
+
+                            <Button
+
+                              variant="outline"
+
+                              disabled={!isEditing}
+
+                              className={cn(
+
+                                "w-full justify-start text-left font-normal bg-muted/50 border-none hover:bg-muted/70 disabled:opacity-100 disabled:cursor-default",
+
+                                !formData.renewalDate && "text-muted-foreground"
+
+                              )}
+
+                            >
+
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+
+                              {formData.renewalDate ? format(parseISO(formData.renewalDate), "dd.MM.yyyy") : <span>Не указано</span>}
+
+                            </Button>
+
+                          </PopoverTrigger>
+
+                          <PopoverContent className="w-auto p-0" align="start">
+
+                            <Calendar
+
+                              mode="single"
+
+                              selected={formData.renewalDate ? parseISO(formData.renewalDate) : undefined}
+
+                              onSelect={(date) => {
+
+                                handleFieldChange('renewalDate', date ? date.toISOString() : '');
+
+                              }}
+
+                              initialFocus
+
+                            />
+
+                          </PopoverContent>
+
+                        </Popover>
 
                       </div>
 
@@ -2568,7 +2676,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.testMethod || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Select value={formData.testMethod || "Не известно"} onValueChange={(value) => handleFieldChange('testMethod', value)} disabled={!isEditing}>
+
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+
+                            <SelectValue />
+
+                          </SelectTrigger>
+
+                          <SelectContent>
+
+                            {["Не известно", "Мануально + VPN", "Авто проксирование", "Авто + мануальное"].map((option) => (
+
+                              <SelectPrimitive.Item
+
+                                key={option}
+
+                                value={option}
+
+                                className={cn(
+
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                  "focus:bg-violet-500/10",
+
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                  formData.testMethod === option && "bg-violet-500/10"
+
+                                )}
+
+                              >
+
+                                <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
+
+                              </SelectPrimitive.Item>
+
+                            ))}
+
+                          </SelectContent>
+
+                        </Select>
 
                       </div>
 
