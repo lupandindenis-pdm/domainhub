@@ -144,9 +144,11 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
           variant={bulkSelectMode ? "default" : "outline"}
           size="icon"
           onClick={onToggleBulkMode}
+          disabled={quickEditMode}
           className={cn(
             "h-10 w-10 transition-colors",
-            bulkSelectMode ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80"
+            bulkSelectMode ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80",
+            quickEditMode && "opacity-50 cursor-not-allowed"
           )}
           aria-label="Toggle bulk select mode"
         >
@@ -158,9 +160,11 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
             variant={quickEditMode ? "default" : "outline"}
             size="icon"
             onClick={onToggleQuickEditMode}
+            disabled={bulkSelectMode}
             className={cn(
               "h-10 w-10 transition-colors",
-              quickEditMode ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80"
+              quickEditMode ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80",
+              bulkSelectMode && "opacity-50 cursor-not-allowed"
             )}
             aria-label="Toggle quick edit mode"
           >
