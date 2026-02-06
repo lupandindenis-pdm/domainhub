@@ -3371,7 +3371,19 @@ export default function DomainDetail() {
 
                     </label>
 
-                    <Input value={domain.oneSignalId || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                    <Input 
+
+                      value={formData.oneSignalId || ""} 
+
+                      onChange={(e) => handleFieldChange('oneSignalId', e.target.value)}
+
+                      readOnly={!isEditing}
+
+                      className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+
+                      placeholder="Не указано"
+
+                    />
 
                   </div>
 
@@ -3393,7 +3405,19 @@ export default function DomainDetail() {
 
                     </label>
 
-                    <Input value={domain.cloudflareAccount || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                    <Input 
+
+                      value={formData.cloudflareAccount || ""} 
+
+                      onChange={(e) => handleFieldChange('cloudflareAccount', e.target.value)}
+
+                      readOnly={!isEditing}
+
+                      className="bg-muted/50 text-base border-none focus-visible:ring-0" 
+
+                      placeholder="Не указано"
+
+                    />
 
                   </div>
 
