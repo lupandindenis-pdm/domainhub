@@ -1086,7 +1086,7 @@ export default function DomainDetail() {
 
               </Button>
 
-              <Button onClick={handleSave} className="gap-2 bg-green-600 hover:bg-green-700 w-[144px] save-button-pulse">
+              <Button onClick={handleSave} className="gap-2 bg-green-600 hover:bg-green-700 w-[144px]">
 
                 <CheckCircle className="h-4 w-4" />
 

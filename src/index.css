@@ -189,17 +189,3 @@
 .editing-mode label svg {
   color: #ca8a04; /* yellow-600 - not too bright */
 }
-
-/* Save button pulse animation */
-@keyframes saveButtonPulse {
-  0%, 100% {
-    background-color: #16a34a; /* green-600 */
-  }
-  50% {
-    background-color: #22c55e; /* green-500 */
-  }
-}
-
-.save-button-pulse {
-  animation: saveButtonPulse 2s ease-in-out infinite;
-}
