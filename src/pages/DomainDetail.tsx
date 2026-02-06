@@ -2836,7 +2836,59 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.gaId || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <div className="relative">
+
+                          <Input 
+
+                            value={formData.gaId || ""} 
+
+                            onChange={(e) => handleFieldChange('gaId', e.target.value)}
+
+                            readOnly={!isEditing}
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
+
+                            placeholder="Не указано"
+
+                          />
+
+                          {!isEditing && formData.gaId && (
+
+                            <Button
+
+                              variant="ghost"
+
+                              size="icon"
+
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-transparent hover:text-yellow-400"
+
+                              onClick={(e) => {
+
+                                e.stopPropagation();
+
+                                try {
+
+                                  navigator.clipboard.writeText(formData.gaId);
+
+                                  toast.success("GA ID скопирован");
+
+                                } catch (error) {
+
+                                  toast.error("Не удалось скопировать");
+
+                                }
+
+                              }}
+
+                            >
+
+                              <Copy className="h-4 w-4" />
+
+                            </Button>
+
+                          )}
+
+                        </div>
 
                       </div>
 
@@ -2858,7 +2910,59 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.gtmId || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <div className="relative">
+
+                          <Input 
+
+                            value={formData.gtmId || ""} 
+
+                            onChange={(e) => handleFieldChange('gtmId', e.target.value)}
+
+                            readOnly={!isEditing}
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
+
+                            placeholder="Не указано"
+
+                          />
+
+                          {!isEditing && formData.gtmId && (
+
+                            <Button
+
+                              variant="ghost"
+
+                              size="icon"
+
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-transparent hover:text-yellow-400"
+
+                              onClick={(e) => {
+
+                                e.stopPropagation();
+
+                                try {
+
+                                  navigator.clipboard.writeText(formData.gtmId);
+
+                                  toast.success("GTM ID скопирован");
+
+                                } catch (error) {
+
+                                  toast.error("Не удалось скопировать");
+
+                                }
+
+                              }}
+
+                            >
+
+                              <Copy className="h-4 w-4" />
+
+                            </Button>
+
+                          )}
+
+                        </div>
 
                       </div>
 
