@@ -1736,55 +1736,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        {isEditing ? (
+                        <Select value={formData.direction} onValueChange={(value) => handleFieldChange('direction', value)} disabled={!isEditing}>
 
-                          <Select value={formData.direction || "Не выбрано"} onValueChange={(value) => handleFieldChange('direction', value)}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
-                            <SelectTrigger className="bg-muted/50 text-base border-none focus-visible:ring-0">
+                            <SelectValue />
 
-                              <SelectValue />
+                          </SelectTrigger>
 
-                            </SelectTrigger>
+                          <SelectContent>
 
-                            <SelectContent>
+                            {marketingDirections.map((direction) => (
 
-                              {marketingDirections.map((direction) => (
+                              <SelectPrimitive.Item
 
-                                <SelectPrimitive.Item
+                                key={direction}
 
-                                  key={direction}
+                                value={direction}
 
-                                  value={direction}
+                                className={cn(
 
-                                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                >
+                                  "focus:bg-violet-500/10",
 
-                                  <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                    <SelectPrimitive.ItemIndicator>
+                                  formData.direction === direction && "bg-violet-500/10"
 
-                                      <Check className="h-4 w-4" />
+                                )}
 
-                                    </SelectPrimitive.ItemIndicator>
+                              >
 
-                                  </span>
+                                <SelectPrimitive.ItemText>{direction}</SelectPrimitive.ItemText>
 
-                                  <SelectPrimitive.ItemText>{direction}</SelectPrimitive.ItemText>
+                              </SelectPrimitive.Item>
 
-                                </SelectPrimitive.Item>
+                            ))}
 
-                              ))}
+                          </SelectContent>
 
-                            </SelectContent>
-
-                          </Select>
-
-                        ) : (
-
-                          <Input value={formData.direction || "Не выбрано"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
-
-                        )}
+                        </Select>
 
                       </div>
 
@@ -1800,55 +1792,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        {isEditing ? (
+                        <Select value={formData.targetAction} onValueChange={(value) => handleFieldChange('targetAction', value)} disabled={!isEditing}>
 
-                          <Select value={formData.targetAction || "Не выбрано"} onValueChange={(value) => handleFieldChange('targetAction', value)}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
-                            <SelectTrigger className="bg-muted/50 text-base border-none focus-visible:ring-0">
+                            <SelectValue />
 
-                              <SelectValue />
+                          </SelectTrigger>
 
-                            </SelectTrigger>
+                          <SelectContent>
 
-                            <SelectContent>
+                            {targetActions.map((action) => (
 
-                              {targetActions.map((action) => (
+                              <SelectPrimitive.Item
 
-                                <SelectPrimitive.Item
+                                key={action}
 
-                                  key={action}
+                                value={action}
 
-                                  value={action}
+                                className={cn(
 
-                                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                >
+                                  "focus:bg-violet-500/10",
 
-                                  <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                    <SelectPrimitive.ItemIndicator>
+                                  formData.targetAction === action && "bg-violet-500/10"
 
-                                      <Check className="h-4 w-4" />
+                                )}
 
-                                    </SelectPrimitive.ItemIndicator>
+                              >
 
-                                  </span>
+                                <SelectPrimitive.ItemText>{action}</SelectPrimitive.ItemText>
 
-                                  <SelectPrimitive.ItemText>{action}</SelectPrimitive.ItemText>
+                              </SelectPrimitive.Item>
 
-                                </SelectPrimitive.Item>
+                            ))}
 
-                              ))}
+                          </SelectContent>
 
-                            </SelectContent>
-
-                          </Select>
-
-                        ) : (
-
-                          <Input value={formData.targetAction || "Не выбрано"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
-
-                        )}
+                        </Select>
 
                       </div>
 
@@ -1926,55 +1910,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        {isEditing ? (
+                        <Select value={formData.needsUpdate} onValueChange={(value) => handleFieldChange('needsUpdate', value)} disabled={!isEditing}>
 
-                          <Select value={formData.needsUpdate || "Нет"} onValueChange={(value) => handleFieldChange('needsUpdate', value)}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
-                            <SelectTrigger className="bg-muted/50 text-base border-none focus-visible:ring-0">
+                            <SelectValue />
 
-                              <SelectValue />
+                          </SelectTrigger>
 
-                            </SelectTrigger>
+                          <SelectContent>
 
-                            <SelectContent>
+                            {needsUpdateOptions.map((option) => (
 
-                              {needsUpdateOptions.map((option) => (
+                              <SelectPrimitive.Item
 
-                                <SelectPrimitive.Item
+                                key={option}
 
-                                  key={option}
+                                value={option}
 
-                                  value={option}
+                                className={cn(
 
-                                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
 
-                                >
+                                  "focus:bg-violet-500/10",
 
-                                  <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 
-                                    <SelectPrimitive.ItemIndicator>
+                                  formData.needsUpdate === option && "bg-violet-500/10"
 
-                                      <Check className="h-4 w-4" />
+                                )}
 
-                                    </SelectPrimitive.ItemIndicator>
+                              >
 
-                                  </span>
+                                <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
 
-                                  <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
+                              </SelectPrimitive.Item>
 
-                                </SelectPrimitive.Item>
+                            ))}
 
-                              ))}
+                          </SelectContent>
 
-                            </SelectContent>
-
-                          </Select>
-
-                        ) : (
-
-                          <Input value={formData.needsUpdate || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
-
-                        )}
+                        </Select>
 
                       </div>
 
