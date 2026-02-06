@@ -206,6 +206,10 @@ export default function DomainDetail() {
 
     techIssues: domain?.techIssues || [],
 
+    hasTechIssues: domain?.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет",
+
+    jiraTaskIT: Array.isArray(domain?.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain?.jiraTaskIT || ''),
+
     testMethod: domain?.testMethod || '',
 
     gaId: domain?.gaId || '',
@@ -629,6 +633,10 @@ export default function DomainDetail() {
 
       techIssues: domain?.techIssues || [],
 
+      hasTechIssues: domain?.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет",
+
+      jiraTaskIT: Array.isArray(domain?.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain?.jiraTaskIT || ''),
+
       testMethod: domain?.testMethod || '',
 
       gaId: domain?.gaId || '',
@@ -694,6 +702,8 @@ export default function DomainDetail() {
       registrar: domain.registrar || '',
       nsServers: domain.nsServers || [],
       techIssues: domain.techIssues || [],
+      hasTechIssues: domain.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет",
+      jiraTaskIT: Array.isArray(domain.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain.jiraTaskIT || ''),
       testMethod: domain.testMethod || '',
       gaId: domain.gaId || '',
       gtmId: domain.gtmId || '',
@@ -928,7 +938,7 @@ export default function DomainDetail() {
 
           <div className="flex items-center gap-2 pl-14 mt-2">
 
-            {domain.needsUpdate && (
+            {(formData.hasTechIssues === "Да" || (formData.needsUpdate && formData.needsUpdate !== "Нет")) && (
 
               <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-0 gap-1 h-6 flex-shrink-0 whitespace-nowrap">
 
@@ -2162,7 +2172,59 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.fileHosting || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <div className="relative">
+
+                          <Input 
+
+                            value={formData.fileHosting || ""} 
+
+                            onChange={(e) => handleFieldChange('fileHosting', e.target.value)}
+
+                            readOnly={!isEditing}
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
+
+                            placeholder="Не указано"
+
+                          />
+
+                          {!isEditing && formData.fileHosting && (
+
+                            <Button
+
+                              variant="ghost"
+
+                              size="icon"
+
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-transparent hover:text-yellow-400"
+
+                              onClick={(e) => {
+
+                                e.stopPropagation();
+
+                                try {
+
+                                  navigator.clipboard.writeText(formData.fileHosting);
+
+                                  toast.success("Хостинг скопирован");
+
+                                } catch (error) {
+
+                                  toast.error("Не удалось скопировать");
+
+                                }
+
+                              }}
+
+                            >
+
+                              <Copy className="h-4 w-4" />
+
+                            </Button>
+
+                          )}
+
+                        </div>
 
                       </div>
 
@@ -2178,7 +2240,59 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.registrar || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <div className="relative">
+
+                          <Input 
+
+                            value={formData.registrar || ""} 
+
+                            onChange={(e) => handleFieldChange('registrar', e.target.value)}
+
+                            readOnly={!isEditing}
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
+
+                            placeholder="Не указано"
+
+                          />
+
+                          {!isEditing && formData.registrar && (
+
+                            <Button
+
+                              variant="ghost"
+
+                              size="icon"
+
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-transparent hover:text-yellow-400"
+
+                              onClick={(e) => {
+
+                                e.stopPropagation();
+
+                                try {
+
+                                  navigator.clipboard.writeText(formData.registrar);
+
+                                  toast.success("Регистратор скопирован");
+
+                                } catch (error) {
+
+                                  toast.error("Не удалось скопировать");
+
+                                }
+
+                              }}
+
+                            >
+
+                              <Copy className="h-4 w-4" />
+
+                            </Button>
+
+                          )}
+
+                        </div>
 
                       </div>
 
@@ -2194,43 +2308,87 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <div className="relative">
+                        <div className="relative flex gap-2">
 
                           <Input 
 
-                            value={domain.nsServers && domain.nsServers.length > 0 ? domain.nsServers.join(", ") : "—"} 
+                            value={formData.nsServers?.[0] || ""} 
 
-                            readOnly 
+                            onChange={(e) => {
 
-                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 font-mono text-sm"
+                              const newNsServers = [...(formData.nsServers || [])];
 
-                          />
+                              newNsServers[0] = e.target.value;
 
-                          <Button
-
-                            variant="ghost"
-
-                            size="icon"
-
-                            className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-muted"
-
-                            onClick={() => {
-
-                              if (domain.nsServers && domain.nsServers.length > 0) {
-
-                                navigator.clipboard.writeText(domain.nsServers.join(", "));
-
-                                toast.success("NS-записи скопированы");
-
-                              }
+                              handleFieldChange('nsServers', newNsServers.filter(ns => ns));
 
                             }}
 
-                          >
+                            readOnly={!isEditing}
 
-                            <Copy className="h-3.5 w-3.5" />
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 font-mono text-sm flex-1" 
 
-                          </Button>
+                            placeholder="NS1"
+
+                          />
+
+                          <Input 
+
+                            value={formData.nsServers?.[1] || ""} 
+
+                            onChange={(e) => {
+
+                              const newNsServers = [...(formData.nsServers || [])];
+
+                              newNsServers[1] = e.target.value;
+
+                              handleFieldChange('nsServers', newNsServers.filter(ns => ns));
+
+                            }}
+
+                            readOnly={!isEditing}
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 font-mono text-sm flex-1 pr-10" 
+
+                            placeholder="NS2"
+
+                          />
+
+                          {!isEditing && formData.nsServers && formData.nsServers.length > 0 && (
+
+                            <Button
+
+                              variant="ghost"
+
+                              size="icon"
+
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-transparent hover:text-yellow-400"
+
+                              onClick={(e) => {
+
+                                e.stopPropagation();
+
+                                try {
+
+                                  navigator.clipboard.writeText(formData.nsServers.join(", "));
+
+                                  toast.success("NS-записи скопированы");
+
+                                } catch (error) {
+
+                                  toast.error("Не удалось скопировать");
+
+                                }
+
+                              }}
+
+                            >
+
+                              <Copy className="h-4 w-4" />
+
+                            </Button>
+
+                          )}
 
                         </div>
 
@@ -2248,7 +2406,47 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <Select value={formData.hasTechIssues || "Нет"} onValueChange={(value) => handleFieldChange('hasTechIssues', value)} disabled={!isEditing}>
+
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+
+                            <SelectValue />
+
+                          </SelectTrigger>
+
+                          <SelectContent>
+
+                            {["Нет", "Да"].map((option) => (
+
+                              <SelectPrimitive.Item
+
+                                key={option}
+
+                                value={option}
+
+                                className={cn(
+
+                                  "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors",
+
+                                  "focus:bg-violet-500/10",
+
+                                  "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+
+                                  formData.hasTechIssues === option && "bg-violet-500/10"
+
+                                )}
+
+                              >
+
+                                <SelectPrimitive.ItemText>{option}</SelectPrimitive.ItemText>
+
+                              </SelectPrimitive.Item>
+
+                            ))}
+
+                          </SelectContent>
+
+                        </Select>
 
                       </div>
 
@@ -2270,7 +2468,59 @@ export default function DomainDetail() {
 
                         </label>
 
-                        <Input value={domain.jiraTask || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                        <div className="relative">
+
+                          <Input 
+
+                            value={formData.jiraTaskIT || ""} 
+
+                            onChange={(e) => handleFieldChange('jiraTaskIT', e.target.value)}
+
+                            readOnly={!isEditing}
+
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
+
+                            placeholder="Не указано"
+
+                          />
+
+                          {!isEditing && formData.jiraTaskIT && (
+
+                            <Button
+
+                              variant="ghost"
+
+                              size="icon"
+
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 hover:bg-transparent hover:text-yellow-400"
+
+                              onClick={(e) => {
+
+                                e.stopPropagation();
+
+                                try {
+
+                                  navigator.clipboard.writeText(formData.jiraTaskIT);
+
+                                  toast.success("Ссылка скопирована");
+
+                                } catch (error) {
+
+                                  toast.error("Не удалось скопировать");
+
+                                }
+
+                              }}
+
+                            >
+
+                              <Copy className="h-4 w-4" />
+
+                            </Button>
+
+                          )}
+
+                        </div>
 
                       </div>
 
