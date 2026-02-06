@@ -188,9 +188,9 @@ export default function DomainDetail() {
 
     category: normalizeValue(domain?.category || '', marketingCategories),
 
-    direction: domain?.direction || '',
+    direction: domain?.direction || "Не выбрано",
 
-    targetAction: domain?.targetAction || '',
+    targetAction: domain?.targetAction || "Не выбрано",
 
     bonus: normalizeValue(domain?.bonus || '', bonusTypes),
 
@@ -611,9 +611,9 @@ export default function DomainDetail() {
 
       category: normalizeValue(domain?.category || '', marketingCategories),
 
-      direction: domain?.direction || '',
+      direction: domain?.direction || "Не выбрано",
 
-      targetAction: domain?.targetAction || '',
+      targetAction: domain?.targetAction || "Не выбрано",
 
       bonus: normalizeValue(domain?.bonus || '', bonusTypes),
 
@@ -685,8 +685,8 @@ export default function DomainDetail() {
       department: domain.department || '',
       project: domain.project || '',
       category: normalizeValue(domain.category || '', marketingCategories),
-      direction: domain.direction || '',
-      targetAction: domain.targetAction || '',
+      direction: domain.direction || "Не выбрано",
+      targetAction: domain.targetAction || "Не выбрано",
       bonus: normalizeValue(domain.bonus || '', bonusTypes),
       needsUpdate: domain.needsUpdate || "Нет",
       jiraTask: domain.jiraTask || '',
@@ -1802,7 +1802,7 @@ export default function DomainDetail() {
 
                         {isEditing ? (
 
-                          <Select value={formData.targetAction || "Нет"} onValueChange={(value) => handleFieldChange('targetAction', value)}>
+                          <Select value={formData.targetAction || "Не выбрано"} onValueChange={(value) => handleFieldChange('targetAction', value)}>
 
                             <SelectTrigger className="bg-muted/50 text-base border-none focus-visible:ring-0">
 
@@ -1846,7 +1846,7 @@ export default function DomainDetail() {
 
                         ) : (
 
-                          <Input value={formData.targetAction || "Нет"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                          <Input value={formData.targetAction || "Не выбрано"} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
 
                         )}
 
