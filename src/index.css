@@ -185,9 +185,9 @@
   height: 0;
 }
 
-/* Editing mode - blue color for input label icons */
+/* Editing mode - yellow color for input label icons */
 .editing-mode label svg {
-  color: #3b82f6; /* blue-500 */
+  color: #ca8a04; /* yellow-600 - not too bright */
 }
 
 /* Save button pulse animation */
