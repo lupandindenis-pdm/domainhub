@@ -18,6 +18,7 @@ export default function Domains() {
   const debouncedFilters = useDebounce(filters, 300);
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [selectedDomainIds, setSelectedDomainIds] = useState<Set<string>>(new Set());
+  const [quickEditMode, setQuickEditMode] = useState(false);
   const [hiddenDomainIds, setHiddenDomainIds] = useState<Set<string>>(() => {
     try {
       const saved = localStorage.getItem('hiddenDomainIds');
@@ -213,6 +214,21 @@ export default function Domains() {
     }
   };
 
+  const handleToggleQuickEditMode = () => {
+    const newMode = !quickEditMode;
+    setQuickEditMode(newMode);
+    if (newMode) {
+      // Отключаем режим множественного выбора при включении быстрого редактирования
+      setBulkSelectMode(false);
+      setSelectedDomainIds(new Set());
+      toast.success("Режим быстрого редактирования включен", {
+        description: "Кликайте по полям Project и Type для редактирования",
+      });
+    } else {
+      toast.info("Режим быстрого редактирования выключен");
+    }
+  };
+
   const handleToggleDomain = (domainId: string) => {
     setSelectedDomainIds(prev => {
       const newSet = new Set(prev);
@@ -308,6 +324,21 @@ export default function Domains() {
     setShowHidden(!showHidden);
   };
 
+  const handleUpdateDomain = (domainId: string, updates: Partial<any>) => {
+    setEditedDomains(prev => {
+      const newEditedDomains = {
+        ...prev,
+        [domainId]: {
+          ...prev[domainId],
+          ...updates,
+        },
+      };
+      // Сохраняем в localStorage для сквозной синхронизации
+      localStorage.setItem('editedDomains', JSON.stringify(newEditedDomains));
+      return newEditedDomains;
+    });
+  };
+
   const handleMoveSelected = () => {
     toast.info("Перемещение доменов", {
       description: `Будет перемещено доменов: ${selectedDomainIds.size}`,
@@ -391,6 +422,8 @@ export default function Domains() {
         onToggleShowHidden={handleToggleShowHidden}
         hiddenCount={hiddenDomainIds.size}
         labels={labels}
+        quickEditMode={quickEditMode}
+        onToggleQuickEditMode={handleToggleQuickEditMode}
       />
 
       {/* Domain Table */}
@@ -401,6 +434,8 @@ export default function Domains() {
         onToggleDomain={handleToggleDomain}
         showHidden={showHidden}
         labels={labels}
+        quickEditMode={quickEditMode}
+        onUpdateDomain={handleUpdateDomain}
       />
 
       {filteredDomains.length === 0 && (

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { X, Download, Check, ChevronDown, CheckSquare, Square, EyeOff } from "lucide-react";
+import { X, Download, Check, ChevronDown, CheckSquare, Square, EyeOff, Edit } from "lucide-react";
 import { SingleSelectFilter } from "./SingleSelectFilter";
 import { DomainFilter, DomainType, DomainStatus, Label } from "@/types/domain";
 import { LabelBadge } from "./LabelBadge";
@@ -34,6 +34,8 @@ interface DomainFiltersProps {
   onToggleShowHidden: () => void;
   hiddenCount: number;
   labels: Label[];
+  quickEditMode?: boolean;
+  onToggleQuickEditMode?: () => void;
 }
 
 interface MultiSelectProps {
@@ -121,7 +123,7 @@ function MultiSelectFilter({ title, options, selectedValues = [], onChange }: Mu
   );
 }
 
-export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode, showHidden, onToggleShowHidden, hiddenCount, labels }: DomainFiltersProps) {
+export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode, showHidden, onToggleShowHidden, hiddenCount, labels, quickEditMode = false, onToggleQuickEditMode }: DomainFiltersProps) {
   const { t } = useLanguage();
   const hasActiveFilters = 
     filters.search || 
@@ -150,6 +152,21 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
         >
           {bulkSelectMode ? <CheckSquare className="h-4 w-4" /> : <Square className="h-4 w-4" />}
         </Button>
+
+        {onToggleQuickEditMode && (
+          <Button
+            variant={quickEditMode ? "default" : "outline"}
+            size="icon"
+            onClick={onToggleQuickEditMode}
+            className={cn(
+              "h-10 w-10 transition-colors",
+              quickEditMode ? "bg-primary text-primary-foreground" : "bg-secondary/50 border-0 hover:bg-secondary/80"
+            )}
+            aria-label="Toggle quick edit mode"
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+        )}
 
         <MultiSelectFilter
           title={t("filters.all_projects")}

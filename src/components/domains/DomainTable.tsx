@@ -11,12 +11,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Copy, ExternalLink, Globe, FolderKanban, Tag, Activity } from "lucide-react";
+import { Copy, ExternalLink, Globe, FolderKanban, Tag, Activity, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/components/language-provider";
 import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { projects } from "@/data/mockDomains";
+import { DOMAIN_TYPES } from "@/constants/domainTypes";
 
 interface DomainTableProps {
   domains: Domain[];
@@ -25,13 +40,20 @@ interface DomainTableProps {
   onToggleDomain: (domainId: string) => void;
   showHidden?: boolean;
   labels: Label[];
+  quickEditMode?: boolean;
+  onUpdateDomain?: (domainId: string, updates: Partial<Domain>) => void;
 }
 
-export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onToggleDomain, showHidden = false, labels }: DomainTableProps) {
+export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onToggleDomain, showHidden = false, labels, quickEditMode = false, onUpdateDomain }: DomainTableProps) {
   const navigate = useNavigate();
   const { t } = useLanguage();
 
   const handleRowClick = (domainId: string) => {
+    // В режиме быстрого редактирования не переходим в карточку
+    if (quickEditMode) {
+      return;
+    }
+    
     if (bulkSelectMode) {
       onToggleDomain(domainId);
     } else {
@@ -137,12 +159,88 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                   </div>
                 </TableCell>
                 <TableCell className="py-3 text-sm text-muted-foreground">
-                  {domain.project}
+                  {quickEditMode && onUpdateDomain ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-full justify-between px-2 hover:bg-muted/50 font-normal text-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span className="truncate">{domain.project}</span>
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0" align="start" onClick={(e) => e.stopPropagation()}>
+                        <Command>
+                          <CommandInput placeholder="Поиск проекта..." />
+                          <CommandList>
+                            <CommandEmpty>Проект не найден</CommandEmpty>
+                            <CommandGroup>
+                              {projects.map((project) => (
+                                <CommandItem
+                                  key={project}
+                                  onSelect={() => {
+                                    onUpdateDomain(domain.id, { project });
+                                    toast.success("Проект обновлен", {
+                                      description: `${domain.name} → ${project}`,
+                                    });
+                                  }}
+                                >
+                                  {project}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    domain.project
+                  )}
                 </TableCell>
                 <TableCell className="py-3">
-                  <div className="flex justify-start">
-                    <DomainTypeBadge type={domain.type} />
-                  </div>
+                  {quickEditMode && onUpdateDomain ? (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-full justify-start px-2 hover:bg-muted/50"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <DomainTypeBadge type={domain.type} />
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0" align="start" onClick={(e) => e.stopPropagation()}>
+                        <Command>
+                          <CommandInput placeholder="Поиск типа..." />
+                          <CommandList>
+                            <CommandEmpty>Тип не найден</CommandEmpty>
+                            <CommandGroup>
+                              {DOMAIN_TYPES.map((type) => (
+                                <CommandItem
+                                  key={type.value}
+                                  onSelect={() => {
+                                    onUpdateDomain(domain.id, { type: type.value });
+                                    toast.success("Тип обновлен", {
+                                      description: `${domain.name} → ${type.label}`,
+                                    });
+                                  }}
+                                >
+                                  {type.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  ) : (
+                    <div className="flex justify-start">
+                      <DomainTypeBadge type={domain.type} />
+                    </div>
+                  )}
                 </TableCell>
                 <TableCell className="py-3">
                   <DomainStatusBadge status={domain.status} />
