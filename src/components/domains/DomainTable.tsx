@@ -165,7 +165,7 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                             </Button>
                           </span>
                         )}
-                        {domain.labelId && (() => {
+                        {!quickEditMode && domain.labelId && (() => {
                           const label = labels.find(l => l.id === domain.labelId);
                           return label ? <LabelBadge label={label} /> : null;
                         })()}
