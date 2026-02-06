@@ -17,35 +17,72 @@ export function DomainSearch() {
   const [results, setResults] = useState<Domain[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
   const [domainLabelAssignments, setDomainLabelAssignments] = useState<Record<string, string>>({});
+  const [editedDomains, setEditedDomains] = useState<Record<string, any>>({});
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Load labels and assignments from localStorage
+  // Merge mockDomains with edited domains from localStorage
+  const domains = mockDomains.map(domain => {
+    const editedData = editedDomains[domain.id];
+    if (editedData) {
+      return {
+        ...domain,
+        ...editedData,
+        id: domain.id,
+        registrationDate: domain.registrationDate,
+        expirationDate: domain.expirationDate,
+        createdAt: domain.createdAt,
+      };
+    }
+    return domain;
+  });
+
+  // Load labels, assignments, and edited domains from localStorage
   useEffect(() => {
-    try {
-      const savedLabels = localStorage.getItem('domainLabels');
-      const savedAssignments = localStorage.getItem('domainLabelAssignments');
-      
-      if (savedLabels) {
-        setLabels(JSON.parse(savedLabels));
-      } else {
+    const loadData = () => {
+      try {
+        const savedLabels = localStorage.getItem('domainLabels');
+        const savedAssignments = localStorage.getItem('domainLabelAssignments');
+        const savedEditedDomains = localStorage.getItem('editedDomains');
+        
+        if (savedLabels) {
+          setLabels(JSON.parse(savedLabels));
+        } else {
+          setLabels(mockLabels);
+        }
+        
+        if (savedAssignments) {
+          setDomainLabelAssignments(JSON.parse(savedAssignments));
+        }
+
+        if (savedEditedDomains) {
+          setEditedDomains(JSON.parse(savedEditedDomains));
+        }
+      } catch (error) {
+        console.error('Failed to load data from localStorage:', error);
         setLabels(mockLabels);
       }
-      
-      if (savedAssignments) {
-        setDomainLabelAssignments(JSON.parse(savedAssignments));
-      }
-    } catch (error) {
-      console.error('Failed to load labels from localStorage:', error);
-      setLabels(mockLabels);
-    }
+    };
+
+    loadData();
+
+    // Reload when window gains focus
+    window.addEventListener('focus', loadData);
+    
+    // Check periodically for changes
+    const interval = setInterval(loadData, 1000);
+
+    return () => {
+      window.removeEventListener('focus', loadData);
+      clearInterval(interval);
+    };
   }, []);
 
   // Debounced search
   useEffect(() => {
     const timer = setTimeout(() => {
       if (query.trim().length > 0) {
-        const filtered = mockDomains.filter(domain =>
+        const filtered = domains.filter(domain =>
           domain.name.toLowerCase().includes(query.toLowerCase())
         );
         setResults(filtered.slice(0, MAX_RESULTS));
@@ -57,7 +94,7 @@ export function DomainSearch() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [query, domains]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -88,7 +125,7 @@ export function DomainSearch() {
     return labelId ? labels.find(l => l.id === labelId) : undefined;
   };
 
-  const totalResults = mockDomains.filter(domain =>
+  const totalResults = domains.filter(domain =>
     domain.name.toLowerCase().includes(query.toLowerCase())
   ).length;
 
