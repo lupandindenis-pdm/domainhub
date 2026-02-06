@@ -2382,7 +2382,7 @@ export default function DomainDetail() {
 
                                   const validNs = formData.nsServers.filter(ns => ns && ns.trim());
 
-                                  navigator.clipboard.writeText(validNs.join(", "));
+                                  navigator.clipboard.writeText(validNs.join(" "));
 
                                   toast.success("NS-записи скопированы");
 
