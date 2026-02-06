@@ -8,7 +8,8 @@ export type DomainType =
   | "redirect"
   | "technical"
   | "product"
-  | "b2b";
+  | "b2b"
+  | "unknown";
 
 export type DomainStatus = "spare" | "actual" | "not_actual" | "not_configured" | "unknown" | "expiring" | "expired" | "blocked" | "test";
 

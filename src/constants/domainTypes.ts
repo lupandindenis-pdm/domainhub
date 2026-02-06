@@ -18,7 +18,8 @@ import {
   ArrowRight,
   Wrench,
   Package,
-  Briefcase
+  Briefcase,
+  HelpCircle
 } from "lucide-react";
 
 /**
@@ -36,6 +37,7 @@ export const DOMAIN_TYPE_LABELS: Record<DomainType, string> = {
   technical: "Технический",
   product: "Домен продукта",
   b2b: "B2B",
+  unknown: "Не известно",
 };
 
 /**
@@ -82,12 +84,17 @@ export const DOMAIN_TYPE_CONFIG: Record<DomainType, { label: string; icon: Lucid
     label: DOMAIN_TYPE_LABELS.b2b,
     icon: Briefcase
   },
+  unknown: {
+    label: DOMAIN_TYPE_LABELS.unknown,
+    icon: HelpCircle
+  },
 };
 
 /**
  * Массив типов для использования в фильтрах и селектах
  */
 export const DOMAIN_TYPES: { value: DomainType; label: string }[] = [
+  { value: "unknown", label: DOMAIN_TYPE_LABELS.unknown },
   { value: "landing", label: DOMAIN_TYPE_LABELS.landing },
   { value: "seo", label: DOMAIN_TYPE_LABELS.seo },
   { value: "mirror", label: DOMAIN_TYPE_LABELS.mirror },
