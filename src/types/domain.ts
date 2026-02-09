@@ -83,9 +83,14 @@ export interface Domain {
   
   // Partnership
   isInProgram?: boolean;
+  isInProgramStatus?: string;
   programStatus?: ProgramStatus;
   companyName?: string;
   programLink?: string;
+  
+  // Dates
+  purchaseDate?: string;
+  renewalDate?: string;
   
   // General
   landingName?: string;
