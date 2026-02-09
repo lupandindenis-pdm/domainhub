@@ -705,7 +705,9 @@ export default function DomainDetail() {
 
       partnershipNote: '',
 
-      integrationsNote: ''
+      integrationsNote: '',
+
+      labelId: domain?.labelId
 
     });
 
@@ -718,6 +720,9 @@ export default function DomainDetail() {
   // Load edited data from localStorage or reset to domain data
 
   useEffect(() => {
+
+    // Для нового домена не загружаем данные
+    if (isNewDomain) return;
 
     if (!id || !domain) return;
 
@@ -761,7 +766,8 @@ export default function DomainDetail() {
       itNote: '',
       analyticsNote: '',
       partnershipNote: '',
-      integrationsNote: ''
+      integrationsNote: '',
+      labelId: domain.labelId
     };
 
     try {
@@ -1081,7 +1087,7 @@ export default function DomainDetail() {
 
               </div>
 
-              <Button onClick={() => { ensureDefaults(); setIsEditing(true); }} className="gap-2 w-[144px]">
+              <Button onClick={() => setIsEditing(true)} className="gap-2 w-[144px]">
 
                 <Edit className="h-4 w-4" />
 
