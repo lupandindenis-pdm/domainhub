@@ -49,6 +49,49 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
   const navigate = useNavigate();
   const { t } = useLanguage();
 
+  // Validate domain name
+  const validateDomain = (domain: string): string => {
+    if (!domain || domain.trim() === '') {
+      return 'Домен не может быть пустым';
+    }
+    
+    // Remove protocol and www if present for validation
+    let cleanDomain = domain.trim();
+    cleanDomain = cleanDomain.replace(/^https?:\/\//, '');
+    cleanDomain = cleanDomain.replace(/^www\./, '');
+    cleanDomain = cleanDomain.replace(/\/$/, '');
+    
+    // Check for spaces
+    if (cleanDomain.includes(' ')) {
+      return 'Домен не может содержать пробелы';
+    }
+    
+    // Check for invalid characters
+    const invalidChars = /[^a-zA-Z0-9.\/:#?&=_-]/;
+    if (invalidChars.test(cleanDomain)) {
+      return 'Домен содержит недопустимые символы';
+    }
+    
+    // Check if domain has at least one dot (unless it's localhost)
+    if (!cleanDomain.includes('.') && !cleanDomain.startsWith('localhost')) {
+      return 'Домен должен содержать хотя бы одну точку (например: example.com)';
+    }
+    
+    // Check domain length
+    if (cleanDomain.length > 253) {
+      return 'Домен слишком длинный (максимум 253 символа)';
+    }
+    
+    // Check if domain starts or ends with dash or dot
+    const parts = cleanDomain.split('/');
+    const domainPart = parts[0];
+    if (domainPart.startsWith('-') || domainPart.endsWith('-') || domainPart.startsWith('.') || domainPart.endsWith('.')) {
+      return 'Домен не может начинаться или заканчиваться дефисом или точкой';
+    }
+    
+    return '';
+  };
+
   const handleRowClick = (domainId: string) => {
     // В режиме быстрого редактирования не переходим в карточку
     if (quickEditMode) {
@@ -132,10 +175,20 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                           <Input
                             value={domain.name}
                             onChange={(e) => {
-                              onUpdateDomain(domain.id, { name: e.target.value });
+                              const newValue = e.target.value;
+                              const validationError = validateDomain(newValue);
+                              
+                              if (validationError) {
+                                toast.error(validationError);
+                              } else {
+                                onUpdateDomain(domain.id, { name: newValue });
+                              }
                             }}
-                            onBlur={() => {
-                              toast.success("Домен обновлен");
+                            onBlur={(e) => {
+                              const validationError = validateDomain(e.target.value);
+                              if (!validationError) {
+                                toast.success("Домен обновлен");
+                              }
                             }}
                             onClick={(e) => e.stopPropagation()}
                             className="h-8 font-mono text-sm bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary"
