@@ -57,7 +57,7 @@ const translations: Translations = {
     "badges.technical": "Тех. домен",
     "badges.b2b": "B2B",
     "badges.site": "Сайт",
-    "badges.unknown": "Неизвестно",
+    "badges.unknown": "Не известно",
 
     "status.spare": "Запасной",
     "status.actual": "Актуален",

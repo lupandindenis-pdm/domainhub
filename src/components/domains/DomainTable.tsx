@@ -182,7 +182,7 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                       <Copy className="h-4 w-4" />
                     </Button>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-2">
                         {quickEditMode && onUpdateDomain ? (
                           <Input
                             value={domain.name}
@@ -216,12 +216,12 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                             )}
                           />
                         ) : (
-                          <span className="font-mono text-sm font-normal break-all line-clamp-2 max-w-xs" style={{ textWrap: 'balance', display: 'inline-block' }}>
+                          <span className="font-mono text-sm font-normal break-all line-clamp-2 max-w-xs inline-flex items-center gap-1">
                             {domain.name}
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 inline-flex items-center justify-center ml-1 align-middle text-muted-foreground hover:text-primary"
+                              className="h-5 w-5 inline-flex items-center justify-center shrink-0 text-muted-foreground hover:text-primary"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const url = `https://${domain.name}`;

@@ -22,7 +22,7 @@ export function LabelBadge({ label, className }: LabelBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center px-2.5 rounded-full text-xs font-medium whitespace-nowrap text-white/70 h-6",
+        "inline-flex items-center justify-center px-2.5 py-0 rounded-full text-xs font-medium whitespace-nowrap text-white/70 h-6 leading-none",
         className
       )}
       style={{

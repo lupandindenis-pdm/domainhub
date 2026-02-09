@@ -115,7 +115,7 @@ export const DOMAIN_STATUS_LABELS: Record<DomainStatus, string> = {
   actual: "Актуальный",
   not_actual: "Неактуальный",
   not_configured: "Не настроен",
-  unknown: "Неизвестно",
+  unknown: "Не известно",
   expiring: "Истекает",
   expired: "Истек",
   blocked: "Заблокирован",

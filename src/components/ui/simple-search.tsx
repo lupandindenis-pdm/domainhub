@@ -103,7 +103,7 @@ export function SimpleSearch({ placeholder = "Поиск домена...", class
       expiring: "Истекает",
       expired: "Истёк",
       not_configured: "Не настроен",
-      unknown: "Неизвестно",
+      unknown: "Не известно",
       spare: "Запасной"
     };
     return labels[status] || status;

@@ -1632,7 +1632,7 @@ export default function DomainDetail() {
               <div className="flex items-center gap-2">
                 <RotateCcw className="h-4 w-4" />
                 <span>Последнее изменение: </span>
-                <span>{(domain as any).updatedAt ? new Date((domain as any).updatedAt).toLocaleDateString() : 'Не изменялся'}</span>
+                <span>{'updatedAt' in domain && domain.updatedAt ? new Date(domain.updatedAt as string).toLocaleDateString() : 'Не изменялся'}</span>
               </div>
 
             </div>
