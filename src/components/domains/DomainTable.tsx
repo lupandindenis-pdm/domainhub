@@ -138,7 +138,7 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                               toast.success("Домен обновлен");
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className="h-8 font-mono text-sm bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary"
+                            className="h-8 font-mono text-sm bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary"
                           />
                         ) : (
                           <span className="font-mono text-sm font-normal break-all line-clamp-2 max-w-xs" style={{ textWrap: 'balance', display: 'inline-block' }}>
