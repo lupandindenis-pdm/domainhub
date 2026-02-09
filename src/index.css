@@ -189,3 +189,10 @@
 .editing-mode label svg {
   color: #a16207; /* yellow-700 - less bright */
 }
+
+/* Placeholder for new domain name input */
+[contenteditable][data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground));
+  opacity: 0.5;
+}

@@ -130,7 +130,10 @@ export default function DomainDetail() {
 
   
 
-  const domain = mockDomains.find((d) => d.id === id);
+  // Определяем режим создания нового домена
+  const isNewDomain = id === 'new';
+
+  const domain = isNewDomain ? null : mockDomains.find((d) => d.id === id);
 
   
 
@@ -148,9 +151,15 @@ export default function DomainDetail() {
 
   const [isIntegrationsNoteOpen, setIsIntegrationsNoteOpen] = useState(false);
 
-  const [isEditing, setIsEditing] = useState(false);
+  // Для нового домена сразу включаем режим редактирования
+  const [isEditing, setIsEditing] = useState(isNewDomain);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const [domainError, setDomainError] = useState<string>('');
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editableDivRef = useRef<HTMLDivElement>(null);
 
   // Normalize category and bonus values - if not in list, use default
   const normalizeValue = (value: string, list: string[]) => {
@@ -158,101 +167,96 @@ export default function DomainDetail() {
     return list.includes(value) ? value : list[0] || '';
   };
 
-  // Ensure category and bonus have default values when entering edit mode
-  const ensureDefaults = () => {
-    setFormData(prev => ({
-      ...prev,
-      category: normalizeValue(prev.category, marketingCategories),
-      bonus: normalizeValue(prev.bonus, bonusTypes)
-    }));
-  };
-
-  const [domainError, setDomainError] = useState<string>('');
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const editableDivRef = useRef<HTMLDivElement>(null);
-
   
 
-  // Form data state
+  // Form data state - дефолтные значения для нового домена
 
-  const [formData, setFormData] = useState({
+  const getDefaultFormData = () => {
+    if (isNewDomain) {
+      return {
+        name: '',
+        type: 'unknown',
+        status: 'unknown',
+        geo: [],
+        blockedGeo: [],
+        department: 'Other',
+        project: 'Не известно',
+        category: 'Нет',
+        direction: 'Нет',
+        targetAction: 'Нет',
+        bonus: 'Нет',
+        needsUpdate: 'Нет',
+        jiraTask: '',
+        fileHosting: '',
+        registrar: '',
+        nsServers: [],
+        techIssues: [],
+        hasTechIssues: 'Нет',
+        jiraTaskIT: '',
+        testMethod: 'Не известно',
+        purchaseDate: '',
+        renewalDate: '',
+        gaId: '',
+        gtmId: '',
+        isInProgram: false,
+        isInProgramStatus: 'Нет',
+        programLink: '',
+        companyName: '',
+        programStatus: 'Не известно',
+        oneSignalId: '',
+        cloudflareAccount: '',
+        description: '',
+        marketingNote: '',
+        itNote: '',
+        analyticsNote: '',
+        partnershipNote: '',
+        integrationsNote: '',
+        labelId: undefined,
+      };
+    }
+    return {
+      name: domain?.name || '',
+      type: domain?.type || '',
+      status: domain?.status || '',
+      geo: domain?.geo || [],
+      blockedGeo: domain?.blockedGeo || [],
+      department: domain?.department || '',
+      project: domain?.project || '',
+      category: normalizeValue(domain?.category || '', marketingCategories),
+      direction: domain?.direction || "Не выбрано",
+      targetAction: domain?.targetAction || "Не выбрано",
+      bonus: normalizeValue(domain?.bonus || '', bonusTypes),
+      needsUpdate: domain?.needsUpdate || "Нет",
+      jiraTask: domain?.jiraTask || '',
+      fileHosting: domain?.fileHosting || '',
+      registrar: domain?.registrar || '',
+      nsServers: domain?.nsServers || [],
+      techIssues: domain?.techIssues || [],
+      hasTechIssues: domain?.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет",
+      jiraTaskIT: Array.isArray(domain?.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain?.jiraTaskIT || ''),
+      testMethod: domain?.testMethod || 'Не известно',
+      purchaseDate: domain?.purchaseDate || '',
+      renewalDate: domain?.renewalDate || '',
+      gaId: domain?.gaId || '',
+      gtmId: domain?.gtmId || '',
+      isInProgram: domain?.isInProgram || false,
+      isInProgramStatus: domain?.isInProgram ? "Да" : (domain?.isInProgramStatus || "Не известно"),
+      programLink: domain?.programLink || '',
+      companyName: domain?.companyName || '',
+      programStatus: domain?.programStatus || 'Не известно',
+      oneSignalId: domain?.oneSignalId || '',
+      cloudflareAccount: domain?.cloudflareAccount || '',
+      description: domain?.description || '',
+      marketingNote: '',
+      itNote: '',
+      analyticsNote: '',
+      partnershipNote: '',
+      integrationsNote: '',
+      labelId: domain?.labelId,
+    };
+  };
 
-    name: domain?.name || '',
-
-    type: domain?.type || '',
-
-    status: domain?.status || '',
-
-    geo: domain?.geo || [],
-
-    blockedGeo: domain?.blockedGeo || [],
-
-    department: domain?.department || '',
-
-    project: domain?.project || '',
-
-    category: normalizeValue(domain?.category || '', marketingCategories),
-
-    direction: domain?.direction || "Не выбрано",
-
-    targetAction: domain?.targetAction || "Не выбрано",
-
-    bonus: normalizeValue(domain?.bonus || '', bonusTypes),
-
-    needsUpdate: domain?.needsUpdate || "Нет",
-
-    jiraTask: domain?.jiraTask || '',
-
-    fileHosting: domain?.fileHosting || '',
-
-    registrar: domain?.registrar || '',
-
-    nsServers: domain?.nsServers || [],
-
-    techIssues: domain?.techIssues || [],
-
-    hasTechIssues: domain?.techIssues && domain.techIssues.length > 0 ? "Да" : "Нет",
-
-    jiraTaskIT: Array.isArray(domain?.jiraTaskIT) ? domain.jiraTaskIT.join(', ') : (domain?.jiraTaskIT || ''),
-
-    testMethod: domain?.testMethod || 'Не известно',
-
-    purchaseDate: domain?.purchaseDate || '',
-
-    renewalDate: domain?.renewalDate || '',
-
-    gaId: domain?.gaId || '',
-
-    gtmId: domain?.gtmId || '',
-
-    isInProgram: domain?.isInProgram || false,
-
-    isInProgramStatus: domain?.isInProgram ? "Да" : (domain?.isInProgramStatus || "Не известно"),
-
-    programLink: domain?.programLink || '',
-
-    companyName: domain?.companyName || '',
-
-    programStatus: domain?.programStatus || 'Не известно',
-
-    oneSignalId: domain?.oneSignalId || '',
-
-    cloudflareAccount: domain?.cloudflareAccount || '',
-
-    description: domain?.description || '',
-
-    marketingNote: '',
-
-    itNote: '',
-
-    analyticsNote: '',
-
-    partnershipNote: '',
-
-    integrationsNote: ''
-
-  });
+  const [formData, setFormData] = useState(getDefaultFormData());
 
   
 
@@ -507,7 +511,11 @@ export default function DomainDetail() {
 
       setDomainError(error);
 
-      toast.error('Исправьте ошибки перед сохранением');
+      toast.error(error, {
+        style: {
+          color: '#EAB308',
+        },
+      });
 
       return;
 
@@ -536,6 +544,20 @@ export default function DomainDetail() {
       const editedDomains = savedDomains ? JSON.parse(savedDomains) : {};
 
       const updatedAt = new Date().toISOString();
+
+      
+
+      // Для нового домена генерируем ID и перенаправляем
+
+      if (isNewDomain) {
+        const newId = `new-${Date.now()}`;
+        editedDomains[newId] = { ...formData, name: cleanedName, updatedAt, id: newId };
+        localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
+        
+        toast.success('Домен создан');
+        navigate(`/domains/${newId}`);
+        return;
+      }
 
       editedDomains[id!] = { ...formData, name: cleanedName, updatedAt };
 
@@ -763,7 +785,8 @@ export default function DomainDetail() {
 
 
 
-  if (!domain) {
+  // Для нового домена не показываем ошибку "не найден"
+  if (!domain && !isNewDomain) {
 
     return (
 
@@ -785,7 +808,7 @@ export default function DomainDetail() {
 
 
 
-  const daysLeft = differenceInDays(parseISO(domain.expirationDate), new Date());
+  const daysLeft = domain ? differenceInDays(parseISO(domain.expirationDate), new Date()) : 0;
 
 
 
@@ -894,6 +917,8 @@ export default function DomainDetail() {
                         className="text-2xl font-bold font-mono tracking-tight bg-transparent outline-none px-2 w-full transition-colors break-all text-green-400"
 
                         style={{ textWrap: 'balance' }}
+
+                        data-placeholder={isNewDomain && !formData.name ? "Введите имя домена..." : ""}
 
                       />
 
