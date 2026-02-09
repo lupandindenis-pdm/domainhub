@@ -78,7 +78,7 @@ const translations: Translations = {
     "management": "Управление",
     "admin": "Администрирование",
     "admin.role": "Администратор",
-    "app.title": "DMS",
+    "app.title": "DCP",
     "app.subtitle": "Domain Management",
   },
   en: {
@@ -150,7 +150,7 @@ const translations: Translations = {
     "management": "Management",
     "admin": "Administration",
     "admin.role": "Administrator",
-    "app.title": "DMS",
+    "app.title": "DCP",
     "app.subtitle": "Domain Management",
   }
 }
