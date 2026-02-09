@@ -43,11 +43,13 @@ interface DomainTableProps {
   labels: Label[];
   quickEditMode?: boolean;
   onUpdateDomain?: (domainId: string, updates: Partial<Domain>) => void;
+  onToggleQuickEditMode?: () => void;
 }
 
-export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onToggleDomain, showHidden = false, labels, quickEditMode = false, onUpdateDomain }: DomainTableProps) {
+export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onToggleDomain, showHidden = false, labels, quickEditMode = false, onUpdateDomain, onToggleQuickEditMode }: DomainTableProps) {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Validate domain name
   const validateDomain = (domain: string): string => {
@@ -87,6 +89,16 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
     const domainPart = parts[0];
     if (domainPart.startsWith('-') || domainPart.endsWith('-') || domainPart.startsWith('.') || domainPart.endsWith('.')) {
       return 'Домен не может начинаться или заканчиваться дефисом или точкой';
+    }
+    
+    // Check TLD (top-level domain) - должна состоять только из букв
+    const domainSegments = domainPart.split('.');
+    if (domainSegments.length > 1) {
+      const tld = domainSegments[domainSegments.length - 1];
+      // TLD должна содержать только буквы (a-z, A-Z), минимум 2 символа
+      if (!/^[a-zA-Z]{2,}$/.test(tld)) {
+        return 'Доменная зона должна состоять только из букв (например: .com, .ru, .org)';
+      }
     }
     
     return '';
@@ -176,22 +188,32 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                             value={domain.name}
                             onChange={(e) => {
                               const newValue = e.target.value;
-                              const validationError = validateDomain(newValue);
+                              // Разрешаем ввод любых символов, валидация будет при выходе из режима
+                              onUpdateDomain(domain.id, { name: newValue });
                               
-                              if (validationError) {
-                                toast.error(validationError);
-                              } else {
-                                onUpdateDomain(domain.id, { name: newValue });
-                              }
+                              // Обновляем состояние ошибок валидации для реактивного изменения обводки
+                              const error = validateDomain(newValue);
+                              setValidationErrors(prev => ({
+                                ...prev,
+                                [domain.id]: error
+                              }));
                             }}
-                            onBlur={(e) => {
-                              const validationError = validateDomain(e.target.value);
-                              if (!validationError) {
-                                toast.success("Домен обновлен");
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                // Вызываем функцию выхода из режима быстрого редактирования (сохранение)
+                                if (onToggleQuickEditMode) {
+                                  onToggleQuickEditMode();
+                                }
                               }
                             }}
                             onClick={(e) => e.stopPropagation()}
-                            className="h-8 font-mono text-sm bg-muted/30 border-none focus-visible:ring-1 focus-visible:ring-primary"
+                            className={cn(
+                              "h-8 font-mono text-sm bg-muted/30 border-none",
+                              validationErrors[domain.id]
+                                ? "ring-1 ring-yellow-500" 
+                                : "focus-visible:ring-1 focus-visible:ring-primary"
+                            )}
                           />
                         ) : (
                           <span className="font-mono text-sm font-normal break-all line-clamp-2 max-w-xs" style={{ textWrap: 'balance', display: 'inline-block' }}>

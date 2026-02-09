@@ -216,6 +216,30 @@ export default function Domains() {
 
   const handleToggleQuickEditMode = () => {
     const newMode = !quickEditMode;
+    
+    // При выходе из режима редактирования - валидируем все домены
+    if (!newMode && quickEditMode) {
+      const invalidDomains: string[] = [];
+      
+      // Проверяем все домены на валидность
+      domains.forEach(domain => {
+        const validationError = validateDomain(domain.name);
+        if (validationError) {
+          invalidDomains.push(domain.name);
+        }
+      });
+      
+      if (invalidDomains.length > 0) {
+        toast.error("Обнаружены ошибки валидации", {
+          description: `Невалидные домены: ${invalidDomains.slice(0, 3).join(', ')}${invalidDomains.length > 3 ? '...' : ''}`,
+          style: {
+            color: '#EAB308', // yellow-500
+          },
+        });
+        return; // Не выходим из режима редактирования
+      }
+    }
+    
     setQuickEditMode(newMode);
     if (newMode) {
       // Отключаем режим множественного выбора при включении быстрого редактирования
@@ -227,6 +251,59 @@ export default function Domains() {
     } else {
       toast.info("Режим быстрого редактирования выключен");
     }
+  };
+  
+  // Validate domain name
+  const validateDomain = (domain: string): string => {
+    if (!domain || domain.trim() === '') {
+      return 'Домен не может быть пустым';
+    }
+    
+    // Remove protocol and www if present for validation
+    let cleanDomain = domain.trim();
+    cleanDomain = cleanDomain.replace(/^https?:\/\//, '');
+    cleanDomain = cleanDomain.replace(/^www\./, '');
+    cleanDomain = cleanDomain.replace(/\/$/, '');
+    
+    // Check for spaces
+    if (cleanDomain.includes(' ')) {
+      return 'Домен не может содержать пробелы';
+    }
+    
+    // Check for invalid characters
+    const invalidChars = /[^a-zA-Z0-9.\/:#?&=_-]/;
+    if (invalidChars.test(cleanDomain)) {
+      return 'Домен содержит недопустимые символы';
+    }
+    
+    // Check if domain has at least one dot (unless it's localhost)
+    if (!cleanDomain.includes('.') && !cleanDomain.startsWith('localhost')) {
+      return 'Домен должен содержать хотя бы одну точку';
+    }
+    
+    // Check domain length
+    if (cleanDomain.length > 253) {
+      return 'Домен слишком длинный (максимум 253 символа)';
+    }
+    
+    // Check if domain starts or ends with dash or dot
+    const parts = cleanDomain.split('/');
+    const domainPart = parts[0];
+    if (domainPart.startsWith('-') || domainPart.endsWith('-') || domainPart.startsWith('.') || domainPart.endsWith('.')) {
+      return 'Домен не может начинаться или заканчиваться дефисом или точкой';
+    }
+    
+    // Check TLD (top-level domain) - должна состоять только из букв
+    const domainSegments = domainPart.split('.');
+    if (domainSegments.length > 1) {
+      const tld = domainSegments[domainSegments.length - 1];
+      // TLD должна содержать только буквы (a-z, A-Z), минимум 2 символа
+      if (!/^[a-zA-Z]{2,}$/.test(tld)) {
+        return 'Доменная зона должна состоять только из букв (например: .com, .ru, .org)';
+      }
+    }
+    
+    return '';
   };
 
   const handleToggleDomain = (domainId: string) => {
@@ -436,6 +513,7 @@ export default function Domains() {
         labels={labels}
         quickEditMode={quickEditMode}
         onUpdateDomain={handleUpdateDomain}
+        onToggleQuickEditMode={handleToggleQuickEditMode}
       />
 
       {filteredDomains.length === 0 && (

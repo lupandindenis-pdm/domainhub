@@ -43,6 +43,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 import { Textarea } from "@/components/ui/textarea";
 
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 import { cn } from "@/lib/utils";
 
 import { projects, departments, marketingCategories, departmentConfig, bonusTypes, marketingDirections, needsUpdateOptions, targetActions } from "@/data/mockDomains";
@@ -96,7 +98,9 @@ import {
 
   Tag,
 
-  Check
+  Check,
+
+  Trash2
 
 } from "lucide-react";
 
@@ -145,6 +149,8 @@ export default function DomainDetail() {
   const [isIntegrationsNoteOpen, setIsIntegrationsNoteOpen] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Normalize category and bonus values - if not in list, use default
   const normalizeValue = (value: string, list: string[]) => {
@@ -1152,7 +1158,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <Tag className="h-4 w-4" />
+                      <Tag className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       Тип
 
@@ -1213,7 +1219,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <Globe className="h-4 w-4" />
+                      <Globe className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       GEO (используется)
 
@@ -1243,7 +1249,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <BarChart3 className="h-4 w-4" />
+                      <BarChart3 className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       Проект
 
@@ -1319,7 +1325,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <Activity className="h-4 w-4" />
+                      <Activity className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       Статус
 
@@ -1384,7 +1390,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <Ban className="h-4 w-4" />
+                      <Ban className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       GEO (блокировка)
 
@@ -1418,7 +1424,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <Users className="h-4 w-4" />
+                      <Users className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       Отдел
 
@@ -1497,7 +1503,7 @@ export default function DomainDetail() {
 
                      <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                         <FileText className="h-4 w-4" />
+                         <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                          Комментарий
 
@@ -1599,7 +1605,7 @@ export default function DomainDetail() {
 
           {/* Author and Date - moved to bottom as less important info */}
 
-          <div className="flex flex-wrap justify-between gap-6 text-sm text-muted-foreground px-6">
+          <div className="flex flex-wrap justify-between items-center gap-6 text-sm text-muted-foreground px-6">
 
             <div className="flex flex-wrap gap-6">
 
@@ -1623,17 +1629,22 @@ export default function DomainDetail() {
 
               </div>
 
-            </div>
-
-            <div className="flex items-center gap-2">
-
-              <RotateCcw className="h-4 w-4" />
-
-              <span>Последнее изменение: </span>
-
-              <span>{formData.updatedAt ? new Date(formData.updatedAt).toLocaleDateString() : 'Не изменялся'}</span>
+              <div className="flex items-center gap-2">
+                <RotateCcw className="h-4 w-4" />
+                <span>Последнее изменение: </span>
+                <span>{(domain as any).updatedAt ? new Date((domain as any).updatedAt).toLocaleDateString() : 'Не изменялся'}</span>
+              </div>
 
             </div>
+
+            <Button 
+              variant="ghost" 
+              className="gap-2 text-muted-foreground hover:text-destructive hover:bg-transparent"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              <Trash2 className="h-4 w-4" />
+              Удалить
+            </Button>
 
           </div>
 
@@ -1699,7 +1710,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Tag className="h-4 w-4" />
+                          <Tag className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Категория
 
@@ -1755,7 +1766,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <BarChart3 className="h-4 w-4" />
+                          <BarChart3 className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Направление
 
@@ -1811,7 +1822,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Activity className="h-4 w-4" />
+                          <Activity className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Целевое действие
 
@@ -1873,7 +1884,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Tag className="h-4 w-4" />
+                          <Tag className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Бонус
 
@@ -1929,7 +1940,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <AlertCircle className="h-4 w-4" />
+                          <AlertCircle className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Требует обновления
 
@@ -1985,7 +1996,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <FileText className="h-4 w-4" />
+                          <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Ссылка на задачу Jira
 
@@ -2063,7 +2074,7 @@ export default function DomainDetail() {
 
                       <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                        <FileText className="h-4 w-4" />
+                        <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                         Примечание
 
@@ -2181,7 +2192,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Server className="h-4 w-4" />
+                          <Server className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Хостинг файлов
 
@@ -2249,7 +2260,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Globe className="h-4 w-4" />
+                          <Globe className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Регистратор
 
@@ -2317,7 +2328,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Server className="h-4 w-4" />
+                          <Server className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           NS-записи
 
@@ -2417,7 +2428,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <AlertCircle className="h-4 w-4" />
+                          <AlertCircle className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Тех. ограничения
 
@@ -2479,7 +2490,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <FileText className="h-4 w-4" />
+                          <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Ссылка на Jira
 
@@ -2547,7 +2558,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <CalendarIcon className="h-4 w-4" />
+                          <CalendarIcon className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Дата покупки
 
@@ -2611,7 +2622,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <CalendarIcon className="h-4 w-4" />
+                          <CalendarIcon className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Дата продления
 
@@ -2675,7 +2686,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Code2 className="h-4 w-4" />
+                          <Code2 className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Метод тестирования
 
@@ -2743,7 +2754,7 @@ export default function DomainDetail() {
 
                       <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                        <FileText className="h-4 w-4" />
+                        <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                         Примечание
 
@@ -2835,7 +2846,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <BarChart3 className="h-4 w-4" />
+                          <BarChart3 className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Номер счетчика GA
 
@@ -2909,7 +2920,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Code2 className="h-4 w-4" />
+                          <Code2 className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Номер счетчика GTM
 
@@ -2989,7 +3000,7 @@ export default function DomainDetail() {
 
                       <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                        <FileText className="h-4 w-4" />
+                        <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                         Примечание
 
@@ -3081,7 +3092,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Users className="h-4 w-4" />
+                          <Users className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Наличие в ПП
 
@@ -3137,7 +3148,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <FileText className="h-4 w-4" />
+                          <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Ссылка в ПП
 
@@ -3171,7 +3182,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Tag className="h-4 w-4" />
+                          <Tag className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Имя компании
 
@@ -3199,7 +3210,7 @@ export default function DomainDetail() {
 
                         <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                          <Activity className="h-4 w-4" />
+                          <Activity className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                           Статус в ПП
 
@@ -3267,7 +3278,7 @@ export default function DomainDetail() {
 
                       <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                        <FileText className="h-4 w-4" />
+                        <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                         Примечание
 
@@ -3365,7 +3376,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <Layers className="h-4 w-4" />
+                      <Layers className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       OneSignal App ID
 
@@ -3399,7 +3410,7 @@ export default function DomainDetail() {
 
                     <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                      <Globe className="h-4 w-4" />
+                      <Globe className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                       CloudFlare аккаунт
 
@@ -3439,7 +3450,7 @@ export default function DomainDetail() {
 
                   <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
 
-                    <FileText className="h-4 w-4" />
+                    <FileText className={`h-4 w-4 ${isEditing ? '!text-green-600' : ''}`} />
 
                     Примечание
 
@@ -3512,6 +3523,49 @@ export default function DomainDetail() {
         </TabsContent>
 
       </Tabs>
+
+      {/* Dialog подтверждения удаления */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Подтверждение удаления
+            </DialogTitle>
+            <DialogDescription className="pt-4">
+              Вы уверены, что хотите удалить домен <span className="font-semibold text-foreground">{domain.name}</span>?
+              <br />
+              <br />
+              Это действие нельзя будет отменить.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              className="gap-2"
+            >
+              Нет, еще подумаю
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                // Логика удаления домена
+                toast.success("Домен удален", {
+                  description: `${domain.name} был успешно удален`,
+                });
+                setShowDeleteDialog(false);
+                // Переход на страницу со списком доменов
+                navigate('/domains');
+              }}
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Да, удаляю
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
 
