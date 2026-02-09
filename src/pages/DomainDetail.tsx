@@ -762,7 +762,7 @@ export default function DomainDetail() {
       programStatus: domain.programStatus || 'Не известно',
       oneSignalId: domain.oneSignalId || '',
       cloudflareAccount: domain.cloudflareAccount || '',
-      description: domain.description || '',
+      description: domain?.description || '',
       marketingNote: '',
       itNote: '',
       analyticsNote: '',
@@ -871,9 +871,9 @@ export default function DomainDetail() {
 
 
 
-  const statusColorClass = statusColors[formData.status || domain.status] || "bg-muted/50";
+  const statusColorClass = statusColors[formData.status || domain?.status || 'unknown'] || "bg-muted/50";
 
-  const typeColorClass = typeColors[formData.type || domain.type] || "bg-muted/50";
+  const typeColorClass = typeColors[formData.type || domain?.type || 'unknown'] || "bg-muted/50";
 
 
 
@@ -955,7 +955,7 @@ export default function DomainDetail() {
 
                         try {
 
-                          navigator.clipboard.writeText(formData.name || domain.name);
+                          navigator.clipboard.writeText(formData.name || domain?.name || '');
 
                           toast.success("Домен скопирован в буфер обмена");
 
@@ -969,13 +969,13 @@ export default function DomainDetail() {
 
                       onDoubleClick={() => {
 
-                        window.open(`https://${formData.name || domain.name}`, "_blank");
+                        window.open(`https://${formData.name || domain?.name || ''}`, "_blank");
 
                       }}
 
                     >
 
-                      {formData.name || domain.name}
+                      {formData.name || domain?.name || ''}
 
                     </div>
 
@@ -1048,7 +1048,7 @@ export default function DomainDetail() {
 
                       color,
 
-                      projectId: domain.project,
+                      projectId: domain?.project || formData.project || '',
 
                     };
 
@@ -1237,7 +1237,7 @@ export default function DomainDetail() {
 
                       <div className={cn("flex items-center h-10 px-3 rounded-md border-none text-sm truncate", typeColorClass)}>
 
-                        {DOMAIN_TYPE_LABELS[formData.type || domain.type]}
+                        {DOMAIN_TYPE_LABELS[formData.type || domain?.type || 'unknown']}
 
                       </div>
 
@@ -1335,7 +1335,7 @@ export default function DomainDetail() {
 
                       <Input 
 
-                        value={formData.project || domain.project} 
+                        value={formData.project || domain?.project || ''} 
 
                         readOnly
 
@@ -1406,7 +1406,7 @@ export default function DomainDetail() {
 
                         <span className="text-sm">
 
-                           {DOMAIN_STATUS_LABELS[formData.status || domain.status]}
+                           {DOMAIN_STATUS_LABELS[formData.status || domain?.status || 'unknown']}
 
                         </span>
 
@@ -1442,7 +1442,7 @@ export default function DomainDetail() {
 
                       <ReadOnlyGeoView 
 
-                        selected={formData.blockedGeo || domain.blockedGeo || []} 
+                        selected={formData.blockedGeo || domain?.blockedGeo || []} 
 
                       />
 
@@ -1511,7 +1511,7 @@ export default function DomainDetail() {
 
                     ) : (
 
-                      <Input value={formData.department || domain.department} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
+                      <Input value={formData.department || domain?.department || ''} readOnly className="bg-muted/50 text-base border-none focus-visible:ring-0" />
 
                     )}
 
@@ -1595,19 +1595,19 @@ export default function DomainDetail() {
 
                    >
 
-                     {formData.description || domain.description ? (
+                     {formData.description || domain?.description ? (
 
                        <span className="text-muted-foreground">
 
                          {isDescriptionOpen 
 
-                           ? (formData.description || domain.description)
+                           ? (formData.description || domain?.description)
 
-                           : ((formData.description || domain.description).length > 100 
+                           : ((formData.description || domain?.description || '').length > 100 
 
-                               ? `${(formData.description || domain.description).substring(0, 100)}...` 
+                               ? `${(formData.description || domain?.description || '').substring(0, 100)}...` 
 
-                               : (formData.description || domain.description)
+                               : (formData.description || domain?.description)
 
                              )
 
@@ -1647,7 +1647,7 @@ export default function DomainDetail() {
 
                 <span>Автор: </span>
 
-                <span>{domain.owner || "Неизвестен"}</span>
+                <span>{domain?.owner || "Неизвестен"}</span>
 
               </div>
 
@@ -1664,7 +1664,7 @@ export default function DomainDetail() {
               <div className="flex items-center gap-2">
                 <RotateCcw className="h-4 w-4" />
                 <span>Последнее изменение: </span>
-                <span>{'updatedAt' in domain && domain.updatedAt ? new Date(domain.updatedAt as string).toLocaleDateString() : 'Не изменялся'}</span>
+                <span>{domain && 'updatedAt' in domain && domain.updatedAt ? new Date(domain.updatedAt as string).toLocaleDateString() : 'Не изменялся'}</span>
               </div>
 
             </div>
@@ -2822,19 +2822,19 @@ export default function DomainDetail() {
 
                     )}>
 
-                      {domain.description ? (
+                      {domain?.description ? (
 
                         <span className="text-muted-foreground">
 
                           {isAnalyticsNoteOpen 
 
-                            ? domain.description 
+                            ? domain?.description 
 
-                            : (domain.description.length > 100 
+                            : (domain?.description?.length > 100 
 
-                                ? `${domain.description.substring(0, 100)}...` 
+                                ? `${domain?.description?.substring(0, 100)}...` 
 
-                                : domain.description
+                                : domain?.description
 
                               )
 
@@ -3068,19 +3068,19 @@ export default function DomainDetail() {
 
                     )}>
 
-                      {domain.description ? (
+                      {domain?.description ? (
 
                         <span className="text-muted-foreground">
 
                           {isAnalyticsNoteOpen 
 
-                            ? domain.description 
+                            ? domain?.description 
 
-                            : (domain.description.length > 100 
+                            : (domain?.description?.length > 100 
 
-                                ? `${domain.description.substring(0, 100)}...` 
+                                ? `${domain?.description?.substring(0, 100)}...` 
 
-                                : domain.description
+                                : domain?.description
 
                               )
 
@@ -3346,19 +3346,19 @@ export default function DomainDetail() {
 
                     )}>
 
-                      {domain.description ? (
+                      {domain?.description ? (
 
                         <span className="text-muted-foreground">
 
                           {isPartnershipNoteOpen 
 
-                            ? domain.description 
+                            ? domain?.description 
 
-                            : (domain.description.length > 100 
+                            : (domain?.description?.length > 100 
 
-                                ? `${domain.description.substring(0, 100)}...` 
+                                ? `${domain?.description?.substring(0, 100)}...` 
 
-                                : domain.description
+                                : domain?.description
 
                               )
 
@@ -3518,19 +3518,19 @@ export default function DomainDetail() {
 
                 )}>
 
-                  {domain.description ? (
+                  {domain?.description ? (
 
                     <span className="text-muted-foreground">
 
                       {isIntegrationsNoteOpen 
 
-                        ? domain.description 
+                        ? domain?.description 
 
-                        : (domain.description.length > 100 
+                        : (domain?.description?.length > 100 
 
-                            ? `${domain.description.substring(0, 100)}...` 
+                            ? `${domain?.description?.substring(0, 100)}...` 
 
-                            : domain.description
+                            : domain?.description
 
                           )
 
@@ -3565,7 +3565,7 @@ export default function DomainDetail() {
               Подтверждение удаления
             </DialogTitle>
             <DialogDescription className="pt-4">
-              Вы уверены, что хотите удалить домен <span className="font-semibold text-foreground">{domain.name}</span>?
+              Вы уверены, что хотите удалить домен <span className="font-semibold text-foreground">{formData.name || domain?.name}</span>?
               <br />
               <br />
               Это действие нельзя будет отменить.
@@ -3584,7 +3584,7 @@ export default function DomainDetail() {
               onClick={() => {
                 // Логика удаления домена
                 toast.success("Домен удален", {
-                  description: `${domain.name} был успешно удален`,
+                  description: `${formData.name || domain?.name} был успешно удален`,
                 });
                 setShowDeleteDialog(false);
                 // Переход на страницу со списком доменов
