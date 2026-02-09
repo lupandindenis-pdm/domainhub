@@ -135,6 +135,9 @@ export default function DomainDetail() {
 
   const domain = isNewDomain ? null : mockDomains.find((d) => d.id === id);
 
+  // Для нового домена domain будет null, но это нормально
+  console.log('DomainDetail:', { id, isNewDomain, hasDomain: !!domain });
+
   
 
   const [version, setVersion] = useState<'v1' | 'v2'>('v2');
@@ -792,7 +795,7 @@ export default function DomainDetail() {
 
 
   // Для нового домена не показываем ошибку "не найден"
-  if (!domain && !isNewDomain) {
+  if (!isNewDomain && !domain) {
 
     return (
 
