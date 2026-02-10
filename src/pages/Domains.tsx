@@ -49,12 +49,22 @@ export default function Domains() {
     }
   });
 
-  // Load edited domains from localStorage
+  // Load edited domains from localStorage (with validation)
   const [editedDomains, setEditedDomains] = useState<Record<string, any>>(() => {
     try {
       const saved = localStorage.getItem('editedDomains');
-      return saved ? JSON.parse(saved) : {};
+      if (!saved) return {};
+      const parsed = JSON.parse(saved);
+      // Validate: remove entries that are not objects
+      const validated: Record<string, any> = {};
+      for (const [key, value] of Object.entries(parsed)) {
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+          validated[key] = value;
+        }
+      }
+      return validated;
     } catch {
+      localStorage.removeItem('editedDomains');
       return {};
     }
   });
@@ -128,12 +138,13 @@ export default function Domains() {
 
   // Merge mockDomains with edited domains from localStorage
   const domains = useMemo(() => {
+    try {
     // 1. Start with mockDomains, merge edits, exclude deleted
     const merged = mockDomains
       .filter(domain => !deletedDomainIds.has(domain.id))
       .map(domain => {
         const editedData = editedDomains[domain.id];
-        if (editedData) {
+        if (editedData && typeof editedData === 'object') {
           return {
             ...domain,
             ...editedData,
@@ -149,7 +160,7 @@ export default function Domains() {
 
     // 2. Add newly created domains (id starts with 'new-')
     const newDomains = Object.entries(editedDomains)
-      .filter(([id]) => id.startsWith('new-') && !deletedDomainIds.has(id))
+      .filter(([id, data]) => id.startsWith('new-') && !deletedDomainIds.has(id) && data && typeof data === 'object')
       .map(([id, data]: [string, any]) => ({
         // Provide required Domain fields with defaults
         id,
@@ -204,6 +215,10 @@ export default function Domains() {
       } as any));
 
     return [...merged, ...newDomains];
+    } catch (error) {
+      console.error('Failed to merge domains:', error);
+      return [...mockDomains];
+    }
   }, [editedDomains, deletedDomainIds]);
 
   const filteredDomains = useMemo(() => {
@@ -222,9 +237,9 @@ export default function Domains() {
       // Search filter
       if (debouncedFilters.search) {
         const searchLower = debouncedFilters.search.toLowerCase();
-        if (!domain.name.toLowerCase().includes(searchLower) &&
-            !domain.project.toLowerCase().includes(searchLower) &&
-            !domain.description.toLowerCase().includes(searchLower)) {
+        if (!(domain.name || '').toLowerCase().includes(searchLower) &&
+            !(domain.project || '').toLowerCase().includes(searchLower) &&
+            !(domain.description || '').toLowerCase().includes(searchLower)) {
           return false;
         }
       }
