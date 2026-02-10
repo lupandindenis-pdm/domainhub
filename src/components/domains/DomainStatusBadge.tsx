@@ -66,7 +66,7 @@ interface DomainStatusBadgeProps {
 }
 
 export function DomainStatusBadge({ status, className }: DomainStatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig.unknown;
   const { t } = useLanguage();
   const Icon = config.icon;
   

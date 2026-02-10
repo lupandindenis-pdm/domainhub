@@ -65,6 +65,11 @@ const typeConfig: Record<DomainType, { label: string; className: string; icon: R
     className: "bg-teal-500/20 text-teal-700 dark:text-teal-300",
     icon: Building
   },
+  unknown: { 
+    label: "badges.unknown", 
+    className: "bg-gray-500/20 text-gray-700 dark:text-gray-300",
+    icon: Globe
+  },
 };
 
 interface DomainTypeBadgeProps {
@@ -73,7 +78,7 @@ interface DomainTypeBadgeProps {
 }
 
 export function DomainTypeBadge({ type, className }: DomainTypeBadgeProps) {
-  const config = typeConfig[type];
+  const config = typeConfig[type] || typeConfig.unknown;
   const { t } = useLanguage();
   const Icon = config.icon;
   
