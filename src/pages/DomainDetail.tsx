@@ -576,8 +576,10 @@ export default function DomainDetail() {
         editedDomains[newId] = { ...formData, name: cleanedName, updatedAt, createdAt, id: newId };
         localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
         
-        toast.success('Домен создан');
-        navigate(`/domains/${newId}`);
+        toast.success('Домен создан', {
+          description: `${cleanedName} добавлен в реестр`,
+        });
+        navigate('/domains');
         return;
       }
 
@@ -836,7 +838,7 @@ export default function DomainDetail() {
 
 
 
-  const daysLeft = domain ? differenceInDays(parseISO(domain.expirationDate), new Date()) : 0;
+  const daysLeft = domain?.expirationDate ? differenceInDays(parseISO(domain.expirationDate), new Date()) : 0;
 
 
 
