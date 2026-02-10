@@ -77,6 +77,11 @@ export default function Domains() {
         if (savedEditedDomains) {
           setEditedDomains(JSON.parse(savedEditedDomains));
         }
+
+        const savedDeletedIds = localStorage.getItem('deletedDomainIds');
+        if (savedDeletedIds) {
+          setDeletedDomainIds(new Set(JSON.parse(savedDeletedIds)));
+        }
       } catch (error) {
         console.error('Failed to load data from localStorage:', error);
       }
@@ -111,26 +116,95 @@ export default function Domains() {
     }
   }, [hiddenDomainIds]);
 
+  // Load deleted domain IDs from localStorage
+  const [deletedDomainIds, setDeletedDomainIds] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('deletedDomainIds');
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
   // Merge mockDomains with edited domains from localStorage
   const domains = useMemo(() => {
-    return mockDomains.map(domain => {
-      const editedData = editedDomains[domain.id];
-      if (editedData) {
-        // Merge edited data with original domain data
-        return {
-          ...domain,
-          ...editedData,
-          // Preserve original fields that shouldn't be overwritten
-          id: domain.id,
-          registrationDate: domain.registrationDate,
-          expirationDate: domain.expirationDate,
-          createdAt: domain.createdAt,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return domain;
-    });
-  }, [editedDomains]);
+    // 1. Start with mockDomains, merge edits, exclude deleted
+    const merged = mockDomains
+      .filter(domain => !deletedDomainIds.has(domain.id))
+      .map(domain => {
+        const editedData = editedDomains[domain.id];
+        if (editedData) {
+          return {
+            ...domain,
+            ...editedData,
+            id: domain.id,
+            registrationDate: domain.registrationDate,
+            expirationDate: domain.expirationDate,
+            createdAt: domain.createdAt,
+            updatedAt: editedData.updatedAt || new Date().toISOString(),
+          };
+        }
+        return domain;
+      });
+
+    // 2. Add newly created domains (id starts with 'new-')
+    const newDomains = Object.entries(editedDomains)
+      .filter(([id]) => id.startsWith('new-') && !deletedDomainIds.has(id))
+      .map(([id, data]: [string, any]) => ({
+        // Provide required Domain fields with defaults
+        id,
+        name: data.name || '',
+        registrationDate: data.createdAt || new Date().toISOString().split('T')[0],
+        expirationDate: data.expirationDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        registrar: data.registrar || '',
+        registrarAccount: data.registrarAccount || '',
+        renewalCost: data.renewalCost || 0,
+        currency: data.currency || 'USD',
+        nsServers: data.nsServers || [],
+        ipAddress: data.ipAddress || '',
+        sslStatus: data.sslStatus || 'none' as const,
+        updateMethod: data.updateMethod || 'manual' as const,
+        project: data.project || 'Не известно',
+        department: data.department || 'Other',
+        owner: data.owner || 'Неизвестен',
+        type: data.type || 'unknown',
+        geo: data.geo || [],
+        status: data.status || 'unknown',
+        accessLevel: data.accessLevel || 'public',
+        description: data.description || '',
+        purity: data.purity || 'white' as const,
+        lifespan: data.lifespan || 'short' as const,
+        tags: data.tags || [],
+        createdAt: data.createdAt || new Date().toISOString(),
+        updatedAt: data.updatedAt || new Date().toISOString(),
+        // Optional fields
+        category: data.category,
+        needsUpdate: data.needsUpdate,
+        direction: data.direction,
+        bonus: data.bonus,
+        targetAction: data.targetAction,
+        jiraTask: data.jiraTask,
+        fileHosting: data.fileHosting,
+        techIssues: data.techIssues,
+        testMethod: data.testMethod,
+        jiraTaskIT: data.jiraTaskIT ? (Array.isArray(data.jiraTaskIT) ? data.jiraTaskIT : data.jiraTaskIT.split(',').map((s: string) => s.trim()).filter(Boolean)) : undefined,
+        gaId: data.gaId,
+        gtmId: data.gtmId,
+        isInProgram: data.isInProgram,
+        isInProgramStatus: data.isInProgramStatus,
+        programStatus: data.programStatus,
+        companyName: data.companyName,
+        programLink: data.programLink,
+        purchaseDate: data.purchaseDate,
+        renewalDate: data.renewalDate,
+        oneSignalId: data.oneSignalId,
+        cloudflareAccount: data.cloudflareAccount,
+        blockedGeo: data.blockedGeo || [],
+        labelId: data.labelId,
+      } as any));
+
+    return [...merged, ...newDomains];
+  }, [editedDomains, deletedDomainIds]);
 
   const filteredDomains = useMemo(() => {
     const filtered = domains.filter((domain) => {
@@ -478,7 +552,7 @@ export default function Domains() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("domains.title")}</h1>
           <p className="text-muted-foreground">
-            {filteredDomains.length} {t("domains.subtitle_prefix")} {mockDomains.length} {t("domains.subtitle_suffix")}
+            {filteredDomains.length} {t("domains.subtitle_prefix")} {domains.length} {t("domains.subtitle_suffix")}
           </p>
           <p className="text-xs text-muted-foreground">build {buildShortSha}</p>
         </div>

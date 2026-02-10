@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -133,7 +133,27 @@ export default function DomainDetail() {
   // Определяем режим создания нового домена
   const isNewDomain = id === 'new';
 
-  const domain = isNewDomain ? null : mockDomains.find((d) => d.id === id);
+  // Ищем домен в mockDomains или в localStorage (для созданных доменов)
+  const domain = useMemo(() => {
+    if (isNewDomain) return null;
+    
+    // Сначала ищем в mockDomains
+    const mockDomain = mockDomains.find((d) => d.id === id);
+    if (mockDomain) return mockDomain;
+    
+    // Если не нашли — ищем в localStorage (созданные домены)
+    try {
+      const saved = localStorage.getItem('editedDomains');
+      if (saved) {
+        const editedDomains = JSON.parse(saved);
+        if (editedDomains[id!]) {
+          return editedDomains[id!] as any;
+        }
+      }
+    } catch {}
+    
+    return undefined;
+  }, [id, isNewDomain]);
 
 
   
@@ -552,7 +572,8 @@ export default function DomainDetail() {
 
       if (isNewDomain) {
         const newId = `new-${Date.now()}`;
-        editedDomains[newId] = { ...formData, name: cleanedName, updatedAt, id: newId };
+        const createdAt = updatedAt;
+        editedDomains[newId] = { ...formData, name: cleanedName, updatedAt, createdAt, id: newId };
         localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
         
         toast.success('Домен создан');
@@ -3582,12 +3603,31 @@ export default function DomainDetail() {
             <Button
               variant="destructive"
               onClick={() => {
-                // Логика удаления домена
-                toast.success("Домен удален", {
-                  description: `${formData.name || domain?.name} был успешно удален`,
-                });
+                try {
+                  // 1. Добавляем ID в список удалённых
+                  const savedDeleted = localStorage.getItem('deletedDomainIds');
+                  const deletedIds: string[] = savedDeleted ? JSON.parse(savedDeleted) : [];
+                  if (id && !deletedIds.includes(id)) {
+                    deletedIds.push(id);
+                    localStorage.setItem('deletedDomainIds', JSON.stringify(deletedIds));
+                  }
+
+                  // 2. Удаляем из editedDomains
+                  const savedEdited = localStorage.getItem('editedDomains');
+                  if (savedEdited && id) {
+                    const editedDomains = JSON.parse(savedEdited);
+                    delete editedDomains[id];
+                    localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
+                  }
+
+                  toast.success("Домен удален", {
+                    description: `${formData.name || domain?.name} был успешно удален`,
+                  });
+                } catch (error) {
+                  console.error('Failed to delete domain:', error);
+                  toast.error("Ошибка при удалении домена");
+                }
                 setShowDeleteDialog(false);
-                // Переход на страницу со списком доменов
                 navigate('/domains');
               }}
               className="gap-2"
