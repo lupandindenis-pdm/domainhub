@@ -270,7 +270,7 @@ export default function Dashboard() {
       {/* Two Column Layout */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Urgent Domains */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 border-0">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-medium">Требуют внимания</CardTitle>
             <Badge variant="outline" className="domain-status-expiring">
@@ -321,7 +321,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Quick Stats */}
-        <Card>
+        <Card className="border-0">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">По типам</CardTitle>
           </CardHeader>
