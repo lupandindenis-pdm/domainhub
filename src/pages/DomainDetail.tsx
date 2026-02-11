@@ -566,7 +566,19 @@ export default function DomainDetail() {
 
       const updatedAt = new Date().toISOString();
 
-      
+      // Проверка на дубликат URL
+      const deletedIds = new Set(JSON.parse(localStorage.getItem('deletedDomainIds') || '[]'));
+      const existingInMock = mockDomains.find(d => d.name.toLowerCase() === cleanedName.toLowerCase() && !deletedIds.has(d.id) && d.id !== id);
+      const existingInEdited = Object.entries(editedDomains).find(([eid, edata]: [string, any]) => 
+        edata && edata.name && edata.name.toLowerCase() === cleanedName.toLowerCase() && !deletedIds.has(eid) && eid !== id
+      );
+      if (existingInMock || existingInEdited) {
+        setDomainError('Домен с таким именем уже существует');
+        toast.error('Домен с таким именем уже существует', {
+          style: { color: '#EAB308' },
+        });
+        return;
+      }
 
       // Для нового домена генерируем ID и перенаправляем
 
