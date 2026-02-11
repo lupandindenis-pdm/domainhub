@@ -4,7 +4,7 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Search, Clock, Globe, Star, Hash, ExternalLink, ArrowRight } from "lucide-react";
-import { mockDomains } from "@/data/mockDomains";
+import { useAllDomains } from "@/hooks/use-all-domains";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useSearchHotkey } from "@/hooks/use-search-hotkey";
@@ -20,6 +20,7 @@ export function SmartSearch({ placeholder = "Поиск домена...", classN
   const [searchHistory, setSearchHistory] = React.useState<string[]>([]);
   const navigate = useNavigate();
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const allDomains = useAllDomains();
 
   // Используем горячие клавиши
   useSearchHotkey(() => {
@@ -47,18 +48,17 @@ export function SmartSearch({ placeholder = "Поиск домена...", classN
     if (!inputValue) return [];
     
     const query = inputValue.toLowerCase();
-    const results = mockDomains.filter(domain => 
-      domain.name.toLowerCase().includes(query) ||
-      domain.project.toLowerCase().includes(query) ||
-      domain.department.toLowerCase().includes(query) ||
-      domain.type.toLowerCase().includes(query) ||
-      domain.status.toLowerCase().includes(query) ||
+    const results = allDomains.filter(domain => 
+      (domain.name || '').toLowerCase().includes(query) ||
+      (domain.project || '').toLowerCase().includes(query) ||
+      (domain.department || '').toLowerCase().includes(query) ||
+      (domain.type || '').toLowerCase().includes(query) ||
+      (domain.status || '').toLowerCase().includes(query) ||
       (domain.label && domain.label.toLowerCase().includes(query))
     ).slice(0, 6);
     
-    console.log('Search query:', query, 'Results:', results);
     return results;
-  }, [inputValue]);
+  }, [inputValue, allDomains]);
 
   // Категории результатов
   const categories = React.useMemo(() => {
@@ -68,8 +68,8 @@ export function SmartSearch({ placeholder = "Поиск домена...", classN
     const cats = [];
     
     // Проверяем типы доменов
-    const types = [...new Set(mockDomains.filter(d => 
-      d.type.toLowerCase().includes(query)
+    const types = [...new Set(allDomains.filter(d => 
+      (d.type || '').toLowerCase().includes(query)
     ).map(d => d.type))];
     
     if (types.length > 0) {
@@ -86,8 +86,8 @@ export function SmartSearch({ placeholder = "Поиск домена...", classN
     }
     
     // Проверяем проекты
-    const projects = [...new Set(mockDomains.filter(d => 
-      d.project.toLowerCase().includes(query)
+    const projects = [...new Set(allDomains.filter(d => 
+      (d.project || '').toLowerCase().includes(query)
     ).map(d => d.project))];
     
     if (projects.length > 0) {
@@ -104,7 +104,7 @@ export function SmartSearch({ placeholder = "Поиск домена...", classN
     }
     
     return cats;
-  }, [inputValue]);
+  }, [inputValue, allDomains]);
 
   const handleSelect = (value: string, type: string = "domain") => {
     setInputValue(value);
@@ -112,7 +112,7 @@ export function SmartSearch({ placeholder = "Поиск домена...", classN
     
     if (type === "domain") {
       // Ищем домен и переходим на его страницу
-      const domain = mockDomains.find(d => d.name === value);
+      const domain = allDomains.find(d => d.name === value);
       if (domain) {
         navigate(`/domains/${domain.id}`);
         toast.success(`Открыт домен: ${domain.name}`);

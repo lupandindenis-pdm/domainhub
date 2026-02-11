@@ -2,7 +2,7 @@ import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Search, ArrowRight } from "lucide-react";
-import { mockDomains } from "@/data/mockDomains";
+import { useAllDomains } from "@/hooks/use-all-domains";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -17,21 +17,22 @@ export function SimpleSearch({ placeholder = "Поиск домена...", class
   const navigate = useNavigate();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const resultsRef = React.useRef<HTMLDivElement>(null);
+  const allDomains = useAllDomains();
 
   // Фильтрация доменов
   const filteredDomains = React.useMemo(() => {
     if (!inputValue) return [];
     
     const query = inputValue.toLowerCase();
-    return mockDomains.filter(domain => 
-      domain.name.toLowerCase().includes(query) ||
-      domain.project.toLowerCase().includes(query) ||
-      domain.type.toLowerCase().includes(query)
+    return allDomains.filter(domain => 
+      (domain.name || '').toLowerCase().includes(query) ||
+      (domain.project || '').toLowerCase().includes(query) ||
+      (domain.type || '').toLowerCase().includes(query)
     ).slice(0, 5);
-  }, [inputValue]);
+  }, [inputValue, allDomains]);
 
   const handleSelect = (domainName: string) => {
-    const domain = mockDomains.find(d => d.name === domainName);
+    const domain = allDomains.find(d => d.name === domainName);
     if (domain) {
       navigate(`/domains/${domain.id}`);
       toast.success(`Открыт домен: ${domain.name}`);

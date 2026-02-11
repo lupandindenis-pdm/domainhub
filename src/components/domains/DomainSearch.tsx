@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { mockDomains, mockLabels } from "@/data/mockDomains";
+import { mockLabels } from "@/data/mockDomains";
+import { useAllDomains } from "@/hooks/use-all-domains";
 import { Domain, Label } from "@/types/domain";
 import { LabelBadge } from "./LabelBadge";
 import { DomainTypeBadge } from "./DomainTypeBadge";
@@ -17,33 +18,16 @@ export function DomainSearch() {
   const [results, setResults] = useState<Domain[]>([]);
   const [labels, setLabels] = useState<Label[]>([]);
   const [domainLabelAssignments, setDomainLabelAssignments] = useState<Record<string, string>>({});
-  const [editedDomains, setEditedDomains] = useState<Record<string, any>>({});
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
+  const domains = useAllDomains();
 
-  // Merge mockDomains with edited domains from localStorage
-  const domains = mockDomains.map(domain => {
-    const editedData = editedDomains[domain.id];
-    if (editedData) {
-      return {
-        ...domain,
-        ...editedData,
-        id: domain.id,
-        registrationDate: domain.registrationDate,
-        expirationDate: domain.expirationDate,
-        createdAt: domain.createdAt,
-      };
-    }
-    return domain;
-  });
-
-  // Load labels, assignments, and edited domains from localStorage
+  // Load labels and assignments from localStorage
   useEffect(() => {
     const loadData = () => {
       try {
         const savedLabels = localStorage.getItem('domainLabels');
         const savedAssignments = localStorage.getItem('domainLabelAssignments');
-        const savedEditedDomains = localStorage.getItem('editedDomains');
         
         if (savedLabels) {
           setLabels(JSON.parse(savedLabels));
@@ -54,10 +38,6 @@ export function DomainSearch() {
         if (savedAssignments) {
           setDomainLabelAssignments(JSON.parse(savedAssignments));
         }
-
-        if (savedEditedDomains) {
-          setEditedDomains(JSON.parse(savedEditedDomains));
-        }
       } catch (error) {
         console.error('Failed to load data from localStorage:', error);
         setLabels(mockLabels);
@@ -66,10 +46,7 @@ export function DomainSearch() {
 
     loadData();
 
-    // Reload when window gains focus
     window.addEventListener('focus', loadData);
-    
-    // Check periodically for changes
     const interval = setInterval(loadData, 1000);
 
     return () => {
@@ -83,7 +60,7 @@ export function DomainSearch() {
     const timer = setTimeout(() => {
       if (query.trim().length > 0) {
         const filtered = domains.filter(domain =>
-          domain.name.toLowerCase().includes(query.toLowerCase())
+          (domain.name || '').toLowerCase().includes(query.toLowerCase())
         );
         setResults(filtered.slice(0, MAX_RESULTS));
         setIsOpen(true);
@@ -126,7 +103,7 @@ export function DomainSearch() {
   };
 
   const totalResults = domains.filter(domain =>
-    domain.name.toLowerCase().includes(query.toLowerCase())
+    (domain.name || '').toLowerCase().includes(query.toLowerCase())
   ).length;
 
   return (
