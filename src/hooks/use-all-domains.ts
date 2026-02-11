@@ -63,11 +63,13 @@ export function useAllDomains() {
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('focus', handleStorageChange);
+    window.addEventListener('domains-updated', handleStorageChange);
     const interval = setInterval(handleStorageChange, 1000);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('focus', handleStorageChange);
+      window.removeEventListener('domains-updated', handleStorageChange);
       clearInterval(interval);
     };
   }, []);

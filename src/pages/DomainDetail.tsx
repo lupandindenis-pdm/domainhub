@@ -575,6 +575,7 @@ export default function DomainDetail() {
         const createdAt = updatedAt;
         editedDomains[newId] = { ...formData, name: cleanedName, updatedAt, createdAt, id: newId };
         localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
+        window.dispatchEvent(new Event('domains-updated'));
         
         toast.success('Домен создан', {
           description: `${cleanedName} добавлен в реестр`,
@@ -586,6 +587,7 @@ export default function DomainDetail() {
       editedDomains[id!] = { ...formData, name: cleanedName, updatedAt };
 
       localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
+      window.dispatchEvent(new Event('domains-updated'));
 
       
 
@@ -3622,6 +3624,7 @@ export default function DomainDetail() {
                     localStorage.setItem('editedDomains', JSON.stringify(editedDomains));
                   }
 
+                  window.dispatchEvent(new Event('domains-updated'));
                   toast.success("Домен удален", {
                     description: `${formData.name || domain?.name} был успешно удален`,
                   });

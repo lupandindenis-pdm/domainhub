@@ -501,6 +501,7 @@ export default function Domains() {
       };
       // Сохраняем в localStorage для сквозной синхронизации
       localStorage.setItem('editedDomains', JSON.stringify(newEditedDomains));
+      window.dispatchEvent(new Event('domains-updated'));
       return newEditedDomains;
     });
   };
