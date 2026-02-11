@@ -30,11 +30,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Plus, Trash2, Pencil, Check, X, Search } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Pencil, Check, X, Search, Folder as FolderIcon } from "lucide-react";
 import { toast } from "sonner";
 import { DomainTypeBadge } from "@/components/domains/DomainTypeBadge";
 import { DomainStatusBadge } from "@/components/domains/DomainStatusBadge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FOLDER_COLORS } from "@/types/folder";
+import { cn } from "@/lib/utils";
 
 export default function FolderDetail() {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +48,7 @@ export default function FolderDetail() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
+  const [editColor, setEditColor] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [addSearch, setAddSearch] = useState("");
@@ -86,6 +89,7 @@ export default function FolderDetail() {
 
   const handleStartEdit = () => {
     setEditName(folder.name);
+    setEditColor(folder.color || '#3b82f6');
     setIsEditing(true);
   };
 
@@ -95,9 +99,9 @@ export default function FolderDetail() {
       toast.error("Название не может быть пустым");
       return;
     }
-    updateFolder(folder.id, { name });
+    updateFolder(folder.id, { name, color: editColor });
     setIsEditing(false);
-    toast.success("Название обновлено");
+    toast.success("Папка обновлена");
   };
 
   const handleCancelEdit = () => {
@@ -148,25 +152,45 @@ export default function FolderDetail() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/folders")}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: `${folder.color || '#3b82f6'}20` }}>
+          <FolderIcon className="h-5 w-5" style={{ color: folder.color || '#3b82f6' }} />
+        </div>
         <div className="flex-1">
           {isEditing ? (
-            <div className="flex items-center gap-2">
-              <Input
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSaveEdit();
-                  if (e.key === "Escape") handleCancelEdit();
-                }}
-                className="text-2xl font-bold h-auto py-1 max-w-md"
-                autoFocus
-              />
-              <Button size="icon" variant="ghost" onClick={handleSaveEdit}>
-                <Check className="h-4 w-4 text-green-500" />
-              </Button>
-              <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
-                <X className="h-4 w-4 text-destructive" />
-              </Button>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSaveEdit();
+                    if (e.key === "Escape") handleCancelEdit();
+                  }}
+                  className="text-2xl font-bold h-auto py-1 max-w-md"
+                  autoFocus
+                />
+                <Button size="icon" variant="ghost" onClick={handleSaveEdit}>
+                  <Check className="h-4 w-4 text-green-500" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                  <X className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                {FOLDER_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    className={cn(
+                      "h-6 w-6 rounded-full transition-all border-2",
+                      editColor === c.value ? "border-foreground scale-110" : "border-transparent hover:scale-105"
+                    )}
+                    style={{ backgroundColor: c.value }}
+                    onClick={() => setEditColor(c.value)}
+                    title={c.label}
+                  />
+                ))}
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-3">

@@ -13,12 +13,15 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { FOLDER_COLORS } from "@/types/folder";
+import { cn } from "@/lib/utils";
 
 export default function Folders() {
   const navigate = useNavigate();
   const { folders, createFolder } = useFolders();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderColor, setNewFolderColor] = useState(FOLDER_COLORS[0].value);
   const [search, setSearch] = useState("");
 
   const filteredFolders = folders.filter(f =>
@@ -36,9 +39,10 @@ export default function Folders() {
       toast.error("Папка с таким названием уже существует");
       return;
     }
-    createFolder(name);
+    createFolder(name, newFolderColor);
     toast.success("Папка создана", { description: name });
     setNewFolderName("");
+    setNewFolderColor(FOLDER_COLORS[0].value);
     setShowCreateDialog(false);
   };
 
@@ -93,8 +97,8 @@ export default function Folders() {
             >
               <CardContent className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <Folder className="h-5 w-5 text-primary" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: `${folder.color || '#3b82f6'}20` }}>
+                    <Folder className="h-5 w-5" style={{ color: folder.color || '#3b82f6' }} />
                   </div>
                   <div>
                     <h3 className="font-medium">{folder.name}</h3>
@@ -116,7 +120,7 @@ export default function Folders() {
           <DialogHeader>
             <DialogTitle>Создать папку</DialogTitle>
           </DialogHeader>
-          <div className="py-4">
+          <div className="space-y-4 py-4">
             <Input
               placeholder="Название папки"
               value={newFolderName}
@@ -124,9 +128,27 @@ export default function Folders() {
               onKeyDown={(e) => e.key === "Enter" && handleCreate()}
               autoFocus
             />
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Цвет</p>
+              <div className="flex flex-wrap gap-2">
+                {FOLDER_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    className={cn(
+                      "h-8 w-8 rounded-full transition-all border-2",
+                      newFolderColor === c.value ? "border-foreground scale-110" : "border-transparent hover:scale-105"
+                    )}
+                    style={{ backgroundColor: c.value }}
+                    onClick={() => setNewFolderColor(c.value)}
+                    title={c.label}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setShowCreateDialog(false); setNewFolderName(""); }}>
+            <Button variant="outline" onClick={() => { setShowCreateDialog(false); setNewFolderName(""); setNewFolderColor(FOLDER_COLORS[0].value); }}>
               Отмена
             </Button>
             <Button onClick={handleCreate} disabled={!newFolderName.trim()}>

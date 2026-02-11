@@ -30,11 +30,12 @@ export function useFolders() {
     };
   }, []);
 
-  const createFolder = useCallback((name: string): Folder => {
+  const createFolder = useCallback((name: string, color: string = '#3b82f6'): Folder => {
     const now = new Date().toISOString();
     const folder: Folder = {
       id: `folder-${Date.now()}`,
       name,
+      color,
       domainIds: [],
       createdAt: now,
       updatedAt: now,
@@ -45,7 +46,7 @@ export function useFolders() {
     return folder;
   }, []);
 
-  const updateFolder = useCallback((id: string, changes: Partial<Pick<Folder, 'name'>>) => {
+  const updateFolder = useCallback((id: string, changes: Partial<Pick<Folder, 'name' | 'color'>>) => {
     const current = loadFolders();
     const updated = current.map(f =>
       f.id === id ? { ...f, ...changes, updatedAt: new Date().toISOString() } : f
