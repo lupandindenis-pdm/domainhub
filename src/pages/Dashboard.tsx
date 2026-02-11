@@ -187,11 +187,10 @@ export default function Dashboard() {
     const items: { domain: any; reason: 'expiring' | 'expired' | 'needs_update'; daysLeft?: number }[] = [];
 
     for (const d of domains) {
-      // Check renewalDate and expirationDate
-      const dateToCheck = d.renewalDate || d.expirationDate;
-      if (dateToCheck) {
+      // Check only renewalDate (NOT expirationDate — that's registration date, present on all domains)
+      if (d.renewalDate) {
         try {
-          const daysLeft = differenceInDays(parseISO(dateToCheck), new Date());
+          const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
           if (daysLeft <= 0) {
             items.push({ domain: d, reason: 'expired', daysLeft });
           } else if (daysLeft <= 30) {
