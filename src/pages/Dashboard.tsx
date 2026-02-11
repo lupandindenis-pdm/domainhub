@@ -174,22 +174,45 @@ export default function Dashboard() {
   });
   const sslIssues = domains.filter(d => d.sslStatus === "expired" || d.sslStatus === "none");
 
-  // Get domains requiring attention
-  const urgentDomains = domains
-    .filter(d => {
-      if (!d.expirationDate) return false;
-      try {
-        const daysLeft = differenceInDays(parseISO(d.expirationDate), new Date());
-        return daysLeft <= 30;
-      } catch {
-        return false;
+  // Get domains requiring attention:
+  // 1. renewalDate < 30 days → "Истекает (<30 дней)"
+  // 2. renewalDate expired → "Истёк"
+  // 3. needsUpdate === "Да" → "Требует обновления" (yellow)
+  const attentionDomains = useMemo(() => {
+    const items: { domain: any; reason: 'expiring' | 'expired' | 'needs_update'; daysLeft?: number }[] = [];
+
+    for (const d of domains) {
+      // Check renewalDate
+      if (d.renewalDate) {
+        try {
+          const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
+          if (daysLeft <= 0) {
+            items.push({ domain: d, reason: 'expired', daysLeft });
+          } else if (daysLeft <= 30) {
+            items.push({ domain: d, reason: 'expiring', daysLeft });
+          }
+        } catch {}
       }
-    })
-    .sort((a, b) => 
-      differenceInDays(parseISO(a.expirationDate), new Date()) - 
-      differenceInDays(parseISO(b.expirationDate), new Date())
-    )
-    .slice(0, 5);
+
+      // Check needsUpdate
+      if (d.needsUpdate === 'Да') {
+        // Avoid duplicates — only add if not already added by renewalDate
+        if (!items.some(item => item.domain.id === d.id)) {
+          items.push({ domain: d, reason: 'needs_update' });
+        }
+      }
+    }
+
+    // Sort: expired first, then expiring (by daysLeft asc), then needs_update
+    items.sort((a, b) => {
+      const order = { expired: 0, expiring: 1, needs_update: 2 };
+      if (order[a.reason] !== order[b.reason]) return order[a.reason] - order[b.reason];
+      if (a.daysLeft !== undefined && b.daysLeft !== undefined) return a.daysLeft - b.daysLeft;
+      return 0;
+    });
+
+    return items;
+  }, [domains]);
 
   // Recent domains — sorted by updatedAt descending
   const recentDomains = useMemo(() => {
@@ -246,30 +269,34 @@ export default function Dashboard() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-medium">Требуют внимания</CardTitle>
             <Badge variant="outline" className="domain-status-expiring">
-              {urgentDomains.length} доменов
+              {attentionDomains.length} доменов
             </Badge>
           </CardHeader>
           <CardContent>
-            {urgentDomains.length > 0 ? (
+            {attentionDomains.length > 0 ? (
               <div className="space-y-3">
-                {urgentDomains.map((domain) => {
-                  const daysLeft = differenceInDays(parseISO(domain.expirationDate), new Date());
+                {attentionDomains.map(({ domain, reason, daysLeft }) => {
+                  const isExpired = reason === 'expired';
+                  const isExpiring = reason === 'expiring';
+                  const isNeedsUpdate = reason === 'needs_update';
                   return (
                     <div 
-                      key={domain.id}
-                      className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-3 transition-colors hover:bg-secondary/50 cursor-pointer"
+                      key={`${domain.id}-${reason}`}
+                      className="flex items-center justify-between rounded-lg bg-secondary/30 p-3 transition-colors hover:bg-secondary/50 cursor-pointer"
                       onClick={() => navigate(`/domains/${domain.id}`)}
                     >
                       <div className="flex items-center gap-3">
-                        <AlertTriangle className={`h-4 w-4 ${daysLeft <= 7 ? "text-destructive" : "text-warning"}`} />
+                        <AlertTriangle className={`h-4 w-4 ${isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`} />
                         <div>
                           <p className="font-mono text-sm font-medium">{domain.name}</p>
                           <p className="text-xs text-muted-foreground">{domain.project || 'Не известно'}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className={`text-sm font-medium ${daysLeft <= 7 ? "text-destructive" : "text-warning"}`}>
-                          {daysLeft > 0 ? `${daysLeft} дней` : "Истёк"}
+                        <p className={`text-sm font-medium ${isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`}>
+                          {isExpired && "Истёк"}
+                          {isExpiring && `Истекает (<30 дней)`}
+                          {isNeedsUpdate && "Требует обновления"}
                         </p>
                         <p className="text-xs text-muted-foreground">{domain.registrar || '—'}</p>
                       </div>
