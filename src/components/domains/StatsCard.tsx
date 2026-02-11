@@ -8,6 +8,8 @@ interface StatsCardProps {
   changeType?: "positive" | "negative" | "neutral";
   icon: LucideIcon;
   iconColor?: string;
+  onClick?: () => void;
+  active?: boolean;
 }
 
 export function StatsCard({ 
@@ -16,10 +18,15 @@ export function StatsCard({
   change, 
   changeType = "neutral",
   icon: Icon,
-  iconColor = "text-primary"
+  iconColor = "text-primary",
+  onClick,
+  active = false,
 }: StatsCardProps) {
   return (
-    <div className="stat-card group">
+    <div 
+      className={cn("stat-card group", onClick && "cursor-pointer", active && "ring-1 ring-primary/50 bg-primary/5")}
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-muted-foreground">{title}</span>

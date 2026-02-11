@@ -165,13 +165,20 @@ export default function Dashboard() {
     }
   }, [editedDomains, deletedDomainIds]);
   
+  // Active filter for stat cards
+  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'expiring' | 'ssl' | null>(null);
+
+  const handleFilterClick = (filter: 'all' | 'active' | 'expiring' | 'ssl') => {
+    setActiveFilter(prev => prev === filter ? null : filter);
+  };
+
   // Calculate stats from actual domain list
   const totalDomains = domains.length;
-  const activeDomains = domains.filter(d => d.status === "actual").length;
+  const activeDomains = domains.filter(d => d.status === "actual");
   const expiringDomains = domains.filter(d => {
-    if (!d.expirationDate) return false;
+    if (!d.renewalDate) return false;
     try {
-      const daysLeft = differenceInDays(parseISO(d.expirationDate), new Date());
+      const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
       return daysLeft <= 30 && daysLeft > 0;
     } catch {
       return false;
@@ -219,16 +226,26 @@ export default function Dashboard() {
     return items;
   }, [domains]);
 
-  // Recent domains — sorted by updatedAt descending
-  const recentDomains = useMemo(() => {
-    return [...domains]
+  // Filtered domains based on active stat card
+  const tableDomains = useMemo(() => {
+    let filtered = domains;
+    if (activeFilter === 'all') {
+      filtered = domains;
+    } else if (activeFilter === 'active') {
+      filtered = activeDomains;
+    } else if (activeFilter === 'expiring') {
+      filtered = expiringDomains;
+    } else if (activeFilter === 'ssl') {
+      filtered = sslIssues;
+    }
+    return [...filtered]
       .sort((a, b) => {
         const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
         const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
         return dateB - dateA;
       })
-      .slice(0, 5);
-  }, [domains]);
+      .slice(0, activeFilter ? 50 : 5);
+  }, [domains, activeFilter, activeDomains, expiringDomains, sslIssues]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -244,12 +261,16 @@ export default function Dashboard() {
           title="Всего доменов"
           value={totalDomains}
           icon={Globe}
+          onClick={() => handleFilterClick('all')}
+          active={activeFilter === 'all'}
         />
         <StatsCard
           title="Активных"
-          value={activeDomains}
+          value={activeDomains.length}
           icon={CheckCircle}
           iconColor="text-success"
+          onClick={() => handleFilterClick('active')}
+          active={activeFilter === 'active'}
         />
         <StatsCard
           title="Истекают (<30 дней)"
@@ -258,12 +279,16 @@ export default function Dashboard() {
           changeType="negative"
           icon={Clock}
           iconColor="text-warning"
+          onClick={() => handleFilterClick('expiring')}
+          active={activeFilter === 'expiring'}
         />
         <StatsCard
           title="Проблемы SSL"
           value={sslIssues.length}
           icon={ShieldAlert}
           iconColor="text-destructive"
+          onClick={() => handleFilterClick('ssl')}
+          active={activeFilter === 'ssl'}
         />
       </div>
 
@@ -375,7 +400,7 @@ export default function Dashboard() {
           </button>
         </div>
         <DomainTable 
-          domains={recentDomains} 
+          domains={tableDomains} 
           bulkSelectMode={false}
           selectedDomainIds={new Set()}
           onToggleDomain={() => {}}
