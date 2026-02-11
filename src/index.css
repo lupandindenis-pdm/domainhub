@@ -150,7 +150,7 @@
   }
 
   .stat-card {
-    @apply relative overflow-hidden rounded-lg border border-border bg-card p-4;
+    @apply relative overflow-hidden rounded-lg bg-card p-4;
     background: linear-gradient(
       135deg,
       hsl(var(--card)) 0%,

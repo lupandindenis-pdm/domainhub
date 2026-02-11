@@ -2,6 +2,8 @@ import { StatsCard } from "@/components/domains/StatsCard";
 import { DomainTable } from "@/components/domains/DomainTable";
 import { mockDomains, mockLabels } from "@/data/mockDomains";
 import { Globe, AlertTriangle, Clock, CheckCircle, TrendingUp, ShieldAlert } from "lucide-react";
+import { DOMAIN_TYPE_LABELS } from "@/constants/domainTypes";
+import { DomainType } from "@/types/domain";
 import { differenceInDays, parseISO } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -293,7 +295,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className={`text-sm font-medium ${isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`}>
+                        <p className={`text-sm ${isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`}>
                           {isExpired && "Истёк"}
                           {isExpiring && `Истекает (<30 дней)`}
                           {isNeedsUpdate && "Требует обновления"}
@@ -322,15 +324,20 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { type: "site", label: "Сайты", color: "bg-primary" },
-                { type: "product", label: "Продукты", color: "bg-success" },
-                { type: "landing", label: "Лендинги", color: "bg-chart-4" },
-                { type: "technical", label: "Технические", color: "bg-muted-foreground" },
-                { type: "mirror", label: "Зеркала", color: "bg-warning" },
-                { type: "seo", label: "SEO", color: "bg-pink-500" },
-                { type: "unknown", label: "Не известно", color: "bg-gray-400" },
-              ].map(({ type, label, color }) => {
+              {([
+                { type: "landing" as DomainType, color: "bg-chart-4" },
+                { type: "seo" as DomainType, color: "bg-pink-500" },
+                { type: "mirror" as DomainType, color: "bg-warning" },
+                { type: "site" as DomainType, color: "bg-primary" },
+                { type: "subdomain" as DomainType, color: "bg-cyan-500" },
+                { type: "referral" as DomainType, color: "bg-violet-500" },
+                { type: "redirect" as DomainType, color: "bg-orange-500" },
+                { type: "technical" as DomainType, color: "bg-muted-foreground" },
+                { type: "product" as DomainType, color: "bg-success" },
+                { type: "b2b" as DomainType, color: "bg-blue-500" },
+                { type: "unknown" as DomainType, color: "bg-gray-400" },
+              ] as { type: DomainType; color: string }[]).map(({ type, color }) => {
+                const label = DOMAIN_TYPE_LABELS[type];
                 const count = domains.filter(d => d.type === type).length;
                 const percentage = totalDomains > 0 ? Math.round((count / totalDomains) * 100) : 0;
                 return (
