@@ -174,8 +174,8 @@ export default function Dashboard() {
 
   // Calculate stats from actual domain list
   const totalDomains = domains.length;
-  const activeDomains = domains.filter(d => d.status === "actual");
-  const expiringDomains = domains.filter(d => {
+  const activeDomains = useMemo(() => domains.filter(d => d.status === "actual"), [domains]);
+  const expiringDomains = useMemo(() => domains.filter(d => {
     if (!d.renewalDate) return false;
     try {
       const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
@@ -183,8 +183,8 @@ export default function Dashboard() {
     } catch {
       return false;
     }
-  });
-  const sslIssues = domains.filter(d => d.sslStatus === "expired" || d.sslStatus === "none");
+  }), [domains]);
+  const sslIssues = useMemo(() => domains.filter(d => d.sslStatus === "expired" || d.sslStatus === "none"), [domains]);
 
   // Get domains requiring attention:
   // 1. renewalDate < 30 days → "Истекает (<30 дней)"

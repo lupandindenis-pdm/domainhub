@@ -26,7 +26,7 @@ export function StatsCard({
     <div 
       className={cn("stat-card group transition-colors", onClick && "cursor-pointer")}
       onClick={onClick}
-      style={active ? { background: `linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.06) 100%)` } : undefined}
+      style={active ? { background: `linear-gradient(135deg, hsl(var(--primary) / 0.22) 0%, hsl(var(--primary) / 0.12) 100%)` } : undefined}
     >
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
