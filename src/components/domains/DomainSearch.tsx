@@ -143,7 +143,7 @@ export function DomainSearch() {
                     
                     {/* Metadata line: Type, Status, Label */}
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                      <span>{domain.type === 'landing' ? 'Лендинг' : domain.type === 'site' ? 'Сайт' : domain.type === 'product' ? 'Домен продукта' : domain.type === 'mirror' ? 'Зеркало' : domain.type === 'seo' ? 'SEO' : domain.type === 'subdomain' ? 'Поддомен' : domain.type === 'referral' ? 'Реферальный' : domain.type === 'redirect' ? 'Редирект' : domain.type === 'technical' ? 'Технический' : domain.type === 'b2b' ? 'B2B' : domain.type}</span>
+                      <span>{domain.type === 'landing' ? 'Лендинг' : domain.type === 'site' ? 'Сайт' : domain.type === 'product' ? 'Домен продукта' : domain.type === 'mirror' ? 'Зеркало' : domain.type === 'seo' ? 'SEO' : domain.type === 'subdomain' ? 'Поддомен' : domain.type === 'referral' ? 'Реферальный' : domain.type === 'redirect' ? 'Редирект' : domain.type === 'technical' ? 'Технический' : domain.type === 'b2b' ? 'B2B' : domain.type === 'unknown' ? 'Не известно' : domain.type}</span>
                       <span>•</span>
                       <span>{domain.status === 'actual' ? 'Активен' : domain.status === 'spare' ? 'Запасной' : domain.status === 'not_actual' ? 'Не актуален' : domain.status === 'not_configured' ? 'Не настроен' : domain.status === 'unknown' ? 'Не известен' : domain.status === 'expiring' ? 'Истекает' : domain.status === 'expired' ? 'Истёк' : domain.status === 'blocked' ? 'Заблокирован' : domain.status === 'test' ? 'Тест' : domain.status}</span>
                       {label && (
