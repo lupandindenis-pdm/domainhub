@@ -111,7 +111,7 @@ export const DOMAIN_TYPES: { value: DomainType; label: string }[] = [
  * Единый источник названий статусов доменов
  */
 export const DOMAIN_STATUS_LABELS: Record<DomainStatus, string> = {
-  spare: "Резерв",
+  spare: "Запасной",
   actual: "Актуальный",
   not_actual: "Неактуальный",
   not_configured: "Не настроен",
