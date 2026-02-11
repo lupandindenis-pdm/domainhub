@@ -75,7 +75,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className={collapsed ? "border-b border-sidebar-border/40 px-2 h-16 justify-center" : "border-b border-sidebar-border/40 px-4 h-16 justify-center"}>
+      <SidebarHeader className={collapsed ? "border-b border-sidebar-border px-2 h-16 justify-center" : "border-b border-sidebar-border px-4 h-16 justify-center"}>
         <div className={collapsed ? "flex w-full items-center justify-center gap-3" : "flex items-center gap-3"}>
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary">
             <Shield className="h-4 w-4 text-primary-foreground" />
@@ -130,7 +130,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className={collapsed ? "border-t border-sidebar-border/40 px-2 py-3" : "border-t border-sidebar-border/40 px-4 py-3"}>
+      <SidebarFooter className={collapsed ? "border-t border-sidebar-border px-2 py-3" : "border-t border-sidebar-border px-4 py-3"}>
         <div className={collapsed ? "flex items-center justify-center" : "flex items-center gap-3"}>
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-medium text-primary">
             АИ

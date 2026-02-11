@@ -4,7 +4,7 @@ import { useFolders } from "@/hooks/use-folders";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Folder, ChevronRight } from "lucide-react";
+import { Plus, Folder, ChevronRight, Search } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,11 @@ export default function Folders() {
   const { folders, createFolder } = useFolders();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [search, setSearch] = useState("");
+
+  const filteredFolders = folders.filter(f =>
+    f.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleCreate = () => {
     const name = newFolderName.trim();
@@ -50,6 +55,18 @@ export default function Folders() {
         </Button>
       </div>
 
+      {folders.length > 0 && (
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Поиск папок..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 max-w-sm"
+          />
+        </div>
+      )}
+
       {folders.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
@@ -66,7 +83,9 @@ export default function Folders() {
         </Card>
       ) : (
         <div className="grid gap-3">
-          {folders.map((folder) => (
+          {filteredFolders.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">Ничего не найдено</p>
+          ) : filteredFolders.map((folder) => (
             <Card
               key={folder.id}
               className="cursor-pointer transition-colors hover:bg-secondary/30"
