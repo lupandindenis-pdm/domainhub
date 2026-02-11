@@ -24,7 +24,7 @@ export function StatsCard({
 }: StatsCardProps) {
   return (
     <div 
-      className={cn("stat-card group", onClick && "cursor-pointer", active && "ring-1 ring-primary/50 bg-primary/5")}
+      className={cn("stat-card group transition-colors", onClick && "cursor-pointer", active && "!bg-[hsl(var(--primary)/0.08)]")}
       onClick={onClick}
     >
       <div className="flex items-start justify-between">

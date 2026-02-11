@@ -244,7 +244,7 @@ export default function Dashboard() {
         const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
         return dateB - dateA;
       })
-      .slice(0, activeFilter ? 50 : 5);
+      .slice(0, activeFilter ? undefined : 5);
   }, [domains, activeFilter, activeDomains, expiringDomains, sslIssues]);
 
   return (
