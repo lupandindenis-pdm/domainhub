@@ -3,7 +3,8 @@ import { X, Download, Check, ChevronDown, CheckSquare, Square, EyeOff, Edit } fr
 import { SingleSelectFilter } from "./SingleSelectFilter";
 import { DomainFilter, DomainType, DomainStatus, Label } from "@/types/domain";
 import { LabelBadge } from "./LabelBadge";
-import { projects, folders } from "@/data/mockDomains";
+import { projects } from "@/data/mockDomains";
+import { useFolders } from "@/hooks/use-folders";
 import { useLanguage } from "@/components/language-provider";
 import {
   Popover,
@@ -125,6 +126,7 @@ function MultiSelectFilter({ title, options, selectedValues = [], onChange }: Mu
 
 export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMode, onToggleBulkMode, showHidden, onToggleShowHidden, hiddenCount, labels, quickEditMode = false, onToggleQuickEditMode }: DomainFiltersProps) {
   const { t } = useLanguage();
+  const { folders } = useFolders();
   const hasActiveFilters = 
     filters.search || 
     filters.types?.length || 
@@ -181,7 +183,10 @@ export function DomainFilters({ filters, onFiltersChange, onExport, bulkSelectMo
 
         <MultiSelectFilter
           title="Папки"
-          options={folders.map(f => ({ value: f, label: f }))}
+          options={[
+            { value: '__none__', label: 'Без папки' },
+            ...folders.map(f => ({ value: f.id, label: f.name }))
+          ]}
           selectedValues={filters.folders}
           onChange={(values) => onFiltersChange({ ...filters, folders: values })}
         />

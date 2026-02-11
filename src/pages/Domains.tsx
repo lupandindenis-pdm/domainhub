@@ -10,10 +10,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useLanguage } from "@/components/language-provider";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useFolders } from "@/hooks/use-folders";
 
 export default function Domains() {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { folders } = useFolders();
   const [filters, setFilters] = useState<DomainFilter>({});
   const debouncedFilters = useDebounce(filters, 300);
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
@@ -268,6 +270,20 @@ export default function Domains() {
       if (debouncedFilters.labelId) {
         const assignedLabelId = domainLabelAssignments[domain.id] || domain.labelId;
         if (assignedLabelId !== debouncedFilters.labelId) {
+          return false;
+        }
+      }
+
+      // Folder filter
+      if (debouncedFilters.folders?.length) {
+        const domainFolderIds = folders
+          .filter(f => f.domainIds.includes(domain.id))
+          .map(f => f.id);
+        const hasNone = debouncedFilters.folders.includes('__none__');
+        const folderFilterIds = debouncedFilters.folders.filter(id => id !== '__none__');
+        const inSelectedFolder = folderFilterIds.some(fid => domainFolderIds.includes(fid));
+        const isWithoutFolder = domainFolderIds.length === 0;
+        if (!(inSelectedFolder || (hasNone && isWithoutFolder))) {
           return false;
         }
       }
