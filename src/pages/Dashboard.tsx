@@ -226,26 +226,31 @@ export default function Dashboard() {
     return items;
   }, [domains]);
 
-  // Filtered domains based on active stat card
-  const tableDomains = useMemo(() => {
-    let filtered = domains;
+  // Filtered attention domains based on active stat card
+  const filteredAttentionDomains = useMemo(() => {
+    if (!activeFilter) return attentionDomains;
     if (activeFilter === 'all') {
-      filtered = domains;
+      return attentionDomains;
     } else if (activeFilter === 'active') {
-      filtered = activeDomains;
+      return attentionDomains.filter(item => activeDomains.some(d => d.id === item.domain.id));
     } else if (activeFilter === 'expiring') {
-      filtered = expiringDomains;
+      return attentionDomains.filter(item => item.reason === 'expiring' || item.reason === 'expired');
     } else if (activeFilter === 'ssl') {
-      filtered = sslIssues;
+      return attentionDomains.filter(item => sslIssues.some(d => d.id === item.domain.id));
     }
-    return [...filtered]
+    return attentionDomains;
+  }, [activeFilter, attentionDomains, activeDomains, expiringDomains, sslIssues]);
+
+  // Recent domains — sorted by updatedAt descending (always independent of filter)
+  const recentDomains = useMemo(() => {
+    return [...domains]
       .sort((a, b) => {
         const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
         const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
         return dateB - dateA;
       })
-      .slice(0, activeFilter ? undefined : 5);
-  }, [domains, activeFilter, activeDomains, expiringDomains, sslIssues]);
+      .slice(0, 5);
+  }, [domains]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -299,13 +304,13 @@ export default function Dashboard() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-medium">Требуют внимания</CardTitle>
             <Badge variant="outline" className="domain-status-expiring">
-              {attentionDomains.length} доменов
+              {filteredAttentionDomains.length} доменов
             </Badge>
           </CardHeader>
           <CardContent>
-            {attentionDomains.length > 0 ? (
+            {filteredAttentionDomains.length > 0 ? (
               <div className="space-y-3">
-                {attentionDomains.map(({ domain, reason, daysLeft }) => {
+                {filteredAttentionDomains.map(({ domain, reason, daysLeft }) => {
                   const isExpired = reason === 'expired';
                   const isExpiring = reason === 'expiring';
                   const isNeedsUpdate = reason === 'needs_update';
@@ -400,7 +405,7 @@ export default function Dashboard() {
           </button>
         </div>
         <DomainTable 
-          domains={tableDomains} 
+          domains={recentDomains} 
           bulkSelectMode={false}
           selectedDomainIds={new Set()}
           onToggleDomain={() => {}}
