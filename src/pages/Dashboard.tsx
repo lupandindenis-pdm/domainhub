@@ -153,6 +153,9 @@ export default function Dashboard() {
           targetAction: data.targetAction,
           labelId: data.labelId,
           blockedGeo: data.blockedGeo || [],
+          needsUpdate: data.needsUpdate || 'Нет',
+          renewalDate: data.renewalDate || '',
+          hasTechIssues: data.hasTechIssues || 'Нет',
         } as any));
 
       return [...merged, ...newDomains];
@@ -196,8 +199,8 @@ export default function Dashboard() {
         } catch {}
       }
 
-      // Check needsUpdate
-      if (d.needsUpdate === 'Да') {
+      // Check needsUpdate or hasTechIssues
+      if (d.needsUpdate === 'Да' || (d.needsUpdate && d.needsUpdate !== 'Нет') || d.hasTechIssues === 'Да') {
         // Avoid duplicates — only add if not already added by renewalDate
         if (!items.some(item => item.domain.id === d.id)) {
           items.push({ domain: d, reason: 'needs_update' });
@@ -291,7 +294,7 @@ export default function Dashboard() {
                         <AlertTriangle className={`h-4 w-4 ${isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`} />
                         <div>
                           <p className="font-mono text-sm font-medium">{domain.name}</p>
-                          <p className="text-xs text-muted-foreground">{domain.project || 'Не известно'}</p>
+                          <p className="text-xs text-muted-foreground">{DOMAIN_TYPE_LABELS[domain.type as DomainType] || 'Не известно'}</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -300,7 +303,7 @@ export default function Dashboard() {
                           {isExpiring && `Истекает (<30 дней)`}
                           {isNeedsUpdate && "Требует обновления"}
                         </p>
-                        <p className="text-xs text-muted-foreground">{domain.registrar || '—'}</p>
+                        <p className="text-xs text-muted-foreground">{domain.department || '—'}</p>
                       </div>
                     </div>
                   );
