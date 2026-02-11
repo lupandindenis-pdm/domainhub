@@ -8,6 +8,7 @@ import DomainsPage from "./pages/DomainsPage";
 import DomainDetailPage from "./pages/DomainDetailPage";
 import FoldersPage from "./pages/FoldersPage";
 import FolderDetailPage from "./pages/FolderDetailPage";
+import UsersPage from "./pages/UsersPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/domains/:id" element={<DomainDetailPage />} />
           <Route path="/folders" element={<FoldersPage />} />
           <Route path="/folders/:id" element={<FolderDetailPage />} />
+          <Route path="/users" element={<UsersPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
