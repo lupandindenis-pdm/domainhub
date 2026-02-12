@@ -53,18 +53,18 @@ import { format } from "date-fns";
 import { ru } from "date-fns/locale";
 
 const STATUS_COLORS: Record<UserStatus, string> = {
-  pending: "bg-yellow-500/15 text-yellow-500 border-yellow-500/30",
-  active: "bg-green-500/15 text-green-500 border-green-500/30",
-  suspended: "bg-red-500/15 text-red-500 border-red-500/30",
-  deleted: "bg-gray-500/15 text-gray-500 border-gray-500/30",
+  pending: "bg-yellow-500/15 text-yellow-500",
+  active: "bg-green-500/15 text-green-500",
+  suspended: "bg-red-500/15 text-red-500",
+  deleted: "bg-gray-500/15 text-gray-500",
 };
 
 const ROLE_COLORS: Record<UserRole, string> = {
-  super_admin: "bg-purple-500/15 text-purple-400 border-purple-500/30",
-  admin: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-  manager: "bg-cyan-500/15 text-cyan-400 border-cyan-500/30",
-  editor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
-  viewer: "bg-gray-500/15 text-gray-400 border-gray-500/30",
+  super_admin: "bg-purple-500/15 text-purple-400",
+  admin: "bg-blue-500/15 text-blue-400",
+  manager: "bg-cyan-500/15 text-cyan-400",
+  editor: "bg-emerald-500/15 text-emerald-400",
+  viewer: "bg-gray-500/15 text-gray-400",
 };
 
 export default function Users() {
@@ -160,7 +160,7 @@ export default function Users() {
                 <TableRow key={user.id} className="cursor-pointer" onClick={() => navigate(`/users/${user.id}/edit`)}>
                   <TableCell className="font-medium truncate">{user.username}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={cn("text-xs", ROLE_COLORS[user.role])}>
+                    <Badge className={cn("text-xs border-0", ROLE_COLORS[user.role])}>
                       {USER_ROLES.find(r => r.value === user.role)?.label}
                     </Badge>
                   </TableCell>
@@ -168,7 +168,7 @@ export default function Users() {
                     {getScopeLabel(user.scope)}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={cn("text-xs", STATUS_COLORS[user.status])}>
+                    <Badge className={cn("text-xs border-0", STATUS_COLORS[user.status])}>
                       {USER_STATUS_LABELS[user.status]}
                     </Badge>
                   </TableCell>

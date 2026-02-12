@@ -40,10 +40,10 @@ const CURRENT_USER_ROLE: UserRole = "super_admin";
 const assignableRoles = USER_ROLES.filter(r => canAssignRole(CURRENT_USER_ROLE, r.value));
 
 const STATUS_COLORS: Record<UserStatus, string> = {
-  pending: "bg-yellow-500/15 text-yellow-500 border-yellow-500/30",
-  active: "bg-green-500/15 text-green-500 border-green-500/30",
-  suspended: "bg-red-500/15 text-red-500 border-red-500/30",
-  deleted: "bg-gray-500/15 text-gray-500 border-gray-500/30",
+  pending: "bg-yellow-500/15 text-yellow-500",
+  active: "bg-green-500/15 text-green-500",
+  suspended: "bg-red-500/15 text-red-500",
+  deleted: "bg-gray-500/15 text-gray-500",
 };
 
 function generatePassword(length = 16): string {
@@ -169,7 +169,7 @@ export default function UserEdit() {
           <h1 className="text-2xl font-bold tracking-tight">Редактировать пользователя</h1>
           <p className="text-muted-foreground">{user.username}</p>
         </div>
-        <Badge variant="outline" className={cn("text-xs", STATUS_COLORS[user.status])}>
+        <Badge className={cn("text-xs border-0", STATUS_COLORS[user.status])}>
           {USER_STATUS_LABELS[user.status]}
         </Badge>
       </div>
