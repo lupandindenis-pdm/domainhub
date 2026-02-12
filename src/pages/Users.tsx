@@ -79,19 +79,19 @@ export default function Users() {
     if (!search.trim()) return users;
     const q = search.toLowerCase();
     return users.filter(u =>
-      u.email.toLowerCase().includes(q) ||
+      u.username.toLowerCase().includes(q) ||
       USER_ROLES.find(r => r.value === u.role)?.label.toLowerCase().includes(q)
     );
   }, [users, search]);
 
   const handleSuspend = (user: AppUser) => {
     suspendUser(user.id);
-    toast.success("Пользователь заблокирован", { description: user.email });
+    toast.success("Пользователь заблокирован", { description: user.username });
   };
 
   const handleReactivate = (user: AppUser) => {
     reactivateUser(user.id);
-    toast.success("Пользователь активирован", { description: user.email });
+    toast.success("Пользователь активирован", { description: user.username });
   };
 
   const handleOpenDelete = (user: AppUser) => {
@@ -102,7 +102,7 @@ export default function Users() {
   const handleDelete = () => {
     if (!selectedUser) return;
     deleteUser(selectedUser.id);
-    toast.success("Пользователь удалён", { description: selectedUser.email });
+    toast.success("Пользователь удалён", { description: selectedUser.username });
     setShowDeleteDialog(false);
     setSelectedUser(null);
   };
@@ -116,7 +116,7 @@ export default function Users() {
         </div>
         <Button onClick={() => navigate("/users/invite")} className="gap-2">
           <UserPlus className="h-4 w-4" />
-          Пригласить пользователя
+          Создать пользователя
         </Button>
       </div>
 
@@ -135,11 +135,11 @@ export default function Users() {
           <ShieldCheck className="h-12 w-12 text-muted-foreground/50 mb-4" />
           <h3 className="text-lg font-medium mb-1">Нет пользователей</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Пригласите первого пользователя в систему
+            Создайте первого пользователя в системе
           </p>
           <Button variant="outline" onClick={() => navigate("/users/invite")} className="gap-2">
             <UserPlus className="h-4 w-4" />
-            Пригласить
+            Создать
           </Button>
         </div>
       ) : (
@@ -147,18 +147,18 @@ export default function Users() {
           <Table className="table-fixed w-full">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[25%]">Email</TableHead>
+                <TableHead className="w-[25%]">Пользователь</TableHead>
                 <TableHead className="w-[13%]">Роль</TableHead>
                 <TableHead className="w-[17%]">Доступ</TableHead>
                 <TableHead className="w-[15%]">Статус</TableHead>
-                <TableHead className="w-[15%]">Приглашён</TableHead>
+                <TableHead className="w-[15%]">Создан</TableHead>
                 <TableHead className="w-[15%] text-right">Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredUsers.map((user) => (
                 <TableRow key={user.id} className="cursor-pointer" onClick={() => navigate(`/users/${user.id}/edit`)}>
-                  <TableCell className="font-medium truncate">{user.email}</TableCell>
+                  <TableCell className="font-medium truncate">{user.username}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={cn("text-xs", ROLE_COLORS[user.role])}>
                       {USER_ROLES.find(r => r.value === user.role)?.label}
@@ -173,7 +173,7 @@ export default function Users() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {format(new Date(user.invitedAt), "dd MMM yyyy", { locale: ru })}
+                    {format(new Date(user.createdAt), "dd MMM yyyy", { locale: ru })}
                   </TableCell>
                   <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
@@ -229,7 +229,7 @@ export default function Users() {
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить пользователя?</AlertDialogTitle>
             <AlertDialogDescription>
-              Пользователь {selectedUser?.email} будет удалён из системы. Это действие можно отменить через базу данных.
+              Пользователь {selectedUser?.username} будет удалён из системы. Это действие можно отменить через базу данных.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

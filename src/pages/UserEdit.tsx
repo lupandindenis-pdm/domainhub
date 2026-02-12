@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
-import { ArrowLeft, Ban, RotateCcw, Trash2 } from "lucide-react";
+import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, Calendar as CalendarIcon, Ban, RotateCcw, Trash2, RefreshCw, Eye, EyeOff, Copy } from "lucide-react";
 import { toast } from "sonner";
 import {
   AppUser,
@@ -49,13 +49,24 @@ const STATUS_COLORS: Record<UserStatus, string> = {
   deleted: "bg-gray-500/15 text-gray-500 border-gray-500/30",
 };
 
+function generatePassword(length = 16): string {
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
 export default function UserEdit() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { users, allUsers, updateUser, suspendUser, reactivateUser, deleteUser } = useUsers();
+  const { allUsers, updateUser, suspendUser, reactivateUser, deleteUser } = useUsers();
 
   const [user, setUser] = useState<AppUser | null>(null);
   const [role, setRole] = useState<UserRole>("viewer");
+  const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -83,9 +94,27 @@ export default function UserEdit() {
     );
   }
 
+  const handleGeneratePassword = () => {
+    const pwd = generatePassword();
+    setNewPassword(pwd);
+    setShowPassword(true);
+    toast.success("Пароль сгенерирован");
+  };
+
+  const handleCopyPassword = () => {
+    if (newPassword) {
+      navigator.clipboard.writeText(newPassword);
+      toast.success("Пароль скопирован");
+    }
+  };
+
   const handleSave = () => {
     if (!canAssignRole(CURRENT_USER_ROLE, role)) {
       toast.error("Нельзя назначить роль выше своей");
+      return;
+    }
+    if (newPassword && newPassword.length < 6) {
+      toast.error("Пароль должен быть не менее 6 символов");
       return;
     }
     const scope: UserScope = {
@@ -99,19 +128,19 @@ export default function UserEdit() {
 
   const handleSuspend = () => {
     suspendUser(user.id);
-    toast.success("Пользователь заблокирован", { description: user.email });
+    toast.success("Пользователь заблокирован", { description: user.username });
     navigate("/users");
   };
 
   const handleReactivate = () => {
     reactivateUser(user.id);
-    toast.success("Пользователь активирован", { description: user.email });
+    toast.success("Пользователь активирован", { description: user.username });
     navigate("/users");
   };
 
   const handleDelete = () => {
     deleteUser(user.id);
-    toast.success("Пользователь удалён", { description: user.email });
+    toast.success("Пользователь удалён", { description: user.username });
     navigate("/users");
   };
 
@@ -123,69 +152,137 @@ export default function UserEdit() {
         </Button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold tracking-tight">Редактировать пользователя</h1>
-          <p className="text-muted-foreground">{user.email}</p>
+          <p className="text-muted-foreground">{user.username}</p>
         </div>
         <Badge variant="outline" className={cn("text-xs", STATUS_COLORS[user.status])}>
           {USER_STATUS_LABELS[user.status]}
         </Badge>
       </div>
 
-      <div className="max-w-lg space-y-5">
-        <div>
-          <label className="text-sm font-medium mb-1.5 block">Email</label>
-          <Input value={user.email} disabled />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
-          <div>
-            <span className="block text-xs mb-0.5">Приглашён</span>
-            {format(new Date(user.invitedAt), "dd MMM yyyy, HH:mm", { locale: ru })}
-          </div>
-          {user.lastActiveAt && (
-            <div>
-              <span className="block text-xs mb-0.5">Последняя активность</span>
-              {format(new Date(user.lastActiveAt), "dd MMM yyyy, HH:mm", { locale: ru })}
+      <div className="p-6 space-y-8">
+        <div className="grid gap-8 md:grid-cols-2">
+          {/* Column 1 */}
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Имя пользователя
+              </label>
+              <Input value={user.username} disabled className="bg-muted/50" />
             </div>
-          )}
+
+            <div className="space-y-2">
+              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                <KeyRound className="h-4 w-4 !text-green-600" />
+                Новый пароль
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Оставьте пустым, чтобы не менять"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="bg-muted/50 pr-20"
+                  />
+                  <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => setShowPassword(!showPassword)}
+                      title={showPassword ? "Скрыть" : "Показать"}
+                    >
+                      {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </Button>
+                    {newPassword && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={handleCopyPassword}
+                        title="Копировать"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGeneratePassword}
+                  className="gap-1.5 shrink-0"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Сгенерировать
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                <Shield className="h-4 w-4 !text-green-600" />
+                Роль
+              </label>
+              <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+                <SelectTrigger className="bg-muted/50">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {assignableRoles.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                Создан
+              </label>
+              <div className="flex items-center h-10 px-3 rounded-md text-sm text-muted-foreground">
+                {format(new Date(user.createdAt), "dd MMM yyyy, HH:mm", { locale: ru })}
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2 */}
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                <FolderKanban className="h-4 w-4 !text-green-600" />
+                Проекты
+              </label>
+              <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем проектам</p>
+              <MultiSelectDropdown
+                options={projectOptions}
+                selected={selectedProjects}
+                onChange={setSelectedProjects}
+                placeholder="Все проекты"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+                <Building2 className="h-4 w-4 !text-green-600" />
+                Отделы
+              </label>
+              <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем отделам</p>
+              <MultiSelectDropdown
+                options={departments}
+                selected={selectedDepartments}
+                onChange={setSelectedDepartments}
+                placeholder="Все отделы"
+              />
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label className="text-sm font-medium mb-1.5 block">Роль</label>
-          <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {assignableRoles.map((r) => (
-                <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-1.5 block">Проекты</label>
-          <p className="text-xs text-muted-foreground mb-1.5">Если ничего не выбрано — доступ ко всем проектам</p>
-          <MultiSelectDropdown
-            options={projectOptions}
-            selected={selectedProjects}
-            onChange={setSelectedProjects}
-            placeholder="Все проекты"
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-1.5 block">Отделы</label>
-          <p className="text-xs text-muted-foreground mb-1.5">Если ничего не выбрано — доступ ко всем отделам</p>
-          <MultiSelectDropdown
-            options={departments}
-            selected={selectedDepartments}
-            onChange={setSelectedDepartments}
-            placeholder="Все отделы"
-          />
-        </div>
-
-        <div className="flex items-center gap-3 pt-4">
+        <div className="flex items-center gap-3 pt-2">
           <Button variant="outline" onClick={() => navigate("/users")}>
             Отмена
           </Button>
@@ -220,7 +317,7 @@ export default function UserEdit() {
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить пользователя?</AlertDialogTitle>
             <AlertDialogDescription>
-              Пользователь {user.email} будет удалён из системы. Это действие можно отменить через базу данных.
+              Пользователь {user.username} будет удалён из системы. Это действие можно отменить через базу данных.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

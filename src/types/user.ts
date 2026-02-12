@@ -17,11 +17,11 @@ export interface UserScope {
 
 export interface AppUser {
   id: string;
-  email: string;
+  username: string;
+  password: string;
   role: UserRole;
   scope: UserScope;
   status: UserStatus;
-  invitedAt: string;
   lastActiveAt?: string;
   createdAt: string;
   updatedAt: string;

@@ -30,15 +30,15 @@ export function useUsers() {
     };
   }, []);
 
-  const inviteUser = useCallback((email: string, role: UserRole, scope: UserScope): AppUser => {
+  const createUser = useCallback((username: string, password: string, role: UserRole, scope: UserScope): AppUser => {
     const now = new Date().toISOString();
     const user: AppUser = {
       id: `user-${Date.now()}`,
-      email,
+      username,
+      password,
       role,
       scope,
-      status: 'pending',
-      invitedAt: now,
+      status: 'active',
       createdAt: now,
       updatedAt: now,
     };
@@ -79,7 +79,7 @@ export function useUsers() {
   return {
     users: activeUsers,
     allUsers: users,
-    inviteUser,
+    createUser,
     updateUser,
     suspendUser,
     reactivateUser,
