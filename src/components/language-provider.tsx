@@ -66,6 +66,8 @@ const translations: Translations = {
     "status.unknown": "Не известно",
     "status.expiring": "Истекает",
     "status.expired": "Истёк",
+    "status.blocked": "Заблокирован",
+    "status.test": "Тестовый",
 
     "history": "История",
     "alerts": "Алерты",
@@ -138,6 +140,8 @@ const translations: Translations = {
     "status.unknown": "Unknown",
     "status.expiring": "Expiring",
     "status.expired": "Expired",
+    "status.blocked": "Blocked",
+    "status.test": "Test",
 
     "history": "History",
     "alerts": "Alerts",

@@ -209,13 +209,13 @@ export default function UserEdit() {
         </div>
 
         {/* 2. Пароль */}
-        <div className="space-y-2">
-          <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-            <KeyRound className="h-4 w-4 !text-green-600" />
-            Пароль
-          </label>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
+        <div className="grid gap-8 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+              <KeyRound className="h-4 w-4 !text-green-600" />
+              Пароль
+            </label>
+            <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Введите пароль"
@@ -248,6 +248,8 @@ export default function UserEdit() {
                 )}
               </div>
             </div>
+          </div>
+          <div className="flex items-end">
             <Button
               type="button"
               variant="outline"
