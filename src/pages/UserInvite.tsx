@@ -122,7 +122,7 @@ export default function UserInvite() {
               placeholder="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="bg-muted/50"
+              className="bg-transparent"
               autoFocus
             />
           </div>
@@ -139,7 +139,7 @@ export default function UserInvite() {
                   placeholder="Введите пароль"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-muted/50 pr-20"
+                  className="bg-transparent pr-20"
                 />
                 <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
                   <Button
@@ -186,7 +186,7 @@ export default function UserInvite() {
             Роль
           </label>
           <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-            <SelectTrigger className="bg-muted/50">
+            <SelectTrigger className="bg-transparent">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
