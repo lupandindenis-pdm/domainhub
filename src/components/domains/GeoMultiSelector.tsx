@@ -94,9 +94,10 @@ interface GeoMultiSelectorProps {
   selected: string[];
   onChange: (selected: string[]) => void;
   disabled?: boolean;
+  triggerClassName?: string;
 }
 
-export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelectorProps) {
+export function GeoMultiSelector({ selected, onChange, disabled, triggerClassName }: GeoMultiSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -138,7 +139,7 @@ export function GeoMultiSelector({ selected, onChange, disabled }: GeoMultiSelec
           role="combobox"
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-start bg-muted/50 border-none hover:bg-muted/70 min-h-10 h-auto py-2"
+          className={triggerClassName || "w-full justify-start bg-muted/50 border-none hover:bg-muted/70 min-h-10 h-auto py-2"}
         >
           <div className="flex flex-wrap gap-1 flex-1">
             {selectedOptions.length > 0 ? (
