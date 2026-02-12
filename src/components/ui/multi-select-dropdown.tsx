@@ -73,7 +73,7 @@ export function MultiSelectDropdown({
         role="combobox"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="w-full justify-between font-normal h-10"
+        className="w-full justify-between font-normal h-10 border-0 border-b border-border rounded-none px-0 bg-transparent hover:bg-transparent focus:ring-0"
       >
         <span className="truncate text-sm">
           {displayText}
@@ -90,7 +90,7 @@ export function MultiSelectDropdown({
       </Button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md animate-in fade-in-0 zoom-in-95">
+        <div className="absolute z-50 mt-1 w-full rounded-md bg-popover shadow-md animate-in fade-in-0 zoom-in-95">
           <div className="max-h-[220px] overflow-auto p-1">
             {/* "Все" option */}
             <label className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/50 rounded-sm cursor-pointer">

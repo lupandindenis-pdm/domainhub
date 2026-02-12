@@ -23,7 +23,6 @@ import { projects, departments } from "@/data/mockDomains";
 
 const CURRENT_USER_ROLE: UserRole = "super_admin";
 const assignableRoles = USER_ROLES.filter(r => canAssignRole(CURRENT_USER_ROLE, r.value));
-const projectOptions = projects.filter(p => p !== "Не известно");
 
 function generatePassword(length = 16): string {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*";
@@ -49,13 +48,15 @@ export default function UserInvite() {
     const pwd = generatePassword();
     setPassword(pwd);
     setShowPassword(true);
-    toast.success("Пароль сгенерирован");
   };
 
-  const handleCopyPassword = () => {
+  const handleCopyPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (password) {
-      navigator.clipboard.writeText(password);
-      toast.success("Пароль скопирован");
+      navigator.clipboard.writeText(password).then(() => {
+        toast.success("Пароль скопирован");
+      });
     }
   };
 
@@ -109,122 +110,121 @@ export default function UserInvite() {
         </div>
       </div>
 
-      <div className="p-6 space-y-8">
+      <div className="p-6 space-y-6">
+        {/* 1. Имя пользователя + Пароль */}
         <div className="grid gap-8 md:grid-cols-2">
-          {/* Column 1 */}
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-                <User className="h-4 w-4 !text-green-600" />
-                Имя пользователя
-              </label>
-              <Input
-                placeholder="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-muted/50"
-                autoFocus
-              />
-            </div>
+          <div className="space-y-2">
+            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+              <User className="h-4 w-4 !text-green-600" />
+              Имя пользователя
+            </label>
+            <Input
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="bg-transparent border-0 border-b border-border rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary"
+              autoFocus
+            />
+          </div>
 
-            <div className="space-y-2">
-              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-                <KeyRound className="h-4 w-4 !text-green-600" />
-                Пароль
-              </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Введите пароль"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="bg-muted/50 pr-20"
-                  />
-                  <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+          <div className="space-y-2">
+            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+              <KeyRound className="h-4 w-4 !text-green-600" />
+              Пароль
+            </label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Введите пароль"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="bg-transparent border-0 border-b border-border rounded-none px-0 pr-20 focus-visible:ring-0 focus-visible:border-primary"
+                />
+                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => setShowPassword(!showPassword)}
+                    title={showPassword ? "Скрыть" : "Показать"}
+                  >
+                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  </Button>
+                  {password && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7"
-                      onClick={() => setShowPassword(!showPassword)}
-                      title={showPassword ? "Скрыть" : "Показать"}
+                      onMouseDown={handleCopyPassword}
+                      title="Копировать"
                     >
-                      {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      <Copy className="h-3.5 w-3.5" />
                     </Button>
-                    {password && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={handleCopyPassword}
-                        title="Копировать"
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
-                  </div>
+                  )}
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleGeneratePassword}
-                  className="gap-1.5 shrink-0"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Сгенерировать
-                </Button>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-                <Shield className="h-4 w-4 !text-green-600" />
-                Роль
-              </label>
-              <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-                <SelectTrigger className="bg-muted/50">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {assignableRoles.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleGeneratePassword}
+                className="gap-1.5 shrink-0 border-0 hover:bg-muted/50"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Сгенерировать
+              </Button>
             </div>
           </div>
+        </div>
 
-          {/* Column 2 */}
-          <div className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-                <FolderKanban className="h-4 w-4 !text-green-600" />
-                Проекты
-              </label>
-              <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем проектам</p>
-              <MultiSelectDropdown
-                options={projectOptions}
-                selected={selectedProjects}
-                onChange={setSelectedProjects}
-                placeholder="Все проекты"
-              />
-            </div>
+        {/* 2. Роль */}
+        <div className="max-w-sm space-y-2">
+          <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+            <Shield className="h-4 w-4 !text-green-600" />
+            Роль
+          </label>
+          <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+            <SelectTrigger className="bg-transparent border-0 border-b border-border rounded-none px-0 focus:ring-0">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {assignableRoles.map((r) => (
+                <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-            <div className="space-y-2">
-              <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-                <Building2 className="h-4 w-4 !text-green-600" />
-                Отделы
-              </label>
-              <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем отделам</p>
-              <MultiSelectDropdown
-                options={departments}
-                selected={selectedDepartments}
-                onChange={setSelectedDepartments}
-                placeholder="Все отделы"
-              />
-            </div>
+        {/* 3. Проекты слева / Отделы справа */}
+        <div className="grid gap-8 md:grid-cols-2">
+          <div className="space-y-2">
+            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+              <FolderKanban className="h-4 w-4 !text-green-600" />
+              Проекты
+            </label>
+            <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем проектам</p>
+            <MultiSelectDropdown
+              options={projects}
+              selected={selectedProjects}
+              onChange={setSelectedProjects}
+              placeholder="Все"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+              <Building2 className="h-4 w-4 !text-green-600" />
+              Отделы
+            </label>
+            <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем отделам</p>
+            <MultiSelectDropdown
+              options={departments}
+              selected={selectedDepartments}
+              onChange={setSelectedDepartments}
+              placeholder="Все"
+            />
           </div>
         </div>
 
