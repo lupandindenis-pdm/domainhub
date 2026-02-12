@@ -1237,7 +1237,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.type} onValueChange={(value) => handleFieldChange('type', value)}>
 
-                        <SelectTrigger className="bg-muted/50">
+                        <SelectTrigger className="bg-muted/50 border-none">
 
                           <SelectValue />
 
@@ -1328,7 +1328,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.project} onValueChange={(value) => handleFieldChange('project', value)}>
 
-                        <SelectTrigger className="bg-muted/50">
+                        <SelectTrigger className="bg-muted/50 border-none">
 
                           <SelectValue />
 
@@ -1404,7 +1404,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.status} onValueChange={(value) => handleFieldChange('status', value)}>
 
-                        <SelectTrigger className="bg-muted/50">
+                        <SelectTrigger className="bg-muted/50 border-none">
 
                           <SelectValue />
 
@@ -1503,7 +1503,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.department} onValueChange={(value) => handleFieldChange('department', value)}>
 
-                        <SelectTrigger className="bg-muted/50">
+                        <SelectTrigger className="bg-muted/50 border-none">
 
                           <SelectValue />
 
@@ -1787,7 +1787,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -1843,7 +1843,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.direction} onValueChange={(value) => handleFieldChange('direction', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -1899,7 +1899,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.targetAction} onValueChange={(value) => handleFieldChange('targetAction', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -1961,7 +1961,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -2017,7 +2017,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.needsUpdate} onValueChange={(value) => handleFieldChange('needsUpdate', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -2505,7 +2505,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.hasTechIssues || "Нет"} onValueChange={(value) => handleFieldChange('hasTechIssues', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -2763,7 +2763,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.testMethod} onValueChange={(value) => handleFieldChange('testMethod', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -3169,7 +3169,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.isInProgramStatus} onValueChange={(value) => handleFieldChange('isInProgramStatus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -3287,7 +3287,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.programStatus} onValueChange={(value) => handleFieldChange('programStatus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
+                          <SelectTrigger className="bg-muted/50 border-none disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
