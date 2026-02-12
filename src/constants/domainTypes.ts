@@ -113,7 +113,7 @@ export const DOMAIN_TYPES: { value: DomainType; label: string }[] = [
 export const DOMAIN_STATUS_LABELS: Record<DomainStatus, string> = {
   spare: "Запасной",
   actual: "Актуальный",
-  not_actual: "Неактуальный",
+  not_actual: "Не актуален",
   not_configured: "Не настроен",
   unknown: "Не известно",
   expiring: "Истекает",

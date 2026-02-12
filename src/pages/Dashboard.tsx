@@ -1,10 +1,11 @@
 import { StatsCard } from "@/components/domains/StatsCard";
 import { DomainTable } from "@/components/domains/DomainTable";
 import { mockDomains, mockLabels } from "@/data/mockDomains";
-import { Globe, AlertTriangle, Clock, CheckCircle, TrendingUp, ShieldAlert } from "lucide-react";
-import { DOMAIN_TYPE_LABELS } from "@/constants/domainTypes";
-import { DomainType } from "@/types/domain";
+import { Globe, AlertTriangle, Clock, CheckCircle, TrendingUp, ShieldAlert, AlertCircle } from "lucide-react";
+import { DOMAIN_TYPE_LABELS, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
+import { DomainType, DomainStatus } from "@/types/domain";
 import { differenceInDays, parseISO } from "date-fns";
+import { computeDomainStatus } from "@/lib/computeDomainStatus";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
@@ -158,7 +159,13 @@ export default function Dashboard() {
           hasTechIssues: data.hasTechIssues || 'Нет',
         } as any));
 
-      return [...merged, ...newDomains];
+      const all = [...merged, ...newDomains];
+
+      // Auto-compute status based on renewalDate
+      return all.map(d => ({
+        ...d,
+        status: computeDomainStatus(d.status, d.renewalDate),
+      }));
     } catch (error) {
       console.error('Dashboard: Failed to merge domains:', error);
       return [...mockDomains];
@@ -166,9 +173,9 @@ export default function Dashboard() {
   }, [editedDomains, deletedDomainIds]);
   
   // Active filter for stat cards
-  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'expiring' | 'ssl' | null>(null);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'expiring' | 'inactive' | null>(null);
 
-  const handleFilterClick = (filter: 'all' | 'active' | 'expiring' | 'ssl') => {
+  const handleFilterClick = (filter: 'all' | 'active' | 'expiring' | 'inactive') => {
     setActiveFilter(prev => prev === filter ? null : filter);
   };
 
@@ -184,14 +191,25 @@ export default function Dashboard() {
       return false;
     }
   }), [domains]);
-  const sslIssues = useMemo(() => domains.filter(d => d.sslStatus === "expired" || d.sslStatus === "none"), [domains]);
+  const inactiveDomains = useMemo(() => domains.filter(d => {
+    // Status: not_actual, unknown
+    if (d.status === "not_actual" || d.status === "unknown") return true;
+    // Expired renewalDate
+    if (d.renewalDate) {
+      try {
+        const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
+        if (daysLeft <= 0) return true;
+      } catch {}
+    }
+    return false;
+  }), [domains]);
 
   // Get domains requiring attention:
   // 1. renewalDate < 30 days → "Истекает (<30 дней)"
   // 2. renewalDate expired → "Истёк"
   // 3. needsUpdate === "Да" → "Требует обновления" (yellow)
   const attentionDomains = useMemo(() => {
-    const items: { domain: any; reason: 'expiring' | 'expired' | 'needs_update'; daysLeft?: number }[] = [];
+    const items: { domain: any; reason: 'expiring' | 'expired' | 'needs_update' | 'inactive'; daysLeft?: number }[] = [];
 
     for (const d of domains) {
       // Check only renewalDate (NOT expirationDate — that's registration date, present on all domains)
@@ -200,24 +218,29 @@ export default function Dashboard() {
           const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
           if (daysLeft <= 0) {
             items.push({ domain: d, reason: 'expired', daysLeft });
+            continue;
           } else if (daysLeft <= 30) {
             items.push({ domain: d, reason: 'expiring', daysLeft });
+            continue;
           }
         } catch {}
       }
 
+      // Check status: not_actual / unknown
+      if (d.status === 'not_actual' || d.status === 'unknown') {
+        items.push({ domain: d, reason: 'inactive' });
+        continue;
+      }
+
       // Check needsUpdate or hasTechIssues
       if (d.needsUpdate === 'Да' || (d.needsUpdate && d.needsUpdate !== 'Нет') || d.hasTechIssues === 'Да') {
-        // Avoid duplicates — only add if not already added by renewalDate
-        if (!items.some(item => item.domain.id === d.id)) {
-          items.push({ domain: d, reason: 'needs_update' });
-        }
+        items.push({ domain: d, reason: 'needs_update' });
       }
     }
 
-    // Sort: expired first, then expiring (by daysLeft asc), then needs_update
+    // Sort: expired first, then inactive, then expiring (by daysLeft asc), then needs_update
     items.sort((a, b) => {
-      const order = { expired: 0, expiring: 1, needs_update: 2 };
+      const order = { expired: 0, inactive: 1, expiring: 2, needs_update: 3 };
       if (order[a.reason] !== order[b.reason]) return order[a.reason] - order[b.reason];
       if (a.daysLeft !== undefined && b.daysLeft !== undefined) return a.daysLeft - b.daysLeft;
       return 0;
@@ -234,12 +257,12 @@ export default function Dashboard() {
     } else if (activeFilter === 'active') {
       return attentionDomains.filter(item => activeDomains.some(d => d.id === item.domain.id));
     } else if (activeFilter === 'expiring') {
-      return attentionDomains.filter(item => item.reason === 'expiring' || item.reason === 'expired');
-    } else if (activeFilter === 'ssl') {
-      return attentionDomains.filter(item => sslIssues.some(d => d.id === item.domain.id));
+      return attentionDomains.filter(item => item.reason === 'expiring');
+    } else if (activeFilter === 'inactive') {
+      return attentionDomains.filter(item => inactiveDomains.some(d => d.id === item.domain.id));
     }
     return attentionDomains;
-  }, [activeFilter, attentionDomains, activeDomains, expiringDomains, sslIssues]);
+  }, [activeFilter, attentionDomains, activeDomains, expiringDomains, inactiveDomains]);
 
   // Recent domains — sorted by updatedAt descending (always independent of filter)
   const recentDomains = useMemo(() => {
@@ -266,14 +289,18 @@ export default function Dashboard() {
           title="Всего доменов"
           value={totalDomains}
           icon={Globe}
+          bgColor="hsl(210 60% 18%)"
+          glowColor="hsla(210, 100%, 50%, 0.15)"
           onClick={() => handleFilterClick('all')}
           active={activeFilter === 'all'}
         />
         <StatsCard
-          title="Активных"
+          title="Актуальные"
           value={activeDomains.length}
           icon={CheckCircle}
           iconColor="text-success"
+          bgColor="hsl(142 50% 16%)"
+          glowColor="hsla(142, 76%, 36%, 0.15)"
           onClick={() => handleFilterClick('active')}
           active={activeFilter === 'active'}
         />
@@ -284,36 +311,76 @@ export default function Dashboard() {
           changeType="negative"
           icon={Clock}
           iconColor="text-warning"
+          bgColor="hsl(38 55% 16%)"
+          glowColor="hsla(38, 92%, 50%, 0.15)"
           onClick={() => handleFilterClick('expiring')}
           active={activeFilter === 'expiring'}
         />
         <StatsCard
-          title="Проблемы SSL"
-          value={sslIssues.length}
-          icon={ShieldAlert}
+          title="Не актуален / Истёк"
+          value={inactiveDomains.length}
+          icon={AlertCircle}
           iconColor="text-destructive"
-          onClick={() => handleFilterClick('ssl')}
-          active={activeFilter === 'ssl'}
+          bgColor="hsl(0 50% 17%)"
+          glowColor="hsla(0, 85%, 60%, 0.15)"
+          onClick={() => handleFilterClick('inactive')}
+          active={activeFilter === 'inactive'}
         />
       </div>
 
       {/* Two Column Layout */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Urgent Domains */}
-        <Card className="lg:col-span-2 border-0">
+        <Card className="lg:col-span-2 border-0" style={{ backgroundColor: '#3b82f608', borderTop: '1px solid #3b82f612' }}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-lg font-medium">Требуют внимания</CardTitle>
+            <CardTitle className="text-lg font-medium">
+              {activeFilter === 'active' ? 'Активные домены' : activeFilter === 'all' ? 'Все домены' : 'Требуют внимания'}
+            </CardTitle>
             <Badge variant="outline" className="domain-status-expiring">
-              {filteredAttentionDomains.length} доменов
+              {activeFilter === 'active' ? activeDomains.length : activeFilter === 'all' ? domains.length : filteredAttentionDomains.length} доменов
             </Badge>
           </CardHeader>
           <CardContent>
-            {filteredAttentionDomains.length > 0 ? (
+            {activeFilter === 'active' || activeFilter === 'all' ? (
+              <div className="space-y-3">
+                {(activeFilter === 'active' ? activeDomains : domains).map((domain) => {
+                  const statusLabel = DOMAIN_STATUS_LABELS[domain.status as DomainStatus] || domain.status;
+                  const statusColor = domain.status === 'actual' ? 'text-success'
+                    : domain.status === 'expired' || domain.status === 'not_actual' ? 'text-destructive'
+                    : domain.status === 'expiring' ? 'text-warning'
+                    : 'text-muted-foreground';
+                  const StatusIcon = domain.status === 'actual' ? CheckCircle
+                    : domain.status === 'expired' || domain.status === 'not_actual' ? AlertCircle
+                    : domain.status === 'expiring' ? Clock
+                    : Globe;
+                  return (
+                    <div 
+                      key={domain.id}
+                      className="flex items-center justify-between rounded-lg bg-secondary/30 p-3 transition-colors hover:bg-secondary/50 cursor-pointer"
+                      onClick={() => navigate(`/domains/${domain.id}`)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <StatusIcon className={`h-4 w-4 ${statusColor}`} />
+                        <div>
+                          <p className="font-mono text-sm font-medium">{domain.name}</p>
+                          <p className="text-xs text-muted-foreground">{DOMAIN_TYPE_LABELS[domain.type as DomainType] || 'Не известно'}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-sm ${statusColor}`}>{statusLabel}</p>
+                        <p className="text-xs text-muted-foreground">{domain.department || '—'}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : filteredAttentionDomains.length > 0 ? (
               <div className="space-y-3">
                 {filteredAttentionDomains.map(({ domain, reason, daysLeft }) => {
                   const isExpired = reason === 'expired';
                   const isExpiring = reason === 'expiring';
                   const isNeedsUpdate = reason === 'needs_update';
+                  const isInactive = reason === 'inactive';
                   return (
                     <div 
                       key={`${domain.id}-${reason}`}
@@ -321,17 +388,18 @@ export default function Dashboard() {
                       onClick={() => navigate(`/domains/${domain.id}`)}
                     >
                       <div className="flex items-center gap-3">
-                        <AlertTriangle className={`h-4 w-4 ${isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`} />
+                        <AlertTriangle className={`h-4 w-4 ${isInactive ? "text-muted-foreground" : isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`} />
                         <div>
                           <p className="font-mono text-sm font-medium">{domain.name}</p>
                           <p className="text-xs text-muted-foreground">{DOMAIN_TYPE_LABELS[domain.type as DomainType] || 'Не известно'}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className={`text-sm ${isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`}>
+                        <p className={`text-sm ${isInactive ? "text-muted-foreground" : isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`}>
                           {isExpired && "Истёк"}
                           {isExpiring && `Истекает (<30 дней)`}
                           {isNeedsUpdate && "Требует обновления"}
+                          {isInactive && (domain.status === 'not_actual' ? "Не актуален" : "Не известно")}
                         </p>
                         <p className="text-xs text-muted-foreground">{domain.department || '—'}</p>
                       </div>
@@ -351,7 +419,7 @@ export default function Dashboard() {
         </Card>
 
         {/* Quick Stats */}
-        <Card className="border-0">
+        <Card className="border-0" style={{ backgroundColor: '#3b82f608', borderTop: '1px solid #3b82f612' }}>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-medium">По типам</CardTitle>
           </CardHeader>

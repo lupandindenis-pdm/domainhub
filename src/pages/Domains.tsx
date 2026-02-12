@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/components/language-provider";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFolders } from "@/hooks/use-folders";
+import { computeDomainStatus } from "@/lib/computeDomainStatus";
 
 export default function Domains() {
   const navigate = useNavigate();
@@ -216,7 +217,13 @@ export default function Domains() {
         labelId: data.labelId,
       } as any));
 
-    return [...merged, ...newDomains];
+    const all = [...merged, ...newDomains];
+
+    // Auto-compute status based on renewalDate
+    return all.map(d => ({
+      ...d,
+      status: computeDomainStatus(d.status, d.renewalDate),
+    }));
     } catch (error) {
       console.error('Failed to merge domains:', error);
       return [...mockDomains];

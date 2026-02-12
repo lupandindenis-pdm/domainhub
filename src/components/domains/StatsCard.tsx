@@ -8,8 +8,11 @@ interface StatsCardProps {
   changeType?: "positive" | "negative" | "neutral";
   icon: LucideIcon;
   iconColor?: string;
+  bgColor?: string;
+  glowColor?: string;
   onClick?: () => void;
   active?: boolean;
+  children?: React.ReactNode;
 }
 
 export function StatsCard({ 
@@ -19,16 +22,26 @@ export function StatsCard({
   changeType = "neutral",
   icon: Icon,
   iconColor = "text-primary",
+  bgColor,
+  glowColor,
   onClick,
   active = false,
+  children,
 }: StatsCardProps) {
   return (
     <div 
-      className={cn("stat-card group transition-colors", onClick && "cursor-pointer")}
+      className={cn(
+        "stat-card group transition-all duration-300 overflow-hidden",
+        onClick && "cursor-pointer",
+      )}
       onClick={onClick}
-      style={active ? { background: `linear-gradient(135deg, hsl(var(--primary) / 0.22) 0%, hsl(var(--primary) / 0.12) 100%)` } : undefined}
+      style={{
+        background: active && bgColor
+          ? `linear-gradient(135deg, ${bgColor} 0%, hsl(224 71% 8%) 100%)`
+          : undefined,
+      }}
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between relative z-10">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-muted-foreground">{title}</span>
           <span className="text-3xl font-bold tracking-tight">{value}</span>
@@ -51,8 +64,17 @@ export function StatsCard({
         </div>
       </div>
       
-      {/* Subtle glow effect on hover */}
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 transition-opacity group-hover:opacity-100" />
+      {children}
+
+      {/* Subtle glow on hover */}
+      <div
+        className="absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-60"
+        style={{
+          background: glowColor
+            ? `radial-gradient(ellipse at 20% 50%, ${glowColor} 0%, transparent 70%)`
+            : 'radial-gradient(ellipse at 20% 50%, hsl(210 100% 52% / 0.06) 0%, transparent 70%)',
+        }}
+      />
     </div>
   );
 }

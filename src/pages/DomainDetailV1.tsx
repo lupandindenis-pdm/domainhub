@@ -27,12 +27,14 @@ import {
 import { format, parseISO, differenceInDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import { toast } from "sonner";
+import { computeDomainStatus } from "@/lib/computeDomainStatus";
 
 export default function DomainDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const domain = mockDomains.find((d) => d.id === id);
+  const rawDomain = mockDomains.find((d) => d.id === id);
+  const domain = rawDomain ? { ...rawDomain, status: computeDomainStatus(rawDomain.status, rawDomain.renewalDate) } : undefined;
   const history = mockHistory.filter((h) => h.domainId === id);
 
   if (!domain) {

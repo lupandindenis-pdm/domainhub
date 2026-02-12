@@ -29,13 +29,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Plus, Trash2, SquarePen, Check, X, Search, Folder as FolderIcon, Globe, FolderOpen, Tag, Activity, Copy, ExternalLink } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, SquarePen, Check, X, Search, Folder as FolderIcon, Globe, FolderOpen, Tag, Activity, Copy, ExternalLink, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { DomainTypeBadge } from "@/components/domains/DomainTypeBadge";
 import { DomainStatusBadge } from "@/components/domains/DomainStatusBadge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FOLDER_COLORS } from "@/types/folder";
 import { cn } from "@/lib/utils";
+import { DOMAIN_TYPE_LABELS } from "@/constants/domainTypes";
+import { DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
+import { DomainType, DomainStatus } from "@/types/domain";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ChevronDown } from "lucide-react";
 
 function pluralDomains(n: number) {
   if (n === 1) return "домен";
@@ -59,6 +68,9 @@ export default function FolderDetail() {
   const [addSearch, setAddSearch] = useState("");
   const [selectedToAdd, setSelectedToAdd] = useState<Set<string>>(new Set());
   const [domainSearch, setDomainSearch] = useState("");
+  const [addFilterTypes, setAddFilterTypes] = useState<Set<string>>(new Set());
+  const [addFilterStatuses, setAddFilterStatuses] = useState<Set<string>>(new Set());
+  const [addFilterProjects, setAddFilterProjects] = useState<Set<string>>(new Set());
 
   const folderDomains = useMemo(() => {
     if (!folder) return [];
@@ -80,14 +92,23 @@ export default function FolderDetail() {
     return allDomains.filter(d => !inFolder.has(d.id));
   }, [folder, allDomains]);
 
+  const availableProjects = useMemo(() => {
+    const projects = new Set(availableDomains.map(d => d.project).filter(Boolean));
+    return Array.from(projects).sort();
+  }, [availableDomains]);
+
   const filteredAvailable = useMemo(() => {
-    if (!addSearch.trim()) return availableDomains;
-    const q = addSearch.toLowerCase();
-    return availableDomains.filter(d =>
-      (d.name || "").toLowerCase().includes(q) ||
-      (d.project || "").toLowerCase().includes(q)
-    );
-  }, [availableDomains, addSearch]);
+    return availableDomains.filter(d => {
+      if (addSearch.trim()) {
+        const q = addSearch.toLowerCase();
+        if (!(d.name || "").toLowerCase().includes(q) && !(d.project || "").toLowerCase().includes(q)) return false;
+      }
+      if (addFilterTypes.size > 0 && !addFilterTypes.has(d.type)) return false;
+      if (addFilterStatuses.size > 0 && !addFilterStatuses.has(d.status)) return false;
+      if (addFilterProjects.size > 0 && !addFilterProjects.has(d.project)) return false;
+      return true;
+    });
+  }, [availableDomains, addSearch, addFilterTypes, addFilterStatuses, addFilterProjects]);
 
   if (!folder) {
     return (
@@ -138,6 +159,9 @@ export default function FolderDetail() {
   const handleOpenAddModal = () => {
     setSelectedToAdd(new Set());
     setAddSearch("");
+    setAddFilterTypes(new Set());
+    setAddFilterStatuses(new Set());
+    setAddFilterProjects(new Set());
     setShowAddModal(true);
   };
 
@@ -329,8 +353,31 @@ export default function FolderDetail() {
                         className="h-8 w-8 shrink-0 text-muted-foreground hover:text-yellow-400"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigator.clipboard.writeText(domain.name);
-                          toast.success("Скопировано");
+                          try {
+                            navigator.clipboard.writeText(domain.name).then(() => {
+                              toast.success("Скопировано");
+                            }).catch(() => {
+                              const ta = document.createElement("textarea");
+                              ta.value = domain.name;
+                              ta.style.position = "fixed";
+                              ta.style.opacity = "0";
+                              document.body.appendChild(ta);
+                              ta.select();
+                              document.execCommand("copy");
+                              document.body.removeChild(ta);
+                              toast.success("Скопировано");
+                            });
+                          } catch {
+                            const ta = document.createElement("textarea");
+                            ta.value = domain.name;
+                            ta.style.position = "fixed";
+                            ta.style.opacity = "0";
+                            document.body.appendChild(ta);
+                            ta.select();
+                            document.execCommand("copy");
+                            document.body.removeChild(ta);
+                            toast.success("Скопировано");
+                          }
                         }}
                       >
                         <Copy className="h-4 w-4" />
@@ -364,7 +411,7 @@ export default function FolderDetail() {
 
       {/* Add Domains Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="max-w-lg max-h-[80vh] flex flex-col border-none">
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col border-none">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <div className="flex h-6 w-6 items-center justify-center rounded" style={{ backgroundColor: `${color}15` }}>
@@ -381,6 +428,102 @@ export default function FolderDetail() {
               onChange={(e) => setAddSearch(e.target.value)}
               className="pl-9 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <Popover modal={true}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-8 text-xs border-border/50 gap-1.5">
+                  {addFilterTypes.size > 0 ? `Тип (${addFilterTypes.size})` : "Все типы"}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start" sideOffset={4}>
+                <div className="space-y-1 max-h-[200px] overflow-auto">
+                  {Object.entries(DOMAIN_TYPE_LABELS).map(([value, label]) => (
+                    <label key={value} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-secondary/50 cursor-pointer text-xs">
+                      <Checkbox
+                        checked={addFilterTypes.has(value)}
+                        onCheckedChange={() => {
+                          setAddFilterTypes(prev => {
+                            const next = new Set(prev);
+                            next.has(value) ? next.delete(value) : next.add(value);
+                            return next;
+                          });
+                        }}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Popover modal={true}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-8 text-xs border-border/50 gap-1.5">
+                  {addFilterStatuses.size > 0 ? `Статус (${addFilterStatuses.size})` : "Все статусы"}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start" sideOffset={4}>
+                <div className="space-y-1 max-h-[200px] overflow-auto">
+                  {Object.entries(DOMAIN_STATUS_LABELS).map(([value, label]) => (
+                    <label key={value} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-secondary/50 cursor-pointer text-xs">
+                      <Checkbox
+                        checked={addFilterStatuses.has(value)}
+                        onCheckedChange={() => {
+                          setAddFilterStatuses(prev => {
+                            const next = new Set(prev);
+                            next.has(value) ? next.delete(value) : next.add(value);
+                            return next;
+                          });
+                        }}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Popover modal={true}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-8 text-xs border-border/50 gap-1.5">
+                  {addFilterProjects.size > 0 ? `Проект (${addFilterProjects.size})` : "Все проекты"}
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-48 p-2" align="start" sideOffset={4}>
+                <div className="space-y-1 max-h-[200px] overflow-auto">
+                  {availableProjects.map((p) => (
+                    <label key={p} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-secondary/50 cursor-pointer text-xs">
+                      <Checkbox
+                        checked={addFilterProjects.has(p)}
+                        onCheckedChange={() => {
+                          setAddFilterProjects(prev => {
+                            const next = new Set(prev);
+                            next.has(p) ? next.delete(p) : next.add(p);
+                            return next;
+                          });
+                        }}
+                      />
+                      {p}
+                    </label>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            {(addFilterTypes.size > 0 || addFilterStatuses.size > 0 || addFilterProjects.size > 0) && (
+              <button
+                type="button"
+                className="text-xs text-destructive hover:underline ml-1"
+                onClick={() => {
+                  setAddFilterTypes(new Set());
+                  setAddFilterStatuses(new Set());
+                  setAddFilterProjects(new Set());
+                }}
+              >
+                Сбросить
+              </button>
+            )}
           </div>
           {filteredAvailable.length > 0 && (
             <div className="flex items-center justify-between text-xs text-muted-foreground px-1">

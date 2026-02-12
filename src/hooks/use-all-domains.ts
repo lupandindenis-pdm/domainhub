@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { mockDomains } from "@/data/mockDomains";
+import { computeDomainStatus } from "@/lib/computeDomainStatus";
 
 /**
  * Хук для получения актуального списка доменов (mockDomains + localStorage).
@@ -150,7 +151,13 @@ export function useAllDomains() {
           cloudflareAccount: data.cloudflareAccount,
         } as any));
 
-      return [...merged, ...newDomains];
+      const all = [...merged, ...newDomains];
+
+      // Auto-compute status based on renewalDate
+      return all.map(d => ({
+        ...d,
+        status: computeDomainStatus(d.status, d.renewalDate),
+      }));
     } catch (error) {
       console.error('useAllDomains: Failed to merge domains:', error);
       return [...mockDomains];

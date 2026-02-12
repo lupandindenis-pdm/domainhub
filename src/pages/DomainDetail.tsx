@@ -46,6 +46,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 import { cn } from "@/lib/utils";
+import { computeDomainStatus } from "@/lib/computeDomainStatus";
 
 import { projects, departments, marketingCategories, departmentConfig, bonusTypes, marketingDirections, needsUpdateOptions, targetActions } from "@/data/mockDomains";
 import { DOMAIN_TYPE_LABELS, DOMAIN_TYPES, DOMAIN_TYPE_CONFIG, DOMAIN_STATUS_CONFIG, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
@@ -137,22 +138,33 @@ export default function DomainDetail() {
   const domain = useMemo(() => {
     if (isNewDomain) return null;
     
+    let found: any = null;
+
     // Сначала ищем в mockDomains
     const mockDomain = mockDomains.find((d) => d.id === id);
-    if (mockDomain) return mockDomain;
     
-    // Если не нашли — ищем в localStorage (созданные домены)
+    // Мержим с localStorage edits
     try {
       const saved = localStorage.getItem('editedDomains');
       if (saved) {
         const editedDomains = JSON.parse(saved);
-        if (editedDomains[id!]) {
-          return editedDomains[id!] as any;
+        const edits = editedDomains[id!];
+        if (mockDomain && edits && typeof edits === 'object') {
+          found = { ...mockDomain, ...edits, id: mockDomain.id };
+        } else if (!mockDomain && edits && typeof edits === 'object') {
+          found = edits;
         }
       }
     } catch {}
-    
-    return undefined;
+
+    if (!found && mockDomain) found = mockDomain;
+    if (!found) return undefined;
+
+    // Auto-compute status based on renewalDate
+    return {
+      ...found,
+      status: computeDomainStatus(found.status, found.renewalDate),
+    };
   }, [id, isNewDomain]);
 
 

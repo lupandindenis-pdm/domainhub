@@ -85,7 +85,7 @@ export default function Folders() {
             placeholder="Поиск папок..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 max-w-sm"
+            className="pl-9 max-w-sm focus-visible:ring-0 focus-visible:ring-offset-0"
           />
         </div>
       )}
