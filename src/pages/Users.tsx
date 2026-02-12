@@ -60,11 +60,10 @@ import {
   AppUser,
   UserRole,
   UserStatus,
-  ScopeType,
   UserScope,
   USER_ROLES,
   USER_STATUS_LABELS,
-  SCOPE_TYPE_LABELS,
+  getScopeLabel,
   canAssignRole,
 } from "@/types/user";
 import { projects, departments } from "@/data/mockDomains";
@@ -102,13 +101,11 @@ export default function Users() {
   // Invite form
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<UserRole>("viewer");
-  const [inviteScopeType, setInviteScopeType] = useState<ScopeType>("global");
   const [inviteProjects, setInviteProjects] = useState<string[]>([]);
   const [inviteDepartments, setInviteDepartments] = useState<string[]>([]);
 
   // Edit form
   const [editRole, setEditRole] = useState<UserRole>("viewer");
-  const [editScopeType, setEditScopeType] = useState<ScopeType>("global");
   const [editProjects, setEditProjects] = useState<string[]>([]);
   const [editDepartments, setEditDepartments] = useState<string[]>([]);
 
@@ -124,7 +121,6 @@ export default function Users() {
   const resetInviteForm = () => {
     setInviteEmail("");
     setInviteRole("viewer");
-    setInviteScopeType("global");
     setInviteProjects([]);
     setInviteDepartments([]);
   };
@@ -150,9 +146,8 @@ export default function Users() {
     }
 
     const scope: UserScope = {
-      type: inviteScopeType,
-      ...(inviteScopeType === "project" ? { projectIds: inviteProjects } : {}),
-      ...(inviteScopeType === "department" ? { departmentIds: inviteDepartments } : {}),
+      projectIds: inviteProjects,
+      departmentIds: inviteDepartments,
     };
 
     inviteUser(email, inviteRole, scope);
@@ -164,7 +159,6 @@ export default function Users() {
   const handleOpenEdit = (user: AppUser) => {
     setSelectedUser(user);
     setEditRole(user.role);
-    setEditScopeType(user.scope.type);
     setEditProjects(user.scope.projectIds || []);
     setEditDepartments(user.scope.departmentIds || []);
     setShowEditDialog(true);
@@ -177,9 +171,8 @@ export default function Users() {
       return;
     }
     const scope: UserScope = {
-      type: editScopeType,
-      ...(editScopeType === "project" ? { projectIds: editProjects } : {}),
-      ...(editScopeType === "department" ? { departmentIds: editDepartments } : {}),
+      projectIds: editProjects,
+      departmentIds: editDepartments,
     };
     updateUser(selectedUser.id, { role: editRole, scope });
     toast.success("Пользователь обновлён");
@@ -210,12 +203,6 @@ export default function Users() {
     setSelectedUser(null);
   };
 
-  const getScopeLabel = (scope: UserScope) => {
-    if (scope.type === "global") return "Глобальный";
-    if (scope.type === "project") return `Проекты (${scope.projectIds?.length || 0})`;
-    if (scope.type === "department") return `Отделы (${scope.departmentIds?.length || 0})`;
-    return "—";
-  };
 
   const assignableRoles = USER_ROLES.filter(r => canAssignRole(CURRENT_USER_ROLE, r.value));
 
@@ -366,58 +353,43 @@ export default function Users() {
               </Select>
             </div>
             <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">Тип доступа</label>
-              <Select value={inviteScopeType} onValueChange={(v) => setInviteScopeType(v as ScopeType)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(SCOPE_TYPE_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm text-muted-foreground mb-1.5 block">Проекты</label>
+              <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем проектам</p>
+              <div className="border rounded-md max-h-[160px] overflow-auto">
+                {projects.filter(p => p !== "Не известно").map((p) => (
+                  <label key={p} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
+                    <Checkbox
+                      checked={inviteProjects.includes(p)}
+                      onCheckedChange={(checked) => {
+                        setInviteProjects(prev =>
+                          checked ? [...prev, p] : prev.filter(x => x !== p)
+                        );
+                      }}
+                    />
+                    <span className="text-sm">{p}</span>
+                  </label>
+                ))}
+              </div>
             </div>
-            {inviteScopeType === "project" && (
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Проекты</label>
-                <div className="border rounded-md max-h-[200px] overflow-auto">
-                  {projects.filter(p => p !== "Не известно").map((p) => (
-                    <label key={p} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                      <Checkbox
-                        checked={inviteProjects.includes(p)}
-                        onCheckedChange={(checked) => {
-                          setInviteProjects(prev =>
-                            checked ? [...prev, p] : prev.filter(x => x !== p)
-                          );
-                        }}
-                      />
-                      <span className="text-sm">{p}</span>
-                    </label>
-                  ))}
-                </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block">Отделы</label>
+              <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем отделам</p>
+              <div className="border rounded-md max-h-[160px] overflow-auto">
+                {departments.map((d) => (
+                  <label key={d} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
+                    <Checkbox
+                      checked={inviteDepartments.includes(d)}
+                      onCheckedChange={(checked) => {
+                        setInviteDepartments(prev =>
+                          checked ? [...prev, d] : prev.filter(x => x !== d)
+                        );
+                      }}
+                    />
+                    <span className="text-sm">{d}</span>
+                  </label>
+                ))}
               </div>
-            )}
-            {inviteScopeType === "department" && (
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Отделы</label>
-                <div className="border rounded-md max-h-[200px] overflow-auto">
-                  {departments.map((d) => (
-                    <label key={d} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                      <Checkbox
-                        checked={inviteDepartments.includes(d)}
-                        onCheckedChange={(checked) => {
-                          setInviteDepartments(prev =>
-                            checked ? [...prev, d] : prev.filter(x => x !== d)
-                          );
-                        }}
-                      />
-                      <span className="text-sm">{d}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setShowInviteDialog(false); resetInviteForm(); }}>
@@ -456,58 +428,43 @@ export default function Users() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Тип доступа</label>
-                <Select value={editScopeType} onValueChange={(v) => setEditScopeType(v as ScopeType)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(SCOPE_TYPE_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <label className="text-sm text-muted-foreground mb-1.5 block">Проекты</label>
+                <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем проектам</p>
+                <div className="border rounded-md max-h-[160px] overflow-auto">
+                  {projects.filter(p => p !== "Не известно").map((p) => (
+                    <label key={p} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
+                      <Checkbox
+                        checked={editProjects.includes(p)}
+                        onCheckedChange={(checked) => {
+                          setEditProjects(prev =>
+                            checked ? [...prev, p] : prev.filter(x => x !== p)
+                          );
+                        }}
+                      />
+                      <span className="text-sm">{p}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-              {editScopeType === "project" && (
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Проекты</label>
-                  <div className="border rounded-md max-h-[200px] overflow-auto">
-                    {projects.filter(p => p !== "Не известно").map((p) => (
-                      <label key={p} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                        <Checkbox
-                          checked={editProjects.includes(p)}
-                          onCheckedChange={(checked) => {
-                            setEditProjects(prev =>
-                              checked ? [...prev, p] : prev.filter(x => x !== p)
-                            );
-                          }}
-                        />
-                        <span className="text-sm">{p}</span>
-                      </label>
-                    ))}
-                  </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-1.5 block">Отделы</label>
+                <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем отделам</p>
+                <div className="border rounded-md max-h-[160px] overflow-auto">
+                  {departments.map((d) => (
+                    <label key={d} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
+                      <Checkbox
+                        checked={editDepartments.includes(d)}
+                        onCheckedChange={(checked) => {
+                          setEditDepartments(prev =>
+                            checked ? [...prev, d] : prev.filter(x => x !== d)
+                          );
+                        }}
+                      />
+                      <span className="text-sm">{d}</span>
+                    </label>
+                  ))}
                 </div>
-              )}
-              {editScopeType === "department" && (
-                <div>
-                  <label className="text-sm text-muted-foreground mb-1.5 block">Отделы</label>
-                  <div className="border rounded-md max-h-[200px] overflow-auto">
-                    {departments.map((d) => (
-                      <label key={d} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                        <Checkbox
-                          checked={editDepartments.includes(d)}
-                          onCheckedChange={(checked) => {
-                            setEditDepartments(prev =>
-                              checked ? [...prev, d] : prev.filter(x => x !== d)
-                            );
-                          }}
-                        />
-                        <span className="text-sm">{d}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           )}
           <DialogFooter>

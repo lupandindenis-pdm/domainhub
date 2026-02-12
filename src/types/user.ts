@@ -2,8 +2,6 @@ export type UserRole = 'super_admin' | 'admin' | 'manager' | 'editor' | 'viewer'
 
 export type UserStatus = 'pending' | 'active' | 'suspended' | 'deleted';
 
-export type ScopeType = 'global' | 'project' | 'department';
-
 export type Permission =
   | 'domain:create'
   | 'domain:edit'
@@ -13,9 +11,8 @@ export type Permission =
   | 'user:manage';
 
 export interface UserScope {
-  type: ScopeType;
-  projectIds?: string[];
-  departmentIds?: string[];
+  projectIds: string[];
+  departmentIds: string[];
 }
 
 export interface AppUser {
@@ -53,11 +50,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   viewer: [],
 };
 
-export const SCOPE_TYPE_LABELS: Record<ScopeType, string> = {
-  global: 'Глобальный',
-  project: 'По проектам',
-  department: 'По отделам',
-};
+export function getScopeLabel(scope: UserScope): string {
+  const parts: string[] = [];
+  if (scope.projectIds?.length) parts.push(`Проекты (${scope.projectIds.length})`);
+  if (scope.departmentIds?.length) parts.push(`Отделы (${scope.departmentIds.length})`);
+  return parts.length > 0 ? parts.join(' + ') : 'Глобальный';
+}
 
 export function hasPermission(role: UserRole, permission: Permission): boolean {
   return ROLE_PERMISSIONS[role]?.includes(permission) ?? false;
