@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useUsers } from "@/hooks/use-users";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,13 +13,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -29,27 +23,17 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   UserPlus,
   Search,
   MoreHorizontal,
-  Shield,
   ShieldCheck,
-  ShieldAlert,
   Pencil,
   Ban,
   RotateCcw,
@@ -60,13 +44,10 @@ import {
   AppUser,
   UserRole,
   UserStatus,
-  UserScope,
   USER_ROLES,
   USER_STATUS_LABELS,
   getScopeLabel,
-  canAssignRole,
 } from "@/types/user";
-import { projects, departments } from "@/data/mockDomains";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
@@ -86,28 +67,13 @@ const ROLE_COLORS: Record<UserRole, string> = {
   viewer: "bg-gray-500/15 text-gray-400 border-gray-500/30",
 };
 
-// Current user is super_admin for demo
-const CURRENT_USER_ROLE: UserRole = "super_admin";
-
 export default function Users() {
-  const { users, inviteUser, updateUser, suspendUser, reactivateUser, deleteUser } = useUsers();
+  const navigate = useNavigate();
+  const { users, suspendUser, reactivateUser, deleteUser } = useUsers();
 
   const [search, setSearch] = useState("");
-  const [showInviteDialog, setShowInviteDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<AppUser | null>(null);
-
-  // Invite form
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<UserRole>("viewer");
-  const [inviteProjects, setInviteProjects] = useState<string[]>([]);
-  const [inviteDepartments, setInviteDepartments] = useState<string[]>([]);
-
-  // Edit form
-  const [editRole, setEditRole] = useState<UserRole>("viewer");
-  const [editProjects, setEditProjects] = useState<string[]>([]);
-  const [editDepartments, setEditDepartments] = useState<string[]>([]);
 
   const filteredUsers = useMemo(() => {
     if (!search.trim()) return users;
@@ -117,68 +83,6 @@ export default function Users() {
       USER_ROLES.find(r => r.value === u.role)?.label.toLowerCase().includes(q)
     );
   }, [users, search]);
-
-  const resetInviteForm = () => {
-    setInviteEmail("");
-    setInviteRole("viewer");
-    setInviteProjects([]);
-    setInviteDepartments([]);
-  };
-
-  const handleInvite = () => {
-    const email = inviteEmail.trim().toLowerCase();
-    if (!email) {
-      toast.error("Введите email");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Некорректный email");
-      return;
-    }
-    const existing = users.find(u => u.email.toLowerCase() === email);
-    if (existing) {
-      toast.error("Пользователь с таким email уже существует");
-      return;
-    }
-    if (!canAssignRole(CURRENT_USER_ROLE, inviteRole)) {
-      toast.error("Нельзя назначить роль выше своей");
-      return;
-    }
-
-    const scope: UserScope = {
-      projectIds: inviteProjects,
-      departmentIds: inviteDepartments,
-    };
-
-    inviteUser(email, inviteRole, scope);
-    toast.success("Приглашение отправлено", { description: email });
-    resetInviteForm();
-    setShowInviteDialog(false);
-  };
-
-  const handleOpenEdit = (user: AppUser) => {
-    setSelectedUser(user);
-    setEditRole(user.role);
-    setEditProjects(user.scope.projectIds || []);
-    setEditDepartments(user.scope.departmentIds || []);
-    setShowEditDialog(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (!selectedUser) return;
-    if (!canAssignRole(CURRENT_USER_ROLE, editRole)) {
-      toast.error("Нельзя назначить роль выше своей");
-      return;
-    }
-    const scope: UserScope = {
-      projectIds: editProjects,
-      departmentIds: editDepartments,
-    };
-    updateUser(selectedUser.id, { role: editRole, scope });
-    toast.success("Пользователь обновлён");
-    setShowEditDialog(false);
-    setSelectedUser(null);
-  };
 
   const handleSuspend = (user: AppUser) => {
     suspendUser(user.id);
@@ -203,9 +107,6 @@ export default function Users() {
     setSelectedUser(null);
   };
 
-
-  const assignableRoles = USER_ROLES.filter(r => canAssignRole(CURRENT_USER_ROLE, r.value));
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
@@ -213,7 +114,7 @@ export default function Users() {
           <h1 className="text-2xl font-bold tracking-tight">Пользователи</h1>
           <p className="text-muted-foreground">Управление доступом и ролями</p>
         </div>
-        <Button onClick={() => setShowInviteDialog(true)} className="gap-2">
+        <Button onClick={() => navigate("/users/invite")} className="gap-2">
           <UserPlus className="h-4 w-4" />
           Пригласить пользователя
         </Button>
@@ -236,7 +137,7 @@ export default function Users() {
           <p className="text-sm text-muted-foreground mb-4">
             Пригласите первого пользователя в систему
           </p>
-          <Button variant="outline" onClick={() => setShowInviteDialog(true)} className="gap-2">
+          <Button variant="outline" onClick={() => navigate("/users/invite")} className="gap-2">
             <UserPlus className="h-4 w-4" />
             Пригласить
           </Button>
@@ -256,7 +157,7 @@ export default function Users() {
             </TableHeader>
             <TableBody>
               {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow key={user.id} className="cursor-pointer" onClick={() => navigate(`/users/${user.id}/edit`)}>
                   <TableCell className="font-medium truncate">{user.email}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={cn("text-xs", ROLE_COLORS[user.role])}>
@@ -274,7 +175,7 @@ export default function Users() {
                   <TableCell className="text-sm text-muted-foreground">
                     {format(new Date(user.invitedAt), "dd MMM yyyy", { locale: ru })}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -282,7 +183,7 @@ export default function Users() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenEdit(user)}>
+                        <DropdownMenuItem onClick={() => navigate(`/users/${user.id}/edit`)}>
                           <Pencil className="h-4 w-4 mr-2" />
                           Редактировать
                         </DropdownMenuItem>
@@ -321,162 +222,6 @@ export default function Users() {
           </Table>
         </div>
       )}
-
-      {/* Invite Dialog */}
-      <Dialog open={showInviteDialog} onOpenChange={(open) => { setShowInviteDialog(open); if (!open) resetInviteForm(); }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Пригласить пользователя</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">Email</label>
-              <Input
-                placeholder="user@example.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                type="email"
-                autoFocus
-              />
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">Роль</label>
-              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as UserRole)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {assignableRoles.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">Проекты</label>
-              <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем проектам</p>
-              <div className="border rounded-md max-h-[160px] overflow-auto">
-                {projects.filter(p => p !== "Не известно").map((p) => (
-                  <label key={p} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                    <Checkbox
-                      checked={inviteProjects.includes(p)}
-                      onCheckedChange={(checked) => {
-                        setInviteProjects(prev =>
-                          checked ? [...prev, p] : prev.filter(x => x !== p)
-                        );
-                      }}
-                    />
-                    <span className="text-sm">{p}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">Отделы</label>
-              <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем отделам</p>
-              <div className="border rounded-md max-h-[160px] overflow-auto">
-                {departments.map((d) => (
-                  <label key={d} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                    <Checkbox
-                      checked={inviteDepartments.includes(d)}
-                      onCheckedChange={(checked) => {
-                        setInviteDepartments(prev =>
-                          checked ? [...prev, d] : prev.filter(x => x !== d)
-                        );
-                      }}
-                    />
-                    <span className="text-sm">{d}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => { setShowInviteDialog(false); resetInviteForm(); }}>
-              Отмена
-            </Button>
-            <Button onClick={handleInvite} disabled={!inviteEmail.trim()}>
-              Отправить приглашение
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog */}
-      <Dialog open={showEditDialog} onOpenChange={(open) => { setShowEditDialog(open); if (!open) setSelectedUser(null); }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Редактировать пользователя</DialogTitle>
-          </DialogHeader>
-          {selectedUser && (
-            <div className="space-y-4 py-2">
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Email</label>
-                <Input value={selectedUser.email} disabled />
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Роль</label>
-                <Select value={editRole} onValueChange={(v) => setEditRole(v as UserRole)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {assignableRoles.map((r) => (
-                      <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Проекты</label>
-                <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем проектам</p>
-                <div className="border rounded-md max-h-[160px] overflow-auto">
-                  {projects.filter(p => p !== "Не известно").map((p) => (
-                    <label key={p} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                      <Checkbox
-                        checked={editProjects.includes(p)}
-                        onCheckedChange={(checked) => {
-                          setEditProjects(prev =>
-                            checked ? [...prev, p] : prev.filter(x => x !== p)
-                          );
-                        }}
-                      />
-                      <span className="text-sm">{p}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm text-muted-foreground mb-1.5 block">Отделы</label>
-                <p className="text-xs text-muted-foreground/70 mb-1.5">Если ничего не выбрано — доступ ко всем отделам</p>
-                <div className="border rounded-md max-h-[160px] overflow-auto">
-                  {departments.map((d) => (
-                    <label key={d} className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/30 cursor-pointer">
-                      <Checkbox
-                        checked={editDepartments.includes(d)}
-                        onCheckedChange={(checked) => {
-                          setEditDepartments(prev =>
-                            checked ? [...prev, d] : prev.filter(x => x !== d)
-                          );
-                        }}
-                      />
-                      <span className="text-sm">{d}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => { setShowEditDialog(false); setSelectedUser(null); }}>
-              Отмена
-            </Button>
-            <Button onClick={handleSaveEdit}>
-              Сохранить
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Confirmation */}
       <AlertDialog open={showDeleteDialog} onOpenChange={(open) => { setShowDeleteDialog(open); if (!open) setSelectedUser(null); }}>

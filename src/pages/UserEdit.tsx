@@ -1,0 +1,236 @@
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useUsers } from "@/hooks/use-users";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
+import { ArrowLeft, Ban, RotateCcw, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  AppUser,
+  UserRole,
+  UserScope,
+  UserStatus,
+  USER_ROLES,
+  USER_STATUS_LABELS,
+  canAssignRole,
+} from "@/types/user";
+import { projects, departments } from "@/data/mockDomains";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ru } from "date-fns/locale";
+
+const CURRENT_USER_ROLE: UserRole = "super_admin";
+const assignableRoles = USER_ROLES.filter(r => canAssignRole(CURRENT_USER_ROLE, r.value));
+const projectOptions = projects.filter(p => p !== "Не известно");
+
+const STATUS_COLORS: Record<UserStatus, string> = {
+  pending: "bg-yellow-500/15 text-yellow-500 border-yellow-500/30",
+  active: "bg-green-500/15 text-green-500 border-green-500/30",
+  suspended: "bg-red-500/15 text-red-500 border-red-500/30",
+  deleted: "bg-gray-500/15 text-gray-500 border-gray-500/30",
+};
+
+export default function UserEdit() {
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const { users, allUsers, updateUser, suspendUser, reactivateUser, deleteUser } = useUsers();
+
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [role, setRole] = useState<UserRole>("viewer");
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  useEffect(() => {
+    const found = allUsers.find(u => u.id === id);
+    if (found) {
+      setUser(found);
+      setRole(found.role);
+      setSelectedProjects(found.scope.projectIds || []);
+      setSelectedDepartments(found.scope.departmentIds || []);
+    }
+  }, [id, allUsers]);
+
+  if (!user) {
+    return (
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/users")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold tracking-tight">Пользователь не найден</h1>
+        </div>
+      </div>
+    );
+  }
+
+  const handleSave = () => {
+    if (!canAssignRole(CURRENT_USER_ROLE, role)) {
+      toast.error("Нельзя назначить роль выше своей");
+      return;
+    }
+    const scope: UserScope = {
+      projectIds: selectedProjects,
+      departmentIds: selectedDepartments,
+    };
+    updateUser(user.id, { role, scope });
+    toast.success("Пользователь обновлён");
+    navigate("/users");
+  };
+
+  const handleSuspend = () => {
+    suspendUser(user.id);
+    toast.success("Пользователь заблокирован", { description: user.email });
+    navigate("/users");
+  };
+
+  const handleReactivate = () => {
+    reactivateUser(user.id);
+    toast.success("Пользователь активирован", { description: user.email });
+    navigate("/users");
+  };
+
+  const handleDelete = () => {
+    deleteUser(user.id);
+    toast.success("Пользователь удалён", { description: user.email });
+    navigate("/users");
+  };
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/users")}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold tracking-tight">Редактировать пользователя</h1>
+          <p className="text-muted-foreground">{user.email}</p>
+        </div>
+        <Badge variant="outline" className={cn("text-xs", STATUS_COLORS[user.status])}>
+          {USER_STATUS_LABELS[user.status]}
+        </Badge>
+      </div>
+
+      <div className="max-w-lg space-y-5">
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">Email</label>
+          <Input value={user.email} disabled />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+          <div>
+            <span className="block text-xs mb-0.5">Приглашён</span>
+            {format(new Date(user.invitedAt), "dd MMM yyyy, HH:mm", { locale: ru })}
+          </div>
+          {user.lastActiveAt && (
+            <div>
+              <span className="block text-xs mb-0.5">Последняя активность</span>
+              {format(new Date(user.lastActiveAt), "dd MMM yyyy, HH:mm", { locale: ru })}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">Роль</label>
+          <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {assignableRoles.map((r) => (
+                <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">Проекты</label>
+          <p className="text-xs text-muted-foreground mb-1.5">Если ничего не выбрано — доступ ко всем проектам</p>
+          <MultiSelectDropdown
+            options={projectOptions}
+            selected={selectedProjects}
+            onChange={setSelectedProjects}
+            placeholder="Все проекты"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-1.5 block">Отделы</label>
+          <p className="text-xs text-muted-foreground mb-1.5">Если ничего не выбрано — доступ ко всем отделам</p>
+          <MultiSelectDropdown
+            options={departments}
+            selected={selectedDepartments}
+            onChange={setSelectedDepartments}
+            placeholder="Все отделы"
+          />
+        </div>
+
+        <div className="flex items-center gap-3 pt-4">
+          <Button variant="outline" onClick={() => navigate("/users")}>
+            Отмена
+          </Button>
+          <Button onClick={handleSave}>
+            Сохранить
+          </Button>
+
+          <div className="flex-1" />
+
+          {(user.status === "active" || user.status === "pending") && (
+            <Button variant="outline" size="sm" onClick={handleSuspend} className="text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10">
+              <Ban className="h-4 w-4 mr-1.5" />
+              Заблокировать
+            </Button>
+          )}
+          {user.status === "suspended" && (
+            <Button variant="outline" size="sm" onClick={handleReactivate} className="text-green-500 border-green-500/30 hover:bg-green-500/10">
+              <RotateCcw className="h-4 w-4 mr-1.5" />
+              Активировать
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)} className="text-destructive border-destructive/30 hover:bg-destructive/10">
+            <Trash2 className="h-4 w-4 mr-1.5" />
+            Удалить
+          </Button>
+        </div>
+      </div>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить пользователя?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Пользователь {user.email} будет удалён из системы. Это действие можно отменить через базу данных.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Удалить
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
