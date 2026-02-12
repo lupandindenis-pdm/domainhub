@@ -156,13 +156,13 @@ export default function DomainDetail() {
       {/* Main Content Tabs */}
       <Tabs defaultValue="general" className="space-y-6">
         <TabsList className="flex h-auto flex-wrap gap-1 bg-transparent p-0 justify-start">
-          <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border border-transparent data-[state=active]:border-primary px-4 py-2 rounded-md shadow-sm bg-card">
+          <TabsTrigger value="general" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground border-0 px-4 py-2 rounded-md shadow-sm bg-card">
             Общая информация
           </TabsTrigger>
-          <TabsTrigger value="department" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white border border-transparent px-4 py-2 rounded-md shadow-sm bg-card">
+          <TabsTrigger value="department" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white border-0 px-4 py-2 rounded-md shadow-sm bg-card">
             Отдел
           </TabsTrigger>
-          <TabsTrigger value="integrations" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white border border-transparent px-4 py-2 rounded-md shadow-sm bg-card">
+          <TabsTrigger value="integrations" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white border-0 px-4 py-2 rounded-md shadow-sm bg-card">
             Интеграции
           </TabsTrigger>
         </TabsList>

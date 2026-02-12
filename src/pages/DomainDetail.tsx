@@ -1185,19 +1185,19 @@ export default function DomainDetail() {
 
         <TabsList className="flex h-auto flex-wrap gap-2 bg-transparent p-0 justify-start pl-6 mt-4">
 
-          <TabsTrigger value="general" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary data-[state=active]:border-primary/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
+          <TabsTrigger value="general" className="data-[state=active]:bg-primary/10 data-[state=active]:text-primary border-0 px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
 
             Общая информация
 
           </TabsTrigger>
 
-          <TabsTrigger value="department" className="data-[state=active]:bg-purple-500/10 data-[state=active]:text-purple-600 data-[state=active]:border-purple-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
+          <TabsTrigger value="department" className="data-[state=active]:bg-purple-500/10 data-[state=active]:text-purple-600 border-0 px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
 
             Отдел
 
           </TabsTrigger>
 
-          <TabsTrigger value="integrations" className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-600 data-[state=active]:border-orange-500/50 border border-border px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
+          <TabsTrigger value="integrations" className="data-[state=active]:bg-orange-500/10 data-[state=active]:text-orange-600 border-0 px-4 py-2 rounded-md transition-colors bg-card hover:bg-accent">
 
             Интеграции
 
