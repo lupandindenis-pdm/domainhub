@@ -73,7 +73,7 @@ export function MultiSelectDropdown({
         role="combobox"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="w-full justify-between font-normal h-10 border-0 border-b border-border rounded-none px-0 bg-transparent hover:bg-transparent focus:ring-0"
+        className="w-full justify-between font-normal h-10 bg-muted/50"
       >
         <span className="truncate text-sm">
           {displayText}

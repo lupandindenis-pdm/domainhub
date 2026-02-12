@@ -480,6 +480,7 @@ export const mockHistory: DomainHistoryEntry[] = [
 ];
 
 export const projects = [
+  "Все",
   "Trafmasters",
   "Atenspace",
   "Quickrivals",
