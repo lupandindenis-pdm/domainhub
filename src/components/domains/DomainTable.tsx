@@ -192,7 +192,17 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                               onUpdateDomain(domain.id, { name: newValue });
                               
                               // Обновляем состояние ошибок валидации для реактивного изменения обводки
-                              const error = validateDomain(newValue);
+                              let error = validateDomain(newValue);
+                              // Проверка на дубликат URL
+                              if (!error && newValue.trim()) {
+                                const normalized = newValue.trim().toLowerCase();
+                                const duplicate = domains.find(
+                                  d => d.id !== domain.id && d.name.trim().toLowerCase() === normalized
+                                );
+                                if (duplicate) {
+                                  error = 'Такой URL уже есть в системе';
+                                }
+                              }
                               setValidationErrors(prev => ({
                                 ...prev,
                                 [domain.id]: error
@@ -208,6 +218,7 @@ export function DomainTable({ domains, bulkSelectMode, selectedDomainIds, onTogg
                               }
                             }}
                             onClick={(e) => e.stopPropagation()}
+                            title={validationErrors[domain.id] || undefined}
                             className={cn(
                               "h-8 font-mono text-sm bg-muted/30 border-none",
                               validationErrors[domain.id]

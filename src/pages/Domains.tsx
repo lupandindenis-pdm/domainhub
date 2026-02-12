@@ -343,6 +343,26 @@ export default function Domains() {
         });
         return; // Не выходим из режима редактирования
       }
+
+      // Проверяем на дубликаты URL
+      const nameCount = new Map<string, string[]>();
+      domains.forEach(domain => {
+        const normalized = domain.name.trim().toLowerCase();
+        if (!normalized) return;
+        const ids = nameCount.get(normalized) || [];
+        ids.push(domain.id);
+        nameCount.set(normalized, ids);
+      });
+      const duplicates = [...nameCount.entries()]
+        .filter(([, ids]) => ids.length > 1)
+        .map(([name]) => name);
+
+      if (duplicates.length > 0) {
+        toast.error("Обнаружены дубликаты доменов", {
+          description: `Такой URL уже есть в системе: ${duplicates.slice(0, 3).join(', ')}${duplicates.length > 3 ? '...' : ''}`,
+        });
+        return; // Не выходим из режима редактирования
+      }
     }
     
     setQuickEditMode(newMode);
