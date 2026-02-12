@@ -432,7 +432,7 @@ export default function FolderDetail() {
           <div className="flex items-center gap-2">
             <Popover modal={true}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="h-8 text-xs border-border/50 gap-1.5">
+                <Button variant="ghost" className="h-8 text-xs gap-1.5">
                   {addFilterTypes.size > 0 ? `Тип (${addFilterTypes.size})` : "Все типы"}
                   <ChevronDown className="h-3 w-3" />
                 </Button>
@@ -459,7 +459,7 @@ export default function FolderDetail() {
             </Popover>
             <Popover modal={true}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="h-8 text-xs border-border/50 gap-1.5">
+                <Button variant="ghost" className="h-8 text-xs gap-1.5">
                   {addFilterStatuses.size > 0 ? `Статус (${addFilterStatuses.size})` : "Все статусы"}
                   <ChevronDown className="h-3 w-3" />
                 </Button>
@@ -486,7 +486,7 @@ export default function FolderDetail() {
             </Popover>
             <Popover modal={true}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="h-8 text-xs border-border/50 gap-1.5">
+                <Button variant="ghost" className="h-8 text-xs gap-1.5">
                   {addFilterProjects.size > 0 ? `Проект (${addFilterProjects.size})` : "Все проекты"}
                   <ChevronDown className="h-3 w-3" />
                 </Button>
@@ -514,13 +514,14 @@ export default function FolderDetail() {
             {(addFilterTypes.size > 0 || addFilterStatuses.size > 0 || addFilterProjects.size > 0) && (
               <button
                 type="button"
-                className="text-xs text-destructive hover:underline ml-1"
+                className="text-xs text-muted-foreground hover:text-destructive transition-colors ml-1 flex items-center gap-1"
                 onClick={() => {
                   setAddFilterTypes(new Set());
                   setAddFilterStatuses(new Set());
                   setAddFilterProjects(new Set());
                 }}
               >
+                <X className="h-3 w-3" />
                 Сбросить
               </button>
             )}
