@@ -22,7 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
-import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, Calendar as CalendarIcon, Ban, RotateCcw, Trash2, RefreshCw, Eye, EyeOff, Copy } from "lucide-react";
+import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, Ban, RotateCcw, Trash2, RefreshCw, Eye, EyeOff, Copy } from "lucide-react";
 import { toast } from "sonner";
 import {
   AppUser,
@@ -35,8 +35,6 @@ import {
 } from "@/types/user";
 import { projects, departments } from "@/data/mockDomains";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { ru } from "date-fns/locale";
 
 const CURRENT_USER_ROLE: UserRole = "super_admin";
 const assignableRoles = USER_ROLES.filter(r => canAssignRole(CURRENT_USER_ROLE, r.value));
@@ -63,8 +61,9 @@ export default function UserEdit() {
   const { allUsers, updateUser, suspendUser, reactivateUser, deleteUser } = useUsers();
 
   const [user, setUser] = useState<AppUser | null>(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("viewer");
-  const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
@@ -74,6 +73,8 @@ export default function UserEdit() {
     const found = allUsers.find(u => u.id === id);
     if (found) {
       setUser(found);
+      setUsername(found.username);
+      setPassword(found.password || "");
       setRole(found.role);
       setSelectedProjects(found.scope.projectIds || []);
       setSelectedDepartments(found.scope.departmentIds || []);
@@ -95,15 +96,15 @@ export default function UserEdit() {
 
   const handleGeneratePassword = () => {
     const pwd = generatePassword();
-    setNewPassword(pwd);
+    setPassword(pwd);
     setShowPassword(true);
   };
 
   const handleCopyPassword = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (newPassword) {
-      navigator.clipboard.writeText(newPassword).then(() => {
+    if (password) {
+      navigator.clipboard.writeText(password).then(() => {
         toast.success("Пароль скопирован");
       });
     }
@@ -114,7 +115,20 @@ export default function UserEdit() {
       toast.error("Нельзя назначить роль выше своей");
       return;
     }
-    if (newPassword && newPassword.length < 6) {
+    const trimmedUsername = username.trim();
+    if (!trimmedUsername) {
+      toast.error("Введите имя пользователя");
+      return;
+    }
+    if (trimmedUsername.length < 3) {
+      toast.error("Имя пользователя должно быть не менее 3 символов");
+      return;
+    }
+    if (!password) {
+      toast.error("Введите или сгенерируйте пароль");
+      return;
+    }
+    if (password.length < 6) {
       toast.error("Пароль должен быть не менее 6 символов");
       return;
     }
@@ -165,10 +179,15 @@ export default function UserEdit() {
         <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <User className="h-4 w-4" />
+              <User className="h-4 w-4 !text-green-600" />
               Имя пользователя
             </label>
-            <Input value={user.username} disabled className="bg-transparent disabled:opacity-70" />
+            <Input
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="bg-transparent"
+            />
           </div>
 
           <div className="space-y-2">
@@ -189,67 +208,55 @@ export default function UserEdit() {
           </div>
         </div>
 
-        {/* 2. Пароль + Создан */}
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <KeyRound className="h-4 w-4 !text-green-600" />
-              Новый пароль
-            </label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Оставьте пустым, чтобы не менять"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="bg-transparent pr-20"
-                />
-                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+        {/* 2. Пароль */}
+        <div className="space-y-2">
+          <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+            <KeyRound className="h-4 w-4 !text-green-600" />
+            Пароль
+          </label>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Введите пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-transparent pr-20"
+              />
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? "Скрыть" : "Показать"}
+                >
+                  {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </Button>
+                {password && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => setShowPassword(!showPassword)}
-                    title={showPassword ? "Скрыть" : "Показать"}
+                    onMouseDown={handleCopyPassword}
+                    title="Копировать"
                   >
-                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    <Copy className="h-3.5 w-3.5" />
                   </Button>
-                  {newPassword && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onMouseDown={handleCopyPassword}
-                      title="Копировать"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </div>
+                )}
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGeneratePassword}
-                className="gap-1.5 shrink-0"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Сгенерировать
-              </Button>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4" />
-              Создан
-            </label>
-            <div className="flex items-center h-10 text-sm text-muted-foreground">
-              {format(new Date(user.createdAt), "dd MMM yyyy, HH:mm", { locale: ru })}
-            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGeneratePassword}
+              className="gap-1.5 shrink-0"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Сгенерировать
+            </Button>
           </div>
         </div>
 
