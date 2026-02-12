@@ -136,7 +136,7 @@ export default function UserEdit() {
       projectIds: selectedProjects,
       departmentIds: selectedDepartments,
     };
-    updateUser(user.id, { role, scope });
+    updateUser(user.id, { username: trimmedUsername, password, role, scope });
     toast.success("Пользователь обновлён");
     navigate("/users");
   };

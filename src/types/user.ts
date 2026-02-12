@@ -51,10 +51,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 };
 
 export function getScopeLabel(scope: UserScope): string {
-  const parts: string[] = [];
-  if (scope.projectIds?.length) parts.push(`Проекты (${scope.projectIds.length})`);
-  if (scope.departmentIds?.length) parts.push(`Отделы (${scope.departmentIds.length})`);
-  return parts.length > 0 ? parts.join(' + ') : 'Глобальный';
+  const hasProjects = scope.projectIds?.length > 0;
+  const hasDepartments = scope.departmentIds?.length > 0;
+  return (hasProjects || hasDepartments) ? 'Смешанный' : 'Глобальный';
 }
 
 export function hasPermission(role: UserRole, permission: Permission): boolean {

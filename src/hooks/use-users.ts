@@ -48,7 +48,7 @@ export function useUsers() {
     return user;
   }, []);
 
-  const updateUser = useCallback((id: string, changes: Partial<Pick<AppUser, 'role' | 'scope' | 'status'>>) => {
+  const updateUser = useCallback((id: string, changes: Partial<Pick<AppUser, 'username' | 'password' | 'role' | 'scope' | 'status'>>) => {
     const current = loadUsers();
     const updated = current.map(u =>
       u.id === id ? { ...u, ...changes, updatedAt: new Date().toISOString() } : u
