@@ -161,7 +161,7 @@ export default function UserEdit() {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* 1. Имя пользователя + Пароль */}
+        {/* 1. Имя пользователя + Роль */}
         <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
@@ -171,6 +171,26 @@ export default function UserEdit() {
             <Input value={user.username} disabled className="bg-transparent disabled:opacity-70" />
           </div>
 
+          <div className="space-y-2">
+            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+              <Shield className="h-4 w-4 !text-green-600" />
+              Роль
+            </label>
+            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+              <SelectTrigger className="bg-transparent">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {assignableRoles.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* 2. Пароль + Создан */}
+        <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
               <KeyRound className="h-4 w-4 !text-green-600" />
@@ -220,26 +240,6 @@ export default function UserEdit() {
                 Сгенерировать
               </Button>
             </div>
-          </div>
-        </div>
-
-        {/* 2. Роль + Создан */}
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <Shield className="h-4 w-4 !text-green-600" />
-              Роль
-            </label>
-            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-              <SelectTrigger className="bg-transparent">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {assignableRoles.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="space-y-2">

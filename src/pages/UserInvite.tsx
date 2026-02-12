@@ -111,7 +111,7 @@ export default function UserInvite() {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* 1. Имя пользователя + Пароль */}
+        {/* 1. Имя пользователя + Роль */}
         <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
@@ -129,72 +129,72 @@ export default function UserInvite() {
 
           <div className="space-y-2">
             <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <KeyRound className="h-4 w-4 !text-green-600" />
-              Пароль
+              <Shield className="h-4 w-4 !text-green-600" />
+              Роль
             </label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Введите пароль"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-transparent pr-20"
-                />
-                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+              <SelectTrigger className="bg-transparent">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {assignableRoles.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* 2. Пароль */}
+        <div className="space-y-2">
+          <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
+            <KeyRound className="h-4 w-4 !text-green-600" />
+            Пароль
+          </label>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Введите пароль"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-transparent pr-20"
+              />
+              <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setShowPassword(!showPassword)}
+                  title={showPassword ? "Скрыть" : "Показать"}
+                >
+                  {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </Button>
+                {password && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => setShowPassword(!showPassword)}
-                    title={showPassword ? "Скрыть" : "Показать"}
+                    onMouseDown={handleCopyPassword}
+                    title="Копировать"
                   >
-                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    <Copy className="h-3.5 w-3.5" />
                   </Button>
-                  {password && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onMouseDown={handleCopyPassword}
-                      title="Копировать"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
-                </div>
+                )}
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGeneratePassword}
-                className="gap-1.5 shrink-0"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Сгенерировать
-              </Button>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGeneratePassword}
+              className="gap-1.5 shrink-0"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Сгенерировать
+            </Button>
           </div>
-        </div>
-
-        {/* 2. Роль */}
-        <div className="space-y-2">
-          <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-            <Shield className="h-4 w-4 !text-green-600" />
-            Роль
-          </label>
-          <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-            <SelectTrigger className="bg-transparent">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {assignableRoles.map((r) => (
-                <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         {/* 3. Проекты слева / Отделы справа */}
