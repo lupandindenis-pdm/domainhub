@@ -12,6 +12,7 @@ import UsersPage from "./pages/UsersPage";
 import UserInvitePage from "./pages/UserInvitePage";
 import UserEditPage from "./pages/UserEditPage";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
           <Route path="/" element={<Index />} />
           <Route path="/domains" element={<DomainsPage />} />
           <Route path="/domains/:id" element={<DomainDetailPage />} />

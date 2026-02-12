@@ -411,7 +411,7 @@ export default function FolderDetail() {
 
       {/* Add Domains Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col border-none">
+        <DialogContent className="max-w-2xl h-[80vh] flex flex-col border-none">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <div className="flex h-6 w-6 items-center justify-center rounded" style={{ backgroundColor: `${color}15` }}>
@@ -437,7 +437,7 @@ export default function FolderDetail() {
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-48 p-2" align="start" sideOffset={4}>
+              <PopoverContent className="w-48 p-2 border-none" align="start" sideOffset={4}>
                 <div className="space-y-1 max-h-[200px] overflow-auto">
                   {Object.entries(DOMAIN_TYPE_LABELS).map(([value, label]) => (
                     <label key={value} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-secondary/50 cursor-pointer text-xs">
@@ -464,7 +464,7 @@ export default function FolderDetail() {
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-48 p-2" align="start" sideOffset={4}>
+              <PopoverContent className="w-48 p-2 border-none" align="start" sideOffset={4}>
                 <div className="space-y-1 max-h-[200px] overflow-auto">
                   {Object.entries(DOMAIN_STATUS_LABELS).map(([value, label]) => (
                     <label key={value} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-secondary/50 cursor-pointer text-xs">
@@ -491,7 +491,7 @@ export default function FolderDetail() {
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-48 p-2" align="start" sideOffset={4}>
+              <PopoverContent className="w-48 p-2 border-none" align="start" sideOffset={4}>
                 <div className="space-y-1 max-h-[200px] overflow-auto">
                   {availableProjects.map((p) => (
                     <label key={p} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-secondary/50 cursor-pointer text-xs">
@@ -538,7 +538,7 @@ export default function FolderDetail() {
               </button>
             </div>
           )}
-          <div className="flex-1 overflow-auto min-h-0 max-h-[400px] border-y border-border/50">
+          <div className="flex-1 overflow-auto min-h-0 border-y border-border/50">
             {filteredAvailable.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 text-muted-foreground text-sm">
                 <Globe className="h-6 w-6 mb-2 opacity-40" />

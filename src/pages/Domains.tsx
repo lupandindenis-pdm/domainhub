@@ -12,6 +12,7 @@ import { useLanguage } from "@/components/language-provider";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFolders } from "@/hooks/use-folders";
 import { computeDomainStatus } from "@/lib/computeDomainStatus";
+import { MoveDomainsModal } from "@/components/domains/MoveDomainsModal";
 
 export default function Domains() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ export default function Domains() {
     }
   });
   const [showHidden, setShowHidden] = useState(false);
+  const [showMoveModal, setShowMoveModal] = useState(false);
   
   // Load labels from localStorage
   const [labels, setLabels] = useState(() => {
@@ -550,10 +552,45 @@ export default function Domains() {
   };
 
   const handleMoveSelected = () => {
-    toast.info("Перемещение доменов", {
-      description: `Будет перемещено доменов: ${selectedDomainIds.size}`,
-    });
-    // TODO: Implement move logic
+    setShowMoveModal(true);
+  };
+
+  const handleMoveTofolder = (folderId: string) => {
+    const folder = folders.find(f => f.id === folderId);
+    if (!folder) return;
+
+    const domainIdsArray = [...selectedDomainIds];
+    const alreadyIn = domainIdsArray.filter(id => folder.domainIds.includes(id));
+    const toMove = domainIdsArray.filter(id => !folder.domainIds.includes(id));
+
+    if (toMove.length > 0) {
+      // Remove from all other folders first
+      const currentFolders = JSON.parse(localStorage.getItem('domainFolders') || '[]');
+      const updated = currentFolders.map((f: any) => {
+        if (f.id === folderId) {
+          const existingIds = new Set(f.domainIds || []);
+          toMove.forEach((id: string) => existingIds.add(id));
+          return { ...f, domainIds: [...existingIds], updatedAt: new Date().toISOString() };
+        }
+        return f;
+      });
+      localStorage.setItem('domainFolders', JSON.stringify(updated));
+      window.dispatchEvent(new Event('folders-updated'));
+    }
+
+    const movedCount = toMove.length;
+    const skippedCount = alreadyIn.length;
+
+    if (movedCount > 0) {
+      toast.success(`${movedCount} ${movedCount === 1 ? 'домен перемещён' : 'доменов перемещено'} в «${folder.name}»`, {
+        description: skippedCount > 0 ? `${skippedCount} уже были в этой папке` : undefined,
+      });
+    } else {
+      toast.info("Все выбранные домены уже находятся в этой папке");
+    }
+
+    setSelectedDomainIds(new Set());
+    setBulkSelectMode(false);
   };
 
   const handleDeleteSelected = () => {
@@ -657,6 +694,16 @@ export default function Domains() {
           </p>
         </div>
       )}
+
+      {/* Move Domains Modal */}
+      <MoveDomainsModal
+        open={showMoveModal}
+        onOpenChange={setShowMoveModal}
+        selectedCount={selectedDomainIds.size}
+        selectedDomainIds={selectedDomainIds}
+        folders={folders}
+        onMove={handleMoveTofolder}
+      />
 
       {/* Bulk Actions Bar */}
       <BulkActionsBar
