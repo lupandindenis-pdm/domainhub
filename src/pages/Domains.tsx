@@ -11,6 +11,22 @@ import { toast } from "sonner";
 import { useLanguage } from "@/components/language-provider";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useFolders } from "@/hooks/use-folders";
+import { differenceInDays, parseISO } from "date-fns";
+import { DomainStatus } from "@/types/domain";
+
+function computeEffectiveStatus(domain: any): DomainStatus {
+  // If status is already manually set to expiring/expired, keep it
+  if (domain.status === 'expiring' || domain.status === 'expired') return domain.status;
+  try {
+    const expDate = domain.expirationDate;
+    if (expDate) {
+      const daysLeft = differenceInDays(parseISO(expDate), new Date());
+      if (daysLeft <= 0) return 'expired';
+      if (daysLeft <= 30) return 'expiring';
+    }
+  } catch {}
+  return domain.status;
+}
 
 export default function Domains() {
   const navigate = useNavigate();
@@ -216,7 +232,10 @@ export default function Domains() {
         labelId: data.labelId,
       } as any));
 
-    return [...merged, ...newDomains];
+    return [...merged, ...newDomains].map(d => ({
+      ...d,
+      status: computeEffectiveStatus(d),
+    }));
     } catch (error) {
       console.error('Failed to merge domains:', error);
       return [...mockDomains];
