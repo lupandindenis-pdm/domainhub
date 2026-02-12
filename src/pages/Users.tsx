@@ -34,7 +34,7 @@ import {
   Search,
   MoreHorizontal,
   ShieldCheck,
-  Pencil,
+  SquarePen,
   Ban,
   RotateCcw,
   Trash2,
@@ -184,7 +184,7 @@ export default function Users() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate(`/users/${user.id}/edit`)}>
-                          <Pencil className="h-4 w-4 mr-2" />
+                          <SquarePen className="h-4 w-4 mr-2" />
                           Редактировать
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

@@ -30,7 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Plus, Trash2, Pencil, Check, X, Search, Folder as FolderIcon } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, SquarePen, Check, X, Search, Folder as FolderIcon } from "lucide-react";
 import { toast } from "sonner";
 import { DomainTypeBadge } from "@/components/domains/DomainTypeBadge";
 import { DomainStatusBadge } from "@/components/domains/DomainStatusBadge";
@@ -196,7 +196,7 @@ export default function FolderDetail() {
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold tracking-tight">{folder.name}</h1>
               <Button size="icon" variant="ghost" onClick={handleStartEdit} className="h-8 w-8">
-                <Pencil className="h-4 w-4" />
+                <SquarePen className="h-4 w-4" />
               </Button>
             </div>
           )}
