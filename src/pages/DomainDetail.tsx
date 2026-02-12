@@ -912,10 +912,7 @@ export default function DomainDetail() {
 
   const typeColorClass = typeColors[formData.type || domain?.type || 'unknown'] || "bg-muted/50";
 
-  const editInputClass = isEditing ? "bg-transparent" : "bg-muted/50";
-  const editInputFieldClass = isEditing ? "bg-transparent text-base focus-visible:ring-0 pr-10 truncate" : "bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate";
-  const editSelectClass = isEditing ? "bg-transparent disabled:opacity-100 disabled:cursor-default" : "bg-muted/50 disabled:opacity-100 disabled:cursor-default";
-  const editDateBtnClass = isEditing ? "w-full justify-start text-left font-normal bg-transparent hover:bg-muted/70 disabled:opacity-100 disabled:cursor-default" : "w-full justify-start text-left font-normal bg-muted/50 border-none hover:bg-muted/70 disabled:opacity-100 disabled:cursor-default";
+
 
   return (
 
@@ -1240,7 +1237,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.type} onValueChange={(value) => handleFieldChange('type', value)}>
 
-                        <SelectTrigger className={editInputClass}>
+                        <SelectTrigger className="bg-muted/50">
 
                           <SelectValue />
 
@@ -1305,8 +1302,6 @@ export default function DomainDetail() {
 
                         onChange={(selected) => handleFieldChange('geo', selected)}
 
-                        triggerClassName="w-full justify-start bg-transparent border border-input hover:bg-muted/70 min-h-10 h-auto py-2"
-
                       />
 
                     ) : (
@@ -1333,7 +1328,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.project} onValueChange={(value) => handleFieldChange('project', value)}>
 
-                        <SelectTrigger className={editInputClass}>
+                        <SelectTrigger className="bg-muted/50">
 
                           <SelectValue />
 
@@ -1409,7 +1404,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.status} onValueChange={(value) => handleFieldChange('status', value)}>
 
-                        <SelectTrigger className={editInputClass}>
+                        <SelectTrigger className="bg-muted/50">
 
                           <SelectValue />
 
@@ -1478,8 +1473,6 @@ export default function DomainDetail() {
 
                         onChange={(selected) => handleFieldChange('blockedGeo', selected)}
 
-                        triggerClassName="w-full justify-start bg-transparent border border-input hover:bg-muted/70 min-h-10 h-auto py-2"
-
                       />
 
                     ) : (
@@ -1510,7 +1503,7 @@ export default function DomainDetail() {
 
                       <Select value={formData.department} onValueChange={(value) => handleFieldChange('department', value)}>
 
-                        <SelectTrigger className={editInputClass}>
+                        <SelectTrigger className="bg-muted/50">
 
                           <SelectValue />
 
@@ -1794,7 +1787,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.category} onValueChange={(value) => handleFieldChange('category', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -1850,7 +1843,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.direction} onValueChange={(value) => handleFieldChange('direction', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -1906,7 +1899,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.targetAction} onValueChange={(value) => handleFieldChange('targetAction', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -1968,7 +1961,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.bonus} onValueChange={(value) => handleFieldChange('bonus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -2024,7 +2017,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.needsUpdate} onValueChange={(value) => handleFieldChange('needsUpdate', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -2088,7 +2081,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={editInputFieldClass} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
 
                           />
 
@@ -2284,7 +2277,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={editInputFieldClass} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
 
                             placeholder="Не указано"
 
@@ -2352,7 +2345,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={editInputFieldClass} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
 
                             placeholder="Не указано"
 
@@ -2428,7 +2421,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={isEditing ? "bg-transparent text-base focus-visible:ring-0 font-mono text-sm flex-1" : "bg-muted/50 text-base border-none focus-visible:ring-0 font-mono text-sm flex-1"} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 font-mono text-sm flex-1" 
 
                             placeholder="NS1"
 
@@ -2450,7 +2443,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={isEditing ? "bg-transparent text-base focus-visible:ring-0 font-mono text-sm flex-1 pr-10" : "bg-muted/50 text-base border-none focus-visible:ring-0 font-mono text-sm flex-1 pr-10"} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 font-mono text-sm flex-1 pr-10" 
 
                             placeholder="NS2"
 
@@ -2512,7 +2505,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.hasTechIssues || "Нет"} onValueChange={(value) => handleFieldChange('hasTechIssues', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -2582,7 +2575,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={editInputFieldClass} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
 
                             placeholder="Не указано"
 
@@ -2652,7 +2645,7 @@ export default function DomainDetail() {
 
                               className={cn(
 
-                                editDateBtnClass,
+                                "w-full justify-start text-left font-normal bg-muted/50 border-none hover:bg-muted/70 disabled:opacity-100 disabled:cursor-default",
 
                                 !formData.purchaseDate && "text-muted-foreground"
 
@@ -2716,7 +2709,7 @@ export default function DomainDetail() {
 
                               className={cn(
 
-                                editDateBtnClass,
+                                "w-full justify-start text-left font-normal bg-muted/50 border-none hover:bg-muted/70 disabled:opacity-100 disabled:cursor-default",
 
                                 !formData.renewalDate && "text-muted-foreground"
 
@@ -2770,7 +2763,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.testMethod} onValueChange={(value) => handleFieldChange('testMethod', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -2938,7 +2931,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={editInputFieldClass} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
 
                             placeholder="Не указано"
 
@@ -3012,7 +3005,7 @@ export default function DomainDetail() {
 
                             readOnly={!isEditing}
 
-                            className={editInputFieldClass} 
+                            className="bg-muted/50 text-base border-none focus-visible:ring-0 pr-10 truncate" 
 
                             placeholder="Не указано"
 
@@ -3176,7 +3169,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.isInProgramStatus} onValueChange={(value) => handleFieldChange('isInProgramStatus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -3238,7 +3231,7 @@ export default function DomainDetail() {
 
                           readOnly={!isEditing}
 
-                          className={isEditing ? "bg-transparent text-base focus-visible:ring-0" : "bg-muted/50 text-base border-none focus-visible:ring-0"} 
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
 
                           placeholder="Не указано"
 
@@ -3272,7 +3265,7 @@ export default function DomainDetail() {
 
                           readOnly={!isEditing}
 
-                          className={isEditing ? "bg-transparent text-base focus-visible:ring-0" : "bg-muted/50 text-base border-none focus-visible:ring-0"} 
+                          className="bg-muted/50 text-base border-none focus-visible:ring-0" 
 
                           placeholder="Не указано"
 
@@ -3294,7 +3287,7 @@ export default function DomainDetail() {
 
                         <Select value={formData.programStatus} onValueChange={(value) => handleFieldChange('programStatus', value)} disabled={!isEditing}>
 
-                          <SelectTrigger className={editSelectClass}>
+                          <SelectTrigger className="bg-muted/50 disabled:opacity-100 disabled:cursor-default">
 
                             <SelectValue />
 
@@ -3466,7 +3459,7 @@ export default function DomainDetail() {
 
                       readOnly={!isEditing}
 
-                      className={isEditing ? "bg-transparent text-base focus-visible:ring-0" : "bg-muted/50 text-base border-none focus-visible:ring-0"} 
+                      className="bg-muted/50 text-base border-none focus-visible:ring-0" 
 
                       placeholder="Не указано"
 
@@ -3500,7 +3493,7 @@ export default function DomainDetail() {
 
                       readOnly={!isEditing}
 
-                      className={isEditing ? "bg-transparent text-base focus-visible:ring-0" : "bg-muted/50 text-base border-none focus-visible:ring-0"} 
+                      className="bg-muted/50 text-base border-none focus-visible:ring-0" 
 
                       placeholder="Не указано"
 
