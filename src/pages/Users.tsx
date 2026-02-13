@@ -160,10 +160,12 @@ export default function Users() {
               </p>
             </div>
           </div>
-          <Button onClick={() => navigate("/users/invite")} className="gap-2 h-10">
-            <UserPlus className="h-4 w-4" />
-            Создать пользователя
-          </Button>
+          {users.length > 0 && (
+            <Button onClick={() => navigate("/users/invite")} className="gap-2 h-10">
+              <UserPlus className="h-4 w-4" />
+              Создать пользователя
+            </Button>
+          )}
         </div>
       </div>
 

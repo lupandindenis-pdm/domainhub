@@ -219,7 +219,7 @@ export default function UserEdit() {
   const scopeIsGlobal = selectedProjects.length === 0 && selectedDepartments.length === 0;
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-3xl">
+    <div className="space-y-6 animate-fade-in max-w-3xl pb-32">
       {/* Header */}
       <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-r from-card/80 via-card to-card/80 p-6">
         <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">

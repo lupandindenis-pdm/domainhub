@@ -93,22 +93,24 @@ export function MultiSelectDropdown({
         role="combobox"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className={cn("w-full justify-between font-normal h-10 bg-transparent", !noneSelected ? "pr-14" : "pr-8")}
+        className={cn("w-full justify-start font-normal h-10 bg-transparent", !noneSelected ? "pr-16" : "pr-9")}
       >
         <span className="truncate text-sm">
           {displayText}
         </span>
-        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform shrink-0 ml-2", open && "rotate-180")} />
       </Button>
       {!noneSelected && (
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); onChange([]); setOpen(false); }}
-          className="absolute right-8 top-1/2 -translate-y-1/2 z-10 p-0.5 rounded hover:bg-white/[0.06] transition-colors"
+          className="absolute right-9 top-1/2 -translate-y-1/2 z-10 p-0.5 rounded hover:bg-white/[0.06] transition-colors"
         >
           <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground cursor-pointer" />
         </button>
       )}
+      <ChevronDown
+        className={cn("absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-transform pointer-events-none", open && "rotate-180")}
+      />
 
       {open && (
         <div className="absolute z-50 mt-1 w-full rounded-md bg-popover shadow-md animate-in fade-in-0 zoom-in-95">
