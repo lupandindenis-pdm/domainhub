@@ -21,6 +21,7 @@ export interface AppUser {
   password: string;
   role: UserRole;
   scope: UserScope;
+  corporateEmail?: string;
   status: UserStatus;
   lastActiveAt?: string;
   createdAt: string;

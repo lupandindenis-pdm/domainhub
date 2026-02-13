@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUsers } from "@/hooks/use-users";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -21,8 +22,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
-import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, Ban, RotateCcw, Trash2, RefreshCw, Eye, EyeOff, Copy } from "lucide-react";
+import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, Ban, RotateCcw, Trash2, RefreshCw, Eye, EyeOff, Copy, MoreHorizontal, AlertTriangle, Globe, Lock } from "lucide-react";
 import { toast } from "sonner";
 import {
   AppUser,
@@ -46,6 +54,14 @@ const STATUS_COLORS: Record<UserStatus, string> = {
   deleted: "bg-gray-500/15 text-gray-500",
 };
 
+const AVATAR_COLORS: Record<UserRole, string> = {
+  super_admin: "bg-purple-500/20 text-purple-400",
+  admin: "bg-blue-500/20 text-blue-400",
+  manager: "bg-cyan-500/20 text-cyan-400",
+  editor: "bg-emerald-500/20 text-emerald-400",
+  viewer: "bg-gray-500/20 text-gray-400",
+};
+
 function generatePassword(length = 16): string {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*";
   let password = "";
@@ -53,6 +69,12 @@ function generatePassword(length = 16): string {
     password += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return password;
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/[\s._-]+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
 }
 
 export default function UserEdit() {
@@ -65,6 +87,7 @@ export default function UserEdit() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("viewer");
   const [showPassword, setShowPassword] = useState(false);
+  const [corporateEmail, setCorporateEmail] = useState("");
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -78,8 +101,21 @@ export default function UserEdit() {
       setRole(found.role);
       setSelectedProjects(found.scope.projectIds || []);
       setSelectedDepartments(found.scope.departmentIds || []);
+      setCorporateEmail(found.corporateEmail || "");
     }
   }, [id, allUsers]);
+
+  const hasChanges = useMemo(() => {
+    if (!user) return false;
+    return (
+      username !== user.username ||
+      password !== (user.password || "") ||
+      role !== user.role ||
+      corporateEmail !== (user.corporateEmail || "") ||
+      JSON.stringify(selectedProjects) !== JSON.stringify(user.scope.projectIds || []) ||
+      JSON.stringify(selectedDepartments) !== JSON.stringify(user.scope.departmentIds || [])
+    );
+  }, [user, username, password, role, corporateEmail, selectedProjects, selectedDepartments]);
 
   if (!user) {
     return (
@@ -136,7 +172,7 @@ export default function UserEdit() {
       projectIds: selectedProjects,
       departmentIds: selectedDepartments,
     };
-    updateUser(user.id, { username: trimmedUsername, password, role, scope });
+    updateUser(user.id, { username: trimmedUsername, password, role, scope, corporateEmail: corporateEmail.trim() || undefined });
     toast.success("Пользователь обновлён");
     navigate("/users");
   };
@@ -159,180 +195,274 @@ export default function UserEdit() {
     navigate("/users");
   };
 
+  const scopeIsGlobal = selectedProjects.length === 0 && selectedDepartments.length === 0;
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/users")}>
+    <div className="space-y-8 animate-fade-in max-w-3xl">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/users")} className="flex-shrink-0">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold tracking-tight">Редактировать пользователя</h1>
-          <p className="text-muted-foreground">{user.username}</p>
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className={cn(
+            "flex h-11 w-11 items-center justify-center rounded-xl text-sm font-semibold flex-shrink-0",
+            AVATAR_COLORS[user.role]
+          )}>
+            {getInitials(user.username)}
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold tracking-tight truncate">Редактирование пользователя</h1>
+            <p className="text-sm text-muted-foreground truncate">{user.username}</p>
+          </div>
         </div>
-        <Badge className={cn("text-xs border-0", STATUS_COLORS[user.status])}>
+        <Badge className={cn("text-xs border-0 flex-shrink-0", STATUS_COLORS[user.status])}>
           {USER_STATUS_LABELS[user.status]}
         </Badge>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="h-9 w-9 border-white/[0.08] flex-shrink-0">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48 border-white/[0.06]">
+            {(user.status === "active" || user.status === "pending") && (
+              <DropdownMenuItem onClick={handleSuspend} className="text-yellow-500 focus:text-yellow-500">
+                <Ban className="h-4 w-4 mr-2" />
+                Заблокировать
+              </DropdownMenuItem>
+            )}
+            {user.status === "suspended" && (
+              <DropdownMenuItem onClick={handleReactivate} className="text-green-500 focus:text-green-500">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Активировать
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator className="bg-white/[0.06]" />
+            <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="text-destructive focus:text-destructive">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Удалить
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      <div className="p-6 space-y-6">
-        {/* 1. Имя пользователя + Роль */}
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <User className="h-4 w-4 !text-green-600" />
-              Имя пользователя
-            </label>
-            <Input
-              placeholder="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="bg-transparent"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <Shield className="h-4 w-4 !text-green-600" />
-              Роль
-            </label>
-            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-              <SelectTrigger className="bg-transparent">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {assignableRoles.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      {/* Unsaved changes indicator */}
+      {hasChanges && (
+        <div className="flex items-center gap-2 text-xs text-yellow-500 bg-yellow-500/10 rounded-lg px-3 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
+          <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+          Есть несохранённые изменения
         </div>
+      )}
 
-        {/* 2. Пароль */}
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <KeyRound className="h-4 w-4 !text-green-600" />
-              Пароль
-            </label>
-            <div className="relative">
+      {/* Block 1: Basic Info */}
+      <Card className="border-white/[0.06]">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <User className="h-4 w-4 text-primary" />
+            Основные данные
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Имя пользователя
+              </label>
               <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="Введите пароль"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-transparent pr-20"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
               />
-              <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setShowPassword(!showPassword)}
-                  title={showPassword ? "Скрыть" : "Показать"}
-                >
-                  {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-                </Button>
-                {password && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onMouseDown={handleCopyPassword}
-                    title="Копировать"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Роль
+              </label>
+              <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+                <SelectTrigger className="bg-muted/30 border-white/[0.06]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {assignableRoles.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground/60">Роль определяет базовый уровень доступа</p>
             </div>
           </div>
-          <div className="flex items-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleGeneratePassword}
-              className="gap-1.5 shrink-0"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Сгенерировать
-            </Button>
+        </CardContent>
+      </Card>
+
+      {/* Block 2: Security */}
+      <Card className="border-white/[0.06]">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <KeyRound className="h-4 w-4 text-primary" />
+            Безопасность
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Пароль
+              </label>
+              <div className="flex gap-2 items-center">
+                <div className="relative flex-1">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Введите пароль"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-muted/30 border-white/[0.06] pr-16"
+                  />
+                  <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => setShowPassword(!showPassword)}
+                      title={showPassword ? "Скрыть" : "Показать"}
+                    >
+                      {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    </Button>
+                    {password && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onMouseDown={handleCopyPassword}
+                        title="Копировать"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={handleGeneratePassword}
+                  className="h-10 w-10 shrink-0 border-white/[0.08]"
+                  title="Сгенерировать пароль"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Корпоративный Email
+              </label>
+              <Input
+                type="email"
+                placeholder="user@company.com"
+                value={corporateEmail}
+                onChange={(e) => setCorporateEmail(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
+              />
+            </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* 3. Проекты слева / Отделы справа */}
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <FolderKanban className="h-4 w-4 !text-green-600" />
-              Проекты
-            </label>
-            <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем проектам</p>
-            <MultiSelectDropdown
-              options={projects}
-              selected={selectedProjects}
-              onChange={setSelectedProjects}
-              placeholder="Все"
-            />
+      {/* Block 3: Access Scope */}
+      <Card className="border-white/[0.06]">
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <Shield className="h-4 w-4 text-primary" />
+              Область доступа
+            </CardTitle>
+            <div className="flex items-center gap-1.5">
+              {scopeIsGlobal ? (
+                <>
+                  <Globe className="h-3.5 w-3.5 text-green-400" />
+                  <span className="text-xs text-green-400">Глобальный</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="h-3.5 w-3.5 text-yellow-400" />
+                  <span className="text-xs text-yellow-400">Ограниченный</span>
+                </>
+              )}
+            </div>
           </div>
-
-          <div className="space-y-2">
-            <label className="text-sm leading-none text-muted-foreground flex items-center gap-2">
-              <Building2 className="h-4 w-4 !text-green-600" />
-              Отделы
-            </label>
-            <p className="text-xs text-muted-foreground/70">Если ничего не выбрано — доступ ко всем отделам</p>
-            <MultiSelectDropdown
-              options={departments}
-              selected={selectedDepartments}
-              onChange={setSelectedDepartments}
-              placeholder="Все"
-            />
+          <p className="text-xs text-muted-foreground/60 mt-1">
+            Определяет, к каким проектам и отделам пользователь имеет доступ
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <FolderKanban className="h-3.5 w-3.5" />
+                Проекты
+              </label>
+              <MultiSelectDropdown
+                options={projects}
+                selected={selectedProjects}
+                onChange={setSelectedProjects}
+                placeholder="Все"
+              />
+              <p className="text-[11px] text-muted-foreground/60">
+                {selectedProjects.length === 0
+                  ? "Доступ ко всем проектам"
+                  : `${selectedProjects.length} проект${selectedProjects.length > 1 ? 'а' : ''} выбрано`}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <Building2 className="h-3.5 w-3.5" />
+                Отделы
+              </label>
+              <MultiSelectDropdown
+                options={departments}
+                selected={selectedDepartments}
+                onChange={setSelectedDepartments}
+                placeholder="Все"
+              />
+              <p className="text-[11px] text-muted-foreground/60">
+                {selectedDepartments.length === 0
+                  ? "Доступ ко всем отделам"
+                  : `${selectedDepartments.length} отдел${selectedDepartments.length > 1 ? 'а' : ''} выбрано`}
+              </p>
+            </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        <div className="flex items-center gap-3 pt-2">
-          <Button variant="outline" onClick={() => navigate("/users")}>
-            Отмена
-          </Button>
-          <Button onClick={handleSave}>
-            Сохранить
-          </Button>
-
-          <div className="flex-1" />
-
-          {(user.status === "active" || user.status === "pending") && (
-            <Button variant="outline" size="sm" onClick={handleSuspend} className="text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10">
-              <Ban className="h-4 w-4 mr-1.5" />
-              Заблокировать
-            </Button>
-          )}
-          {user.status === "suspended" && (
-            <Button variant="outline" size="sm" onClick={handleReactivate} className="text-green-500 border-green-500/30 hover:bg-green-500/10">
-              <RotateCcw className="h-4 w-4 mr-1.5" />
-              Активировать
-            </Button>
-          )}
-          <Button variant="outline" size="sm" onClick={() => setShowDeleteDialog(true)} className="text-destructive border-destructive/30 hover:bg-destructive/10">
-            <Trash2 className="h-4 w-4 mr-1.5" />
-            Удалить
-          </Button>
-        </div>
+      {/* Actions */}
+      <div className="flex items-center gap-3">
+        <Button variant="outline" onClick={() => navigate("/users")} className="border-white/[0.08]">
+          Отмена
+        </Button>
+        <Button
+          onClick={handleSave}
+          disabled={!hasChanges}
+          className="gap-2 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90"
+        >
+          Сохранить
+        </Button>
       </div>
 
       {/* Delete Confirmation */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border-white/[0.06]">
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить пользователя?</AlertDialogTitle>
             <AlertDialogDescription>
-              Пользователь {user.username} будет удалён из системы. Это действие можно отменить через базу данных.
+              Пользователь <span className="font-medium text-foreground">{user.username}</span> будет удалён из системы. Это действие можно отменить через базу данных.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogCancel className="border-white/[0.08]">Отмена</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Удалить
             </AlertDialogAction>
