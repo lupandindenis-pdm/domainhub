@@ -12,6 +12,8 @@ interface MultiSelectDropdownProps {
   selected: string[];
   onChange: (selected: string[]) => void;
   placeholder?: string;
+  allLabel?: string;
+  emptyMeansAll?: boolean;
   className?: string;
 }
 
@@ -28,6 +30,8 @@ export function MultiSelectDropdown({
   selected,
   onChange,
   placeholder = "Выберите...",
+  allLabel = "Все",
+  emptyMeansAll = true,
   className,
 }: MultiSelectDropdownProps) {
   const [open, setOpen] = useState(false);
@@ -74,9 +78,9 @@ export function MultiSelectDropdown({
   };
 
   const displayText = noneSelected
-    ? placeholder || "Все"
+    ? placeholder
     : allSelected
-    ? "Все"
+    ? allLabel
     : selected.length <= 2
     ? selected.map(getLabel).join(", ")
     : `Выбрано: ${selected.length}`;
@@ -89,21 +93,22 @@ export function MultiSelectDropdown({
         role="combobox"
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="w-full justify-between font-normal h-10 bg-transparent"
+        className={cn("w-full justify-between font-normal h-10 bg-transparent", !noneSelected ? "pr-14" : "pr-8")}
       >
         <span className="truncate text-sm">
           {displayText}
         </span>
-        <div className="flex items-center gap-1 ml-2 shrink-0">
-          {!noneSelected && !allSelected && (
-            <X
-              className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground"
-              onClick={handleClear}
-            />
-          )}
-          <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
-        </div>
+        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform shrink-0 ml-2", open && "rotate-180")} />
       </Button>
+      {!noneSelected && (
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onChange([]); setOpen(false); }}
+          className="absolute right-8 top-1/2 -translate-y-1/2 z-10 p-0.5 rounded hover:bg-white/[0.06] transition-colors"
+        >
+          <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground cursor-pointer" />
+        </button>
+      )}
 
       {open && (
         <div className="absolute z-50 mt-1 w-full rounded-md bg-popover shadow-md animate-in fade-in-0 zoom-in-95">
@@ -111,10 +116,10 @@ export function MultiSelectDropdown({
             {/* "Все" option */}
             <label className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/50 rounded-sm cursor-pointer">
               <Checkbox
-                checked={allSelected || noneSelected}
+                checked={allSelected || (emptyMeansAll && noneSelected)}
                 onCheckedChange={handleToggleAll}
               />
-              <span className="text-sm font-medium">Все</span>
+              <span className="text-sm font-medium">{allLabel}</span>
             </label>
 
             <div className="mx-2 my-1 border-t" />

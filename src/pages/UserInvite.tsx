@@ -14,6 +14,7 @@ import {
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
 import { useFolders } from "@/hooks/use-folders";
 import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, RefreshCw, Eye, EyeOff, Copy, UserPlus, Globe, Lock, FolderLock } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
   UserRole,
@@ -45,6 +46,7 @@ export default function UserInvite() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [corporateEmail, setCorporateEmail] = useState("");
+  const [position, setPosition] = useState("");
   const [role, setRole] = useState<UserRole>("viewer");
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
@@ -99,7 +101,7 @@ export default function UserInvite() {
       departmentIds: selectedDepartments,
     };
 
-    createUser(trimmedUsername, password, role, scope, corporateEmail.trim() || undefined, selectedPrivateFolders);
+    createUser(trimmedUsername, password, role, scope, corporateEmail.trim() || undefined, selectedPrivateFolders, position.trim() || undefined);
     toast.success("Пользователь создан", { description: trimmedUsername });
     navigate("/users");
   };
@@ -107,25 +109,29 @@ export default function UserInvite() {
   const scopeIsGlobal = selectedProjects.length === 0 && selectedDepartments.length === 0;
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-3xl">
+    <div className="space-y-6 animate-fade-in max-w-3xl">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/users")} className="flex-shrink-0">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div className="flex items-center gap-3 flex-1">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 flex-shrink-0">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-r from-card/80 via-card to-card/80 p-6">
+        <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+          <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-blue-500 opacity-[0.07] blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-primary opacity-[0.05] blur-2xl" />
+        </div>
+        <div className="relative flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/users")} className="flex-shrink-0 -ml-2 hover:bg-white/[0.06]">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 border border-white/[0.08] flex-shrink-0">
             <UserPlus className="h-5 w-5 text-primary" />
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">Создать пользователя</h1>
-            <p className="text-sm text-muted-foreground">Заполните данные нового пользователя</p>
+            <p className="text-sm text-muted-foreground/60">Заполните данные нового пользователя</p>
           </div>
         </div>
       </div>
 
       {/* Block 1: Basic Info */}
-      <Card className="border-white/[0.06]">
+      <Card className="border-white/[0.06] bg-card/50">
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <User className="h-4 w-4 text-primary" />
@@ -133,31 +139,57 @@ export default function UserInvite() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Имя пользователя
-            </label>
-            <Input
-              placeholder="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="bg-muted/30 border-white/[0.06] max-w-md"
-              autoFocus
-            />
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Имя пользователя
+              </label>
+              <Input
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Позиция
+              </label>
+              <Input
+                placeholder="Например: Маркетолог, Разработчик..."
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
+              />
+              <p className="text-[11px] text-muted-foreground/60">Должность или роль коллеги в компании</p>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Block 2: Security */}
-      <Card className="border-white/[0.06]">
+      <Card className="border-white/[0.06] bg-card/50">
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <KeyRound className="h-4 w-4 text-primary" />
-            Безопасность
+            Безопасность <span className="text-muted-foreground/40 font-normal">(Креды)</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Корпоративный Email
+              </label>
+              <Input
+                type="email"
+                placeholder="user@company.com"
+                value={corporateEmail}
+                onChange={(e) => setCorporateEmail(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
+              />
+            </div>
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Пароль
@@ -208,24 +240,12 @@ export default function UserInvite() {
                 </Button>
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Корпоративный Email
-              </label>
-              <Input
-                type="email"
-                placeholder="user@company.com"
-                value={corporateEmail}
-                onChange={(e) => setCorporateEmail(e.target.value)}
-                className="bg-muted/30 border-white/[0.06]"
-              />
-            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Block 3: Access Scope */}
-      <Card className="border-white/[0.06]">
+      <Card className="border-white/[0.06] bg-card/50">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-medium flex items-center gap-2">
@@ -247,28 +267,53 @@ export default function UserInvite() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground/60 mt-1">
-            Определяет позицию, проекты, отделы и приватные папки пользователя
+            Определяет роль, проекты, отделы и закрытые папки пользователя
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Position (formerly Role) */}
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Позиция
-            </label>
-            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-              <SelectTrigger className="bg-muted/30 border-white/[0.06] max-w-md">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {assignableRoles.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-[11px] text-muted-foreground/60">Позиция определяет базовый уровень доступа</p>
+          {/* Role + Private Folders row */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <Shield className="h-3.5 w-3.5" />
+                Роль
+              </label>
+              <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+                <SelectTrigger className="bg-muted/30 border-white/[0.06]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {assignableRoles.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground/60">Роль определяет базовый уровень доступа</p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <FolderLock className="h-3.5 w-3.5" />
+                Закрытые папки
+              </label>
+              <MultiSelectDropdown
+                options={privateFolders.map(f => ({ value: f.id, label: f.name }))}
+                selected={selectedPrivateFolders}
+                onChange={setSelectedPrivateFolders}
+                placeholder="Нет доступа"
+                allLabel="Все закрытые"
+                emptyMeansAll={false}
+              />
+              <p className="text-[11px] text-muted-foreground/60">
+                {selectedPrivateFolders.length === 0
+                  ? "Нет доступа к закрытым папкам"
+                  : selectedPrivateFolders.length === privateFolders.length && privateFolders.length > 0
+                  ? "Доступ ко всем закрытым папкам"
+                  : `${selectedPrivateFolders.length} закрыт${selectedPrivateFolders.length > 1 ? 'ых папок' : 'ая папка'} выбрано`}
+              </p>
+            </div>
           </div>
 
+          {/* Projects + Departments row */}
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
@@ -305,27 +350,6 @@ export default function UserInvite() {
               </p>
             </div>
           </div>
-
-          {/* Private Folders */}
-          {privateFolders.length > 0 && (
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                <FolderLock className="h-3.5 w-3.5" />
-                Приватные папки
-              </label>
-              <MultiSelectDropdown
-                options={privateFolders.map(f => ({ value: f.id, label: f.name }))}
-                selected={selectedPrivateFolders}
-                onChange={setSelectedPrivateFolders}
-                placeholder="Нет"
-              />
-              <p className="text-[11px] text-muted-foreground/60">
-                {selectedPrivateFolders.length === 0
-                  ? "Нет доступа к приватным папкам"
-                  : `${selectedPrivateFolders.length} приватн${selectedPrivateFolders.length > 1 ? 'ых папок' : 'ая папка'} выбрано`}
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
 

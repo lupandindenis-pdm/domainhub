@@ -91,10 +91,23 @@ export default function UserEdit() {
   const [role, setRole] = useState<UserRole>("viewer");
   const [showPassword, setShowPassword] = useState(false);
   const [corporateEmail, setCorporateEmail] = useState("");
+  const [position, setPosition] = useState("");
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [selectedPrivateFolders, setSelectedPrivateFolders] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const folderOptions = useMemo(() => {
+    const privateOpts = privateFolders.map(f => ({ value: f.id, label: f.name }));
+    const privateIds = new Set(privateFolders.map(f => f.id));
+    const extraOpts = selectedPrivateFolders
+      .filter(fid => !privateIds.has(fid))
+      .map(fid => {
+        const f = folders.find(fl => fl.id === fid);
+        return { value: fid, label: f ? f.name : fid };
+      });
+    return [...privateOpts, ...extraOpts];
+  }, [privateFolders, folders, selectedPrivateFolders]);
 
   useEffect(() => {
     const found = allUsers.find(u => u.id === id);
@@ -106,6 +119,7 @@ export default function UserEdit() {
       setSelectedProjects(found.scope.projectIds || []);
       setSelectedDepartments(found.scope.departmentIds || []);
       setCorporateEmail(found.corporateEmail || "");
+      setPosition(found.position || "");
       setSelectedPrivateFolders(found.privateFolderIds || []);
     }
   }, [id, allUsers]);
@@ -117,11 +131,12 @@ export default function UserEdit() {
       password !== (user.password || "") ||
       role !== user.role ||
       corporateEmail !== (user.corporateEmail || "") ||
+      position !== (user.position || "") ||
       JSON.stringify(selectedProjects) !== JSON.stringify(user.scope.projectIds || []) ||
       JSON.stringify(selectedDepartments) !== JSON.stringify(user.scope.departmentIds || []) ||
       JSON.stringify(selectedPrivateFolders) !== JSON.stringify(user.privateFolderIds || [])
     );
-  }, [user, username, password, role, corporateEmail, selectedProjects, selectedDepartments, selectedPrivateFolders]);
+  }, [user, username, password, role, corporateEmail, position, selectedProjects, selectedDepartments, selectedPrivateFolders]);
 
   if (!user) {
     return (
@@ -178,7 +193,7 @@ export default function UserEdit() {
       projectIds: selectedProjects,
       departmentIds: selectedDepartments,
     };
-    updateUser(user.id, { username: trimmedUsername, password, role, scope, corporateEmail: corporateEmail.trim() || undefined, privateFolderIds: selectedPrivateFolders });
+    updateUser(user.id, { username: trimmedUsername, password, role, scope, corporateEmail: corporateEmail.trim() || undefined, position: position.trim() || undefined, privateFolderIds: selectedPrivateFolders });
     toast.success("Пользователь обновлён");
     navigate("/users");
   };
@@ -204,65 +219,67 @@ export default function UserEdit() {
   const scopeIsGlobal = selectedProjects.length === 0 && selectedDepartments.length === 0;
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-3xl">
+    <div className="space-y-6 animate-fade-in max-w-3xl">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/users")} className="flex-shrink-0">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-r from-card/80 via-card to-card/80 p-6">
+        <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+          <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-purple-500 opacity-[0.07] blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-blue-500 opacity-[0.05] blur-2xl" />
+        </div>
+        <div className="relative flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/users")} className="flex-shrink-0 -ml-2 hover:bg-white/[0.06]">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <div className={cn(
-            "flex h-11 w-11 items-center justify-center rounded-xl text-sm font-semibold flex-shrink-0",
+            "flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold flex-shrink-0",
             AVATAR_COLORS[user.role]
           )}>
             {getInitials(user.username)}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h1 className="text-xl font-bold tracking-tight truncate">Редактирование пользователя</h1>
-            <p className="text-sm text-muted-foreground truncate">{user.username}</p>
+            <p className="text-sm text-muted-foreground/60 truncate">{user.username}</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className={cn(
+              "flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg",
+              STATUS_COLORS[user.status]
+            )}>
+              {USER_STATUS_LABELS[user.status]}
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="h-9 w-9 border-white/[0.08]">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 border-white/[0.06]">
+                {(user.status === "active" || user.status === "pending") && (
+                  <DropdownMenuItem onClick={handleSuspend} className="text-yellow-500 focus:text-yellow-500">
+                    <Ban className="h-4 w-4 mr-2" />
+                    Заблокировать
+                  </DropdownMenuItem>
+                )}
+                {user.status === "suspended" && (
+                  <DropdownMenuItem onClick={handleReactivate} className="text-green-500 focus:text-green-500">
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Активировать
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator className="bg-white/[0.06]" />
+                <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="text-destructive focus:text-destructive">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Удалить
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
-        <Badge className={cn("text-xs border-0 flex-shrink-0", STATUS_COLORS[user.status])}>
-          {USER_STATUS_LABELS[user.status]}
-        </Badge>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="h-9 w-9 border-white/[0.08] flex-shrink-0">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 border-white/[0.06]">
-            {(user.status === "active" || user.status === "pending") && (
-              <DropdownMenuItem onClick={handleSuspend} className="text-yellow-500 focus:text-yellow-500">
-                <Ban className="h-4 w-4 mr-2" />
-                Заблокировать
-              </DropdownMenuItem>
-            )}
-            {user.status === "suspended" && (
-              <DropdownMenuItem onClick={handleReactivate} className="text-green-500 focus:text-green-500">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Активировать
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuSeparator className="bg-white/[0.06]" />
-            <DropdownMenuItem onClick={() => setShowDeleteDialog(true)} className="text-destructive focus:text-destructive">
-              <Trash2 className="h-4 w-4 mr-2" />
-              Удалить
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
-      {/* Unsaved changes indicator */}
-      {hasChanges && (
-        <div className="flex items-center gap-2 text-xs text-yellow-500 bg-yellow-500/10 rounded-lg px-3 py-2 animate-in fade-in slide-in-from-top-1 duration-200">
-          <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
-          Есть несохранённые изменения
-        </div>
-      )}
 
       {/* Block 1: Basic Info */}
-      <Card className="border-white/[0.06]">
+      <Card className="border-white/[0.06] bg-card/50">
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <User className="h-4 w-4 text-primary" />
@@ -270,30 +287,56 @@ export default function UserEdit() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Имя пользователя
-            </label>
-            <Input
-              placeholder="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="bg-muted/30 border-white/[0.06] max-w-md"
-            />
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Имя пользователя
+              </label>
+              <Input
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Позиция
+              </label>
+              <Input
+                placeholder="Например: Маркетолог, Разработчик..."
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
+              />
+              <p className="text-[11px] text-muted-foreground/60">Должность или роль коллеги в компании</p>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Block 2: Security */}
-      <Card className="border-white/[0.06]">
+      <Card className="border-white/[0.06] bg-card/50">
         <CardHeader className="pb-4">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <KeyRound className="h-4 w-4 text-primary" />
-            Безопасность
+            Безопасность <span className="text-muted-foreground/40 font-normal">(Креды)</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Корпоративный Email
+              </label>
+              <Input
+                type="email"
+                placeholder="user@company.com"
+                value={corporateEmail}
+                onChange={(e) => setCorporateEmail(e.target.value)}
+                className="bg-muted/30 border-white/[0.06]"
+              />
+            </div>
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Пароль
@@ -344,24 +387,12 @@ export default function UserEdit() {
                 </Button>
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Корпоративный Email
-              </label>
-              <Input
-                type="email"
-                placeholder="user@company.com"
-                value={corporateEmail}
-                onChange={(e) => setCorporateEmail(e.target.value)}
-                className="bg-muted/30 border-white/[0.06]"
-              />
-            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Block 3: Access Scope */}
-      <Card className="border-white/[0.06]">
+      <Card className="border-white/[0.06] bg-card/50">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-medium flex items-center gap-2">
@@ -383,28 +414,53 @@ export default function UserEdit() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground/60 mt-1">
-            Определяет позицию, проекты, отделы и приватные папки пользователя
+            Определяет роль, проекты, отделы и закрытые папки пользователя
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Position (formerly Role) */}
-          <div className="space-y-2">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Позиция
-            </label>
-            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-              <SelectTrigger className="bg-muted/30 border-white/[0.06] max-w-md">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {assignableRoles.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-[11px] text-muted-foreground/60">Позиция определяет базовый уровень доступа</p>
+          {/* Role + Private Folders row */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <Shield className="h-3.5 w-3.5" />
+                Роль
+              </label>
+              <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+                <SelectTrigger className="bg-muted/30 border-white/[0.06]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {assignableRoles.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-[11px] text-muted-foreground/60">Роль определяет базовый уровень доступа</p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <FolderLock className="h-3.5 w-3.5" />
+                Закрытые папки
+              </label>
+              <MultiSelectDropdown
+                options={folderOptions}
+                selected={selectedPrivateFolders}
+                onChange={setSelectedPrivateFolders}
+                placeholder="Нет доступа"
+                allLabel="Все закрытые"
+                emptyMeansAll={false}
+              />
+              <p className="text-[11px] text-muted-foreground/60">
+                {selectedPrivateFolders.length === 0
+                  ? "Нет доступа к закрытым папкам"
+                  : selectedPrivateFolders.length === folderOptions.length && folderOptions.length > 0
+                  ? "Доступ ко всем закрытым папкам"
+                  : `${selectedPrivateFolders.length} закрыт${selectedPrivateFolders.length > 1 ? 'ых папок' : 'ая папка'} выбрано`}
+              </p>
+            </div>
           </div>
 
+          {/* Projects + Departments row */}
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
@@ -441,27 +497,6 @@ export default function UserEdit() {
               </p>
             </div>
           </div>
-
-          {/* Private Folders */}
-          {privateFolders.length > 0 && (
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                <FolderLock className="h-3.5 w-3.5" />
-                Приватные папки
-              </label>
-              <MultiSelectDropdown
-                options={privateFolders.map(f => ({ value: f.id, label: f.name }))}
-                selected={selectedPrivateFolders}
-                onChange={setSelectedPrivateFolders}
-                placeholder="Нет"
-              />
-              <p className="text-[11px] text-muted-foreground/60">
-                {selectedPrivateFolders.length === 0
-                  ? "Нет доступа к приватным папкам"
-                  : `${selectedPrivateFolders.length} приватн${selectedPrivateFolders.length > 1 ? 'ых папок' : 'ая папка'} выбрано`}
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -477,6 +512,12 @@ export default function UserEdit() {
         >
           Сохранить
         </Button>
+        {hasChanges && (
+          <span className="flex items-center gap-1.5 text-xs text-yellow-500 animate-in fade-in duration-200">
+            <AlertTriangle className="h-3.5 w-3.5" />
+            Есть несохранённые изменения
+          </span>
+        )}
       </div>
 
       {/* Delete Confirmation */}
