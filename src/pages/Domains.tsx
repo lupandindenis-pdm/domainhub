@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { DomainTable } from "@/components/domains/DomainTable";
 import { DomainFilters } from "@/components/domains/DomainFilters";
 import { BulkActionsBar } from "@/components/domains/BulkActionsBar";
@@ -33,6 +33,7 @@ export default function Domains() {
   });
   const [showHidden, setShowHidden] = useState(false);
   const [showMoveModal, setShowMoveModal] = useState(false);
+  const editedDomainsSnapshot = useRef<Record<string, any> | null>(null);
   
   // Load labels from localStorage
   const [labels, setLabels] = useState(() => {
@@ -376,6 +377,8 @@ export default function Domains() {
     
     setQuickEditMode(newMode);
     if (newMode) {
+      // Сохраняем снапшот для возможности отмены
+      editedDomainsSnapshot.current = JSON.parse(JSON.stringify(editedDomains));
       // Отключаем режим множественного выбора при включении быстрого редактирования
       setBulkSelectMode(false);
       setSelectedDomainIds(new Set());
@@ -438,6 +441,17 @@ export default function Domains() {
     }
     
     return '';
+  };
+
+  const handleCancelQuickEdit = () => {
+    if (editedDomainsSnapshot.current !== null) {
+      setEditedDomains(editedDomainsSnapshot.current);
+      localStorage.setItem('editedDomains', JSON.stringify(editedDomainsSnapshot.current));
+      window.dispatchEvent(new Event('domains-updated'));
+      editedDomainsSnapshot.current = null;
+    }
+    setQuickEditMode(false);
+    toast.info("Изменения отменены");
   };
 
   const handleToggleDomain = (domainId: string) => {
@@ -671,6 +685,7 @@ export default function Domains() {
         labels={labels}
         quickEditMode={quickEditMode}
         onToggleQuickEditMode={handleToggleQuickEditMode}
+        onCancelQuickEdit={handleCancelQuickEdit}
       />
 
       {/* Domain Table */}
