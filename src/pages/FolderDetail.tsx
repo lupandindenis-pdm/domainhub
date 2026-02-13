@@ -29,12 +29,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Plus, Trash2, SquarePen, Check, X, Search, Folder as FolderIcon, Globe, FolderOpen, Tag, Activity, Copy, ExternalLink, Filter } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, SquarePen, Check, X, Search, Folder as FolderIcon, Globe, FolderOpen, Tag, Activity, Copy, ExternalLink, Filter, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { DomainTypeBadge } from "@/components/domains/DomainTypeBadge";
 import { DomainStatusBadge } from "@/components/domains/DomainStatusBadge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FOLDER_COLORS } from "@/types/folder";
+import { FOLDER_COLORS, FolderAccessType } from "@/types/folder";
 import { cn } from "@/lib/utils";
 import { DOMAIN_TYPE_LABELS } from "@/constants/domainTypes";
 import { DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
@@ -260,7 +260,32 @@ export default function FolderDetail() {
                       <Globe className="h-3.5 w-3.5" />
                       {folderDomains.length} {pluralDomains(folderDomains.length)}
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newType: FolderAccessType = (folder.accessType || 'public') === 'public' ? 'private' : 'public';
+                        updateFolder(folder.id, { accessType: newType });
+                        toast.success(newType === 'private' ? 'Папка стала приватной' : 'Папка стала публичной');
+                      }}
+                      className={cn(
+                        "flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-md transition-colors cursor-pointer",
+                        (folder.accessType || 'public') === 'public'
+                          ? "bg-green-500/10 text-green-400 hover:bg-green-500/20"
+                          : "bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20"
+                      )}
+                    >
+                      {(folder.accessType || 'public') === 'public' ? (
+                        <><Globe className="h-3 w-3" /> Public</>
+                      ) : (
+                        <><Lock className="h-3 w-3" /> Private</>
+                      )}
+                    </button>
                   </div>
+                  {(folder.accessType || 'public') === 'private' && (
+                    <p className="text-[11px] text-muted-foreground/60 mt-1">
+                      Доступ настраивается в карточках пользователей
+                    </p>
+                  )}
                 </>
               )}
             </div>

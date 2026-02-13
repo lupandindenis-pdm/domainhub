@@ -30,7 +30,7 @@ export function useUsers() {
     };
   }, []);
 
-  const createUser = useCallback((username: string, password: string, role: UserRole, scope: UserScope, corporateEmail?: string): AppUser => {
+  const createUser = useCallback((username: string, password: string, role: UserRole, scope: UserScope, corporateEmail?: string, privateFolderIds?: string[]): AppUser => {
     const now = new Date().toISOString();
     const user: AppUser = {
       id: `user-${Date.now()}`,
@@ -39,6 +39,7 @@ export function useUsers() {
       role,
       scope,
       corporateEmail,
+      privateFolderIds,
       status: 'active',
       createdAt: now,
       updatedAt: now,
@@ -49,7 +50,7 @@ export function useUsers() {
     return user;
   }, []);
 
-  const updateUser = useCallback((id: string, changes: Partial<Pick<AppUser, 'username' | 'password' | 'role' | 'scope' | 'corporateEmail' | 'status'>>) => {
+  const updateUser = useCallback((id: string, changes: Partial<Pick<AppUser, 'username' | 'password' | 'role' | 'scope' | 'corporateEmail' | 'privateFolderIds' | 'status'>>) => {
     const current = loadUsers();
     const updated = current.map(u =>
       u.id === id ? { ...u, ...changes, updatedAt: new Date().toISOString() } : u

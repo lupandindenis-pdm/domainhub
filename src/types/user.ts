@@ -22,6 +22,7 @@ export interface AppUser {
   role: UserRole;
   scope: UserScope;
   corporateEmail?: string;
+  privateFolderIds?: string[];
   status: UserStatus;
   lastActiveAt?: string;
   createdAt: string;

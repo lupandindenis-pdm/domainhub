@@ -4,13 +4,23 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+type OptionItem = string | { value: string; label: string };
+
 interface MultiSelectDropdownProps {
   label?: string;
-  options: string[];
+  options: OptionItem[];
   selected: string[];
   onChange: (selected: string[]) => void;
   placeholder?: string;
   className?: string;
+}
+
+function getOptionValue(opt: OptionItem): string {
+  return typeof opt === 'string' ? opt : opt.value;
+}
+
+function getOptionLabel(opt: OptionItem): string {
+  return typeof opt === 'string' ? opt : opt.label;
 }
 
 export function MultiSelectDropdown({
@@ -23,7 +33,8 @@ export function MultiSelectDropdown({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const allSelected = selected.length === options.length && options.length > 0;
+  const optionValues = options.map(getOptionValue);
+  const allSelected = selected.length === optionValues.length && optionValues.length > 0;
   const noneSelected = selected.length === 0;
 
   useEffect(() => {
@@ -40,15 +51,15 @@ export function MultiSelectDropdown({
     if (allSelected) {
       onChange([]);
     } else {
-      onChange([...options]);
+      onChange([...optionValues]);
     }
   };
 
-  const handleToggle = (option: string) => {
-    if (selected.includes(option)) {
-      onChange(selected.filter((s) => s !== option));
+  const handleToggle = (value: string) => {
+    if (selected.includes(value)) {
+      onChange(selected.filter((s) => s !== value));
     } else {
-      onChange([...selected, option]);
+      onChange([...selected, value]);
     }
   };
 
@@ -57,12 +68,17 @@ export function MultiSelectDropdown({
     onChange([]);
   };
 
+  const getLabel = (val: string) => {
+    const opt = options.find(o => getOptionValue(o) === val);
+    return opt ? getOptionLabel(opt) : val;
+  };
+
   const displayText = noneSelected
-    ? "Все"
+    ? placeholder || "Все"
     : allSelected
     ? "Все"
     : selected.length <= 2
-    ? selected.join(", ")
+    ? selected.map(getLabel).join(", ")
     : `Выбрано: ${selected.length}`;
 
   return (
@@ -103,18 +119,22 @@ export function MultiSelectDropdown({
 
             <div className="mx-2 my-1 border-t" />
 
-            {options.map((option) => (
-              <label
-                key={option}
-                className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/50 rounded-sm cursor-pointer"
-              >
-                <Checkbox
-                  checked={selected.includes(option)}
-                  onCheckedChange={() => handleToggle(option)}
-                />
-                <span className="text-sm">{option}</span>
-              </label>
-            ))}
+            {options.map((option) => {
+              const val = getOptionValue(option);
+              const lbl = getOptionLabel(option);
+              return (
+                <label
+                  key={val}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-secondary/50 rounded-sm cursor-pointer"
+                >
+                  <Checkbox
+                    checked={selected.includes(val)}
+                    onCheckedChange={() => handleToggle(val)}
+                  />
+                  <span className="text-sm">{lbl}</span>
+                </label>
+              );
+            })}
           </div>
         </div>
       )}

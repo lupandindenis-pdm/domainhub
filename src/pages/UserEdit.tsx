@@ -30,7 +30,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
-import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, Ban, RotateCcw, Trash2, RefreshCw, Eye, EyeOff, Copy, MoreHorizontal, AlertTriangle, Globe, Lock } from "lucide-react";
+import { useFolders } from "@/hooks/use-folders";
+import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, Ban, RotateCcw, Trash2, RefreshCw, Eye, EyeOff, Copy, MoreHorizontal, AlertTriangle, Globe, Lock, FolderLock } from "lucide-react";
 import { toast } from "sonner";
 import {
   AppUser,
@@ -81,6 +82,8 @@ export default function UserEdit() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { allUsers, updateUser, suspendUser, reactivateUser, deleteUser } = useUsers();
+  const { folders } = useFolders();
+  const privateFolders = useMemo(() => folders.filter(f => f.accessType === 'private'), [folders]);
 
   const [user, setUser] = useState<AppUser | null>(null);
   const [username, setUsername] = useState("");
@@ -90,6 +93,7 @@ export default function UserEdit() {
   const [corporateEmail, setCorporateEmail] = useState("");
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [selectedPrivateFolders, setSelectedPrivateFolders] = useState<string[]>([]);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
@@ -102,6 +106,7 @@ export default function UserEdit() {
       setSelectedProjects(found.scope.projectIds || []);
       setSelectedDepartments(found.scope.departmentIds || []);
       setCorporateEmail(found.corporateEmail || "");
+      setSelectedPrivateFolders(found.privateFolderIds || []);
     }
   }, [id, allUsers]);
 
@@ -113,9 +118,10 @@ export default function UserEdit() {
       role !== user.role ||
       corporateEmail !== (user.corporateEmail || "") ||
       JSON.stringify(selectedProjects) !== JSON.stringify(user.scope.projectIds || []) ||
-      JSON.stringify(selectedDepartments) !== JSON.stringify(user.scope.departmentIds || [])
+      JSON.stringify(selectedDepartments) !== JSON.stringify(user.scope.departmentIds || []) ||
+      JSON.stringify(selectedPrivateFolders) !== JSON.stringify(user.privateFolderIds || [])
     );
-  }, [user, username, password, role, corporateEmail, selectedProjects, selectedDepartments]);
+  }, [user, username, password, role, corporateEmail, selectedProjects, selectedDepartments, selectedPrivateFolders]);
 
   if (!user) {
     return (
@@ -172,7 +178,7 @@ export default function UserEdit() {
       projectIds: selectedProjects,
       departmentIds: selectedDepartments,
     };
-    updateUser(user.id, { username: trimmedUsername, password, role, scope, corporateEmail: corporateEmail.trim() || undefined });
+    updateUser(user.id, { username: trimmedUsername, password, role, scope, corporateEmail: corporateEmail.trim() || undefined, privateFolderIds: selectedPrivateFolders });
     toast.success("Пользователь обновлён");
     navigate("/users");
   };
@@ -263,35 +269,17 @@ export default function UserEdit() {
             Основные данные
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Имя пользователя
-              </label>
-              <Input
-                placeholder="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-muted/30 border-white/[0.06]"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Роль
-              </label>
-              <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-                <SelectTrigger className="bg-muted/30 border-white/[0.06]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {assignableRoles.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-[11px] text-muted-foreground/60">Роль определяет базовый уровень доступа</p>
-            </div>
+        <CardContent>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Имя пользователя
+            </label>
+            <Input
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="bg-muted/30 border-white/[0.06] max-w-md"
+            />
           </div>
         </CardContent>
       </Card>
@@ -395,10 +383,28 @@ export default function UserEdit() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground/60 mt-1">
-            Определяет, к каким проектам и отделам пользователь имеет доступ
+            Определяет позицию, проекты, отделы и приватные папки пользователя
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* Position (formerly Role) */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Позиция
+            </label>
+            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+              <SelectTrigger className="bg-muted/30 border-white/[0.06] max-w-md">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {assignableRoles.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-[11px] text-muted-foreground/60">Позиция определяет базовый уровень доступа</p>
+          </div>
+
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
@@ -435,6 +441,27 @@ export default function UserEdit() {
               </p>
             </div>
           </div>
+
+          {/* Private Folders */}
+          {privateFolders.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <FolderLock className="h-3.5 w-3.5" />
+                Приватные папки
+              </label>
+              <MultiSelectDropdown
+                options={privateFolders.map(f => ({ value: f.id, label: f.name }))}
+                selected={selectedPrivateFolders}
+                onChange={setSelectedPrivateFolders}
+                placeholder="Нет"
+              />
+              <p className="text-[11px] text-muted-foreground/60">
+                {selectedPrivateFolders.length === 0
+                  ? "Нет доступа к приватным папкам"
+                  : `${selectedPrivateFolders.length} приватн${selectedPrivateFolders.length > 1 ? 'ых папок' : 'ая папка'} выбрано`}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

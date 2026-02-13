@@ -1,7 +1,10 @@
+export type FolderAccessType = 'public' | 'private';
+
 export interface Folder {
   id: string;
   name: string;
   color: string;
+  accessType: FolderAccessType;
   domainIds: string[];
   createdAt: string;
   updatedAt: string;

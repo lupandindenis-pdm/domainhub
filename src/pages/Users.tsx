@@ -177,7 +177,7 @@ export default function Users() {
             <TableHeader>
               <TableRow className="hover:bg-transparent border-white/[0.06]">
                 <TableHead className="w-[28%]">Пользователь</TableHead>
-                <TableHead className="w-[14%]">Роль</TableHead>
+                <TableHead className="w-[14%]">Позиция</TableHead>
                 <TableHead className="w-[18%]">Доступ</TableHead>
                 <TableHead className="w-[14%]">Статус</TableHead>
                 <TableHead className="w-[14%]">Создан</TableHead>

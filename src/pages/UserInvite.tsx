@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUsers } from "@/hooks/use-users";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
-import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, RefreshCw, Eye, EyeOff, Copy, UserPlus, Globe, Lock } from "lucide-react";
+import { useFolders } from "@/hooks/use-folders";
+import { ArrowLeft, User, KeyRound, Shield, FolderKanban, Building2, RefreshCw, Eye, EyeOff, Copy, UserPlus, Globe, Lock, FolderLock } from "lucide-react";
 import { toast } from "sonner";
 import {
   UserRole,
@@ -37,6 +38,8 @@ function generatePassword(length = 16): string {
 export default function UserInvite() {
   const navigate = useNavigate();
   const { users, createUser } = useUsers();
+  const { folders } = useFolders();
+  const privateFolders = useMemo(() => folders.filter(f => f.accessType === 'private'), [folders]);
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +48,7 @@ export default function UserInvite() {
   const [role, setRole] = useState<UserRole>("viewer");
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [selectedPrivateFolders, setSelectedPrivateFolders] = useState<string[]>([]);
 
   const handleGeneratePassword = () => {
     const pwd = generatePassword();
@@ -95,7 +99,7 @@ export default function UserInvite() {
       departmentIds: selectedDepartments,
     };
 
-    createUser(trimmedUsername, password, role, scope, corporateEmail.trim() || undefined);
+    createUser(trimmedUsername, password, role, scope, corporateEmail.trim() || undefined, selectedPrivateFolders);
     toast.success("Пользователь создан", { description: trimmedUsername });
     navigate("/users");
   };
@@ -128,36 +132,18 @@ export default function UserInvite() {
             Основные данные
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-5">
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Имя пользователя
-              </label>
-              <Input
-                placeholder="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-muted/30 border-white/[0.06]"
-                autoFocus
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Роль
-              </label>
-              <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
-                <SelectTrigger className="bg-muted/30 border-white/[0.06]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {assignableRoles.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-[11px] text-muted-foreground/60">Роль определяет базовый уровень доступа</p>
-            </div>
+        <CardContent>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Имя пользователя
+            </label>
+            <Input
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="bg-muted/30 border-white/[0.06] max-w-md"
+              autoFocus
+            />
           </div>
         </CardContent>
       </Card>
@@ -261,10 +247,28 @@ export default function UserInvite() {
             </div>
           </div>
           <p className="text-xs text-muted-foreground/60 mt-1">
-            Определяет, к каким проектам и отделам пользователь имеет доступ
+            Определяет позицию, проекты, отделы и приватные папки пользователя
           </p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          {/* Position (formerly Role) */}
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Позиция
+            </label>
+            <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
+              <SelectTrigger className="bg-muted/30 border-white/[0.06] max-w-md">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {assignableRoles.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-[11px] text-muted-foreground/60">Позиция определяет базовый уровень доступа</p>
+          </div>
+
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
@@ -301,6 +305,27 @@ export default function UserInvite() {
               </p>
             </div>
           </div>
+
+          {/* Private Folders */}
+          {privateFolders.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+                <FolderLock className="h-3.5 w-3.5" />
+                Приватные папки
+              </label>
+              <MultiSelectDropdown
+                options={privateFolders.map(f => ({ value: f.id, label: f.name }))}
+                selected={selectedPrivateFolders}
+                onChange={setSelectedPrivateFolders}
+                placeholder="Нет"
+              />
+              <p className="text-[11px] text-muted-foreground/60">
+                {selectedPrivateFolders.length === 0
+                  ? "Нет доступа к приватным папкам"
+                  : `${selectedPrivateFolders.length} приватн${selectedPrivateFolders.length > 1 ? 'ых папок' : 'ая папка'} выбрано`}
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
