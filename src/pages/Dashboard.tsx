@@ -1,13 +1,14 @@
 import { StatsCard } from "@/components/domains/StatsCard";
 import { DomainTable } from "@/components/domains/DomainTable";
-import { mockDomains, mockLabels } from "@/data/mockDomains";
-import { Globe, AlertTriangle, Clock, CheckCircle, TrendingUp, ShieldAlert, AlertCircle } from "lucide-react";
+import { mockDomains, mockLabels, projects } from "@/data/mockDomains";
+import { Globe, AlertTriangle, Clock, CheckCircle, TrendingUp, AlertCircle } from "lucide-react";
 import { DOMAIN_TYPE_LABELS, DOMAIN_STATUS_LABELS } from "@/constants/domainTypes";
 import { DomainType, DomainStatus } from "@/types/domain";
 import { differenceInDays, parseISO } from "date-fns";
 import { computeDomainStatus } from "@/lib/computeDomainStatus";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -173,17 +174,35 @@ export default function Dashboard() {
     }
   }, [editedDomains, deletedDomainIds]);
   
-  // Active filter for stat cards
-  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'expiring' | 'inactive' | null>(null);
+  // Active tab for stat cards — always one is active, default = 'all'
+  const [activeFilter, setActiveFilter] = useState<'all' | 'attention' | 'expiring' | 'inactive'>('all');
 
-  const handleFilterClick = (filter: 'all' | 'active' | 'expiring' | 'inactive') => {
-    setActiveFilter(prev => prev === filter ? null : filter);
-  };
+  // Project filter for "По типам" card
+  const [selectedProject, setSelectedProject] = useState<string>('all');
+
+  // Use projects from mockDomains (excluding "Все")
+  const availableProjects = projects.filter(p => p !== "Все");
+
+  // Filter domains by selected project for type statistics
+  const filteredDomainsForTypes = useMemo(() => {
+    if (selectedProject === 'all') return domains;
+    return domains.filter(d => d.project === selectedProject);
+  }, [domains, selectedProject]);
 
   // Calculate stats from actual domain list
   const totalDomains = domains.length;
-  const activeDomains = useMemo(() => domains.filter(d => d.status === "actual"), [domains]);
+
+  // Card 2: Требуют внимания — badge "требует внимания" + статусы unknown, not_configured, test
+  const needAttentionDomains = useMemo(() => domains.filter(d => {
+    if (d.status === 'unknown' || d.status === 'not_configured' || d.status === 'test') return true;
+    if (d.needsUpdate === 'Да' || (d.needsUpdate && d.needsUpdate !== 'Нет')) return true;
+    if (d.hasTechIssues === 'Да') return true;
+    return false;
+  }), [domains]);
+
+  // Card 3: Истекают — статус expiring ИЛИ renewalDate < 30 дней
   const expiringDomains = useMemo(() => domains.filter(d => {
+    if (d.status === 'expiring') return true;
     if (!d.renewalDate) return false;
     try {
       const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
@@ -192,10 +211,10 @@ export default function Dashboard() {
       return false;
     }
   }), [domains]);
+
+  // Card 4: Не актуален / Истёк — статусы not_actual, expired
   const inactiveDomains = useMemo(() => domains.filter(d => {
-    // Status: not_actual, unknown
-    if (d.status === "not_actual" || d.status === "unknown") return true;
-    // Expired renewalDate
+    if (d.status === 'not_actual' || d.status === 'expired') return true;
     if (d.renewalDate) {
       try {
         const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
@@ -205,67 +224,7 @@ export default function Dashboard() {
     return false;
   }), [domains]);
 
-  // Get domains requiring attention:
-  // 1. renewalDate < 30 days → "Истекает (<30 дней)"
-  // 2. renewalDate expired → "Истёк"
-  // 3. needsUpdate === "Да" → "Требует обновления" (yellow)
-  const attentionDomains = useMemo(() => {
-    const items: { domain: any; reason: 'expiring' | 'expired' | 'needs_update' | 'inactive'; daysLeft?: number }[] = [];
-
-    for (const d of domains) {
-      // Check only renewalDate (NOT expirationDate — that's registration date, present on all domains)
-      if (d.renewalDate) {
-        try {
-          const daysLeft = differenceInDays(parseISO(d.renewalDate), new Date());
-          if (daysLeft <= 0) {
-            items.push({ domain: d, reason: 'expired', daysLeft });
-            continue;
-          } else if (daysLeft <= 30) {
-            items.push({ domain: d, reason: 'expiring', daysLeft });
-            continue;
-          }
-        } catch {}
-      }
-
-      // Check status: not_actual / unknown
-      if (d.status === 'not_actual' || d.status === 'unknown') {
-        items.push({ domain: d, reason: 'inactive' });
-        continue;
-      }
-
-      // Check needsUpdate or hasTechIssues
-      if (d.needsUpdate === 'Да' || (d.needsUpdate && d.needsUpdate !== 'Нет') || d.hasTechIssues === 'Да') {
-        items.push({ domain: d, reason: 'needs_update' });
-      }
-    }
-
-    // Sort: expired first, then inactive, then expiring (by daysLeft asc), then needs_update
-    items.sort((a, b) => {
-      const order = { expired: 0, inactive: 1, expiring: 2, needs_update: 3 };
-      if (order[a.reason] !== order[b.reason]) return order[a.reason] - order[b.reason];
-      if (a.daysLeft !== undefined && b.daysLeft !== undefined) return a.daysLeft - b.daysLeft;
-      return 0;
-    });
-
-    return items;
-  }, [domains]);
-
-  // Filtered attention domains based on active stat card
-  const filteredAttentionDomains = useMemo(() => {
-    if (!activeFilter) return attentionDomains;
-    if (activeFilter === 'all') {
-      return attentionDomains;
-    } else if (activeFilter === 'active') {
-      return attentionDomains.filter(item => activeDomains.some(d => d.id === item.domain.id));
-    } else if (activeFilter === 'expiring') {
-      return attentionDomains.filter(item => item.reason === 'expiring');
-    } else if (activeFilter === 'inactive') {
-      return attentionDomains.filter(item => inactiveDomains.some(d => d.id === item.domain.id));
-    }
-    return attentionDomains;
-  }, [activeFilter, attentionDomains, activeDomains, expiringDomains, inactiveDomains]);
-
-  // Recent domains — sorted by updatedAt descending (always independent of filter)
+  // Recent domains — sorted by updatedAt descending
   const recentDomains = useMemo(() => {
     return [...domains]
       .sort((a, b) => {
@@ -273,8 +232,31 @@ export default function Dashboard() {
         const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
         return dateB - dateA;
       })
-      .slice(0, 5);
+      .slice(0, 20);
   }, [domains]);
+
+  // Displayed domains based on active tab
+  const displayedDomains = useMemo(() => {
+    switch (activeFilter) {
+      case 'all': return recentDomains;
+      case 'attention': return needAttentionDomains;
+      case 'expiring': return expiringDomains;
+      case 'inactive': return inactiveDomains;
+      default: return recentDomains;
+    }
+  }, [activeFilter, recentDomains, needAttentionDomains, expiringDomains, inactiveDomains]);
+
+  const cardConfig = useMemo(() => {
+    switch (activeFilter) {
+      case 'all': return { title: 'Последние обновления', Icon: Globe, iconColor: 'text-primary', iconBg: 'bg-primary/10' };
+      case 'attention': return { title: 'Требуют внимания', Icon: AlertTriangle, iconColor: 'text-yellow-500', iconBg: 'bg-yellow-500/10' };
+      case 'expiring': return { title: 'Истекают', Icon: Clock, iconColor: 'text-orange-400', iconBg: 'bg-orange-500/10' };
+      case 'inactive': return { title: 'Не актуален / Истёк', Icon: AlertCircle, iconColor: 'text-destructive', iconBg: 'bg-destructive/10' };
+      default: return { title: 'Последние обновления', Icon: Globe, iconColor: 'text-primary', iconBg: 'bg-primary/10' };
+    }
+  }, [activeFilter]);
+
+  const CardIcon = cardConfig.Icon;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -290,23 +272,23 @@ export default function Dashboard() {
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title="Всего доменов"
-          value={totalDomains}
+          title="Последние обновления"
+          value={recentDomains.length}
           icon={Globe}
           bgColor="hsl(210 60% 18%)"
           glowColor="hsla(210, 100%, 50%, 0.15)"
-          onClick={() => handleFilterClick('all')}
+          onClick={() => setActiveFilter('all')}
           active={activeFilter === 'all'}
         />
         <StatsCard
-          title="Актуальные"
-          value={activeDomains.length}
-          icon={CheckCircle}
-          iconColor="text-success"
-          bgColor="hsl(142 50% 16%)"
-          glowColor="hsla(142, 76%, 36%, 0.15)"
-          onClick={() => handleFilterClick('active')}
-          active={activeFilter === 'active'}
+          title="Требуют внимания"
+          value={needAttentionDomains.length}
+          icon={AlertTriangle}
+          iconColor="text-yellow-500"
+          bgColor="hsl(50 50% 14%)"
+          glowColor="hsla(50, 90%, 50%, 0.12)"
+          onClick={() => setActiveFilter('attention')}
+          active={activeFilter === 'attention'}
         />
         <StatsCard
           title="Истекают (<30 дней)"
@@ -314,10 +296,10 @@ export default function Dashboard() {
           change={expiringDomains.length > 0 ? "Требуют продления" : undefined}
           changeType="negative"
           icon={Clock}
-          iconColor="text-warning"
-          bgColor="hsl(38 55% 16%)"
-          glowColor="hsla(38, 92%, 50%, 0.15)"
-          onClick={() => handleFilterClick('expiring')}
+          iconColor="text-orange-400"
+          bgColor="hsl(25 55% 16%)"
+          glowColor="hsla(25, 90%, 50%, 0.15)"
+          onClick={() => setActiveFilter('expiring')}
           active={activeFilter === 'expiring'}
         />
         <StatsCard
@@ -327,40 +309,42 @@ export default function Dashboard() {
           iconColor="text-destructive"
           bgColor="hsl(0 50% 17%)"
           glowColor="hsla(0, 85%, 60%, 0.15)"
-          onClick={() => handleFilterClick('inactive')}
+          onClick={() => setActiveFilter('inactive')}
           active={activeFilter === 'inactive'}
         />
       </div>
 
       {/* Two Column Layout */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Urgent Domains */}
+        {/* Domain List — driven by active tab */}
         <Card className="lg:col-span-2 border border-white/[0.06] rounded-2xl bg-gradient-to-br from-card/80 to-card/40 overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-3 pt-5 px-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warning/10">
-                <AlertTriangle className="h-4 w-4 text-warning" />
+              <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", cardConfig.iconBg)}>
+                <CardIcon className={cn("h-4 w-4", cardConfig.iconColor)} />
               </div>
               <CardTitle className="text-base font-semibold tracking-tight">
-                {activeFilter === 'active' ? 'Активные домены' : activeFilter === 'all' ? 'Все домены' : 'Требуют внимания'}
+                {cardConfig.title}
               </CardTitle>
             </div>
-            <Badge variant="outline" className="rounded-lg border-white/[0.08] bg-white/[0.04] text-xs font-medium px-2.5 py-1">
-              {activeFilter === 'active' ? activeDomains.length : activeFilter === 'all' ? domains.length : filteredAttentionDomains.length} доменов
-            </Badge>
+            <p className="text-xs text-muted-foreground/60">
+              <span className="font-semibold text-foreground">{displayedDomains.length}</span> из <span className="font-semibold text-foreground">{totalDomains}</span> доменов
+            </p>
           </CardHeader>
           <CardContent className="px-5 pb-5">
-            {activeFilter === 'active' || activeFilter === 'all' ? (
-              <div className="space-y-3">
-                {(activeFilter === 'active' ? activeDomains : domains).map((domain) => {
+            {displayedDomains.length > 0 ? (
+              <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                {displayedDomains.map((domain) => {
                   const statusLabel = DOMAIN_STATUS_LABELS[domain.status as DomainStatus] || domain.status;
                   const statusColor = domain.status === 'actual' ? 'text-success'
                     : domain.status === 'expired' || domain.status === 'not_actual' ? 'text-destructive'
-                    : domain.status === 'expiring' ? 'text-warning'
+                    : domain.status === 'expiring' ? 'text-orange-400'
+                    : domain.status === 'unknown' || domain.status === 'not_configured' || domain.status === 'test' ? 'text-yellow-500'
                     : 'text-muted-foreground';
                   const StatusIcon = domain.status === 'actual' ? CheckCircle
                     : domain.status === 'expired' || domain.status === 'not_actual' ? AlertCircle
                     : domain.status === 'expiring' ? Clock
+                    : domain.status === 'unknown' || domain.status === 'not_configured' || domain.status === 'test' ? AlertTriangle
                     : Globe;
                   return (
                     <div 
@@ -368,56 +352,18 @@ export default function Dashboard() {
                       className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/[0.04] p-3.5 transition-all hover:bg-white/[0.05] hover:border-white/[0.08] cursor-pointer group/row"
                       onClick={() => navigate(`/domains/${domain.id}`)}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/[0.04] shrink-0">
-                          <StatusIcon className={`h-4 w-4 ${statusColor}`} />
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg shrink-0", cardConfig.iconBg)}>
+                          <StatusIcon className={cn("h-4 w-4", statusColor)} />
                         </div>
-                        <div>
-                          <p className="font-mono text-sm font-medium group-hover/row:text-primary transition-colors">{domain.name}</p>
+                        <div className="min-w-0">
+                          <p className="font-mono text-sm font-medium group-hover/row:text-primary transition-colors truncate">{domain.name}</p>
                           <p className="text-xs text-muted-foreground/60">{DOMAIN_TYPE_LABELS[domain.type as DomainType] || 'Не известно'}</p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className={`text-sm font-medium ${statusColor}`}>{statusLabel}</p>
-                        <p className="text-xs text-muted-foreground/50">{domain.department || '—'}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : filteredAttentionDomains.length > 0 ? (
-              <div className="space-y-3">
-                {filteredAttentionDomains.map(({ domain, reason, daysLeft }) => {
-                  const isExpired = reason === 'expired';
-                  const isExpiring = reason === 'expiring';
-                  const isNeedsUpdate = reason === 'needs_update';
-                  const isInactive = reason === 'inactive';
-                  return (
-                    <div 
-                      key={`${domain.id}-${reason}`}
-                      className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/[0.04] p-3.5 transition-all hover:bg-white/[0.05] hover:border-white/[0.08] cursor-pointer group/row"
-                      onClick={() => navigate(`/domains/${domain.id}`)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "flex h-8 w-8 items-center justify-center rounded-lg shrink-0",
-                          isExpired ? "bg-destructive/10" : isNeedsUpdate ? "bg-yellow-500/10" : isInactive ? "bg-muted/30" : "bg-warning/10"
-                        )}>
-                          <AlertTriangle className={`h-4 w-4 ${isInactive ? "text-muted-foreground" : isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`} />
-                        </div>
-                        <div>
-                          <p className="font-mono text-sm font-medium group-hover/row:text-primary transition-colors">{domain.name}</p>
-                          <p className="text-xs text-muted-foreground/60">{DOMAIN_TYPE_LABELS[domain.type as DomainType] || 'Не известно'}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-sm font-medium ${isInactive ? "text-muted-foreground" : isNeedsUpdate ? "text-yellow-500" : isExpired ? "text-destructive" : "text-warning"}`}>
-                          {isExpired && "Истёк"}
-                          {isExpiring && `Истекает (<30 дней)`}
-                          {isNeedsUpdate && "Требует обновления"}
-                          {isInactive && (domain.status === 'not_actual' ? "Не актуален" : "Не известно")}
-                        </p>
-                        <p className="text-xs text-muted-foreground/50">{domain.department || '—'}</p>
+                      <div className="text-right shrink-0 ml-3">
+                        <p className={cn("text-xs", statusColor)}>{statusLabel}</p>
+                        <p className="text-[11px] text-muted-foreground/40">{domain.department || '—'}</p>
                       </div>
                     </div>
                   );
@@ -431,10 +377,8 @@ export default function Dashboard() {
                     <CheckCircle className="h-8 w-8 text-success/40" />
                   </div>
                 </div>
-                <p className="text-sm font-medium text-muted-foreground/70">
-                  Все домены в порядке
-                </p>
-                <p className="text-xs text-muted-foreground/40 mt-1">Нет проблем, требующих внимания</p>
+                <p className="text-sm font-medium text-muted-foreground/70">Всё в порядке</p>
+                <p className="text-xs text-muted-foreground/40 mt-1">Нет доменов в этой категории</p>
               </div>
             )}
           </CardContent>
@@ -442,13 +386,25 @@ export default function Dashboard() {
 
         {/* Quick Stats */}
         <Card className="border border-white/[0.06] rounded-2xl bg-gradient-to-br from-card/80 to-card/40 overflow-hidden">
-          <CardHeader className="pb-3 pt-5 px-5">
+          <CardHeader className="pb-3 pt-5 px-5 space-y-3">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
                 <TrendingUp className="h-4 w-4 text-primary" />
               </div>
               <CardTitle className="text-base font-semibold tracking-tight">По типам</CardTitle>
             </div>
+            {/* Project filter dropdown */}
+            <Select value={selectedProject} onValueChange={setSelectedProject}>
+              <SelectTrigger className="bg-muted/30 border-white/[0.06] h-9 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Все проекты</SelectItem>
+                {availableProjects.map(project => (
+                  <SelectItem key={project} value={project}>{project}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </CardHeader>
           <CardContent className="px-5 pb-5">
             <div className="space-y-3.5">
@@ -466,20 +422,27 @@ export default function Dashboard() {
                 { type: "unknown" as DomainType, color: "bg-gray-400" },
               ] as { type: DomainType; color: string }[]).map(({ type, color }) => {
                 const label = DOMAIN_TYPE_LABELS[type];
-                const count = domains.filter(d => d.type === type).length;
-                const percentage = totalDomains > 0 ? Math.round((count / totalDomains) * 100) : 0;
+                const count = filteredDomainsForTypes.filter(d => d.type === type).length;
+                const filteredTotal = filteredDomainsForTypes.length;
+                const percentage = filteredTotal > 0 ? Math.round((count / filteredTotal) * 100) : 0;
                 if (count === 0) return null;
                 return (
-                  <div key={type} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground/80">{label}</span>
-                      <span className="font-semibold text-xs bg-white/[0.06] px-2 py-0.5 rounded-md">{count}</span>
+                  <div key={type} className="group space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-sm text-muted-foreground/80 group-hover:text-muted-foreground transition-colors">{label}</span>
+                        <span className="text-xs font-medium text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors">({percentage}%)</span>
+                      </div>
+                      <span className="text-xs font-semibold tabular-nums bg-white/[0.06] px-2 py-0.5 rounded-md group-hover:bg-white/[0.1] transition-colors">{count}</span>
                     </div>
-                    <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                    <div className="h-2.5 rounded-full bg-gradient-to-r from-white/[0.03] to-white/[0.06] overflow-hidden relative shadow-inner">
                       <div 
-                        className={`h-full rounded-full ${color} transition-all duration-500`} 
+                        className={`h-full rounded-full ${color} transition-all duration-700 ease-out relative overflow-hidden`} 
                         style={{ width: `${Math.max(percentage, 4)}%` }}
-                      />
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-50" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
+                      </div>
                     </div>
                   </div>
                 );
@@ -487,31 +450,6 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Recent Domains */}
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Clock className="h-4 w-4 text-primary" />
-            </div>
-            <h2 className="text-base font-semibold tracking-tight">Последние обновления</h2>
-          </div>
-          <button 
-            onClick={() => navigate("/domains")}
-            className="text-xs font-medium text-muted-foreground/60 hover:text-primary transition-colors"
-          >
-            Все домены →
-          </button>
-        </div>
-        <DomainTable 
-          domains={recentDomains} 
-          bulkSelectMode={false}
-          selectedDomainIds={new Set()}
-          onToggleDomain={() => {}}
-          labels={labels}
-        />
       </div>
     </div>
   );
